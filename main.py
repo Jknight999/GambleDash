@@ -3,6 +3,7 @@ from time import sleep
 import random
 import math
 
+FRAMERATE = 80
 
 class Player:
     def __init__(self, sw, sh, floor_y):
@@ -94,5 +95,5 @@ while running:
     draw_player(player)
     draw_spike(spike)
     #4. Update and Wait
-    sleep(0.02)
+    sleep(1/FRAMERATE)
     pygame.display.flip()
