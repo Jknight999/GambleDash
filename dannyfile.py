@@ -1,10 +1,12 @@
+#imports
 import pygame
 from time import sleep
 import random
 
-
+#player class
 class Player:
     def __init__(self, sw, sh):
+        #setting char properties
         self.SCREENWIDTH = sw
         self.SCREENHEIGHT = sh
         self.w = 20
@@ -15,9 +17,11 @@ class Player:
         self.x_vel = 10
         self.y_vel = 10
 
+    #jump function, only called when jumping = 1
     def jump(self):
         pass
 
+#draws player to the screen
 def draw_player(to_draw):
     global screen
     pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
@@ -27,6 +31,7 @@ SCREENHEIGHT = 600
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
 
+#creates the player
 player = Player(SCREENWIDTH, SCREENHEIGHT)
 
 running = True
@@ -39,12 +44,14 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        #jumping if space bar is pressed, otherwise not
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 jumping = 1
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
                 jumping = 0
+    #calls jump function if space bar is pushed
     if jumping:
         player.jump()
     #3. Draw New
