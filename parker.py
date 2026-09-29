@@ -24,14 +24,26 @@ floor_y = math.floor(0.66 * s_h)
 def draw_screen(s_w, s_h, floor_color):
     screen.fill((0, 0, 102))
     pygame.draw.rect(screen, floor_color, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
+    
+SCREENWIDTH = 800
+SCREENHEIGHT = 450
+
+floor_color = [0, 102, 255]
 '''
+
+floor_y = math.floor(0.66 * s_h)
+
+
+def draw_screen(s_w, s_h, floor_color):
+    screen.fill((0, 0, 102))
+    pygame.draw.rect(screen, floor_color, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
 
 
 SCREENWIDTH = 800
-SCREENHEIGHT = 800
-'''
+SCREENHEIGHT = 450
+
 floor_color = [0, 102, 255]
-'''
+
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
 pygame.display.update()
