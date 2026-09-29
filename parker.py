@@ -46,7 +46,7 @@ while running:
     #2. Make Changes
     draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
 
-    #3. Draw New
+    #3. Draw New bozo
     draw_player(player)
     #4. Update and Wait
     pygame.display.flip()
