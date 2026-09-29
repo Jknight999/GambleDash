@@ -42,6 +42,8 @@ pygame.init()
 player = Player(SCREENWIDTH, SCREENHEIGHT)
 floor_color = [0, 102, 255]
 running = True
+
+#why 0 instead of False? since it will only be True or False? I guess its the same thing
 jumping = 0
 
 while running:
