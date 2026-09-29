@@ -60,10 +60,10 @@ def draw_spike(to_draw):
     pygame.draw.polygon(screen, (255, 255, 255), to_draw.find_vertices())
 
 
-def draw_screen(s_w, s_h, floor_color):
+def draw_screen(s_w, s_h, floor):
     screen.fill((0, 0, 102))
     #calculates so that the floor always draws 2/3 of the way down
-    pygame.draw.rect(screen, floor_color, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
+    pygame.draw.rect(screen, floor, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
 
 #16:9 aspect ratio
 SCREENWIDTH = 800
