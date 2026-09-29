@@ -21,7 +21,7 @@ class Player:
 
     #player jump function, only called when jumping = 1
     def jump(self):
-        pass
+        self.y_vel = self.jump_strength
 
 #draws player to the screen
 def draw_player(to_draw):
@@ -31,9 +31,9 @@ def draw_player(to_draw):
 SCREENWIDTH = 600
 SCREENHEIGHT = 600
 
-def draw_screen(sw, sh, floor_color):
+def draw_screen(sw, sh, f_color):
     screen.fill((0, 0, 102))
-    pygame.draw.rect(screen, floor_color, (0, math.floor(0.66*sh), sw, math.ceil(0.34 * sh)))
+    pygame.draw.rect(screen, f_color, (0, math.floor(0.66*sh), sw, math.ceil(0.34 * sh)))
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
 
@@ -55,13 +55,21 @@ while running:
         #jumping if space bar is pressed, otherwise not
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                jumping = 1
+                if player.y == math.ceil(0.34 * SCREENHEIGHT):
+                    jumping = 1
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
                 jumping = 0
     #calls jump function if space bar is pushed
     if jumping:
         player.jump()
+        print("Jump")
+    player.y_vel += player.gravity
+    player.y += player.y_vel
+
+    if player.y >= math.ceil(0.34 * SCREENHEIGHT):
+        player.y = math.ceil(0.34 * SCREENHEIGHT)
+        player.y_vel = 0
     #3. Draw New
     draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
     draw_player(player)
