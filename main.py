@@ -84,7 +84,6 @@ while running:
 
     if jumping and player.y == math.ceil(floor_y - player.h):
         player.jump()
-        print("Jump")
 
     #2. Make Changes
     player.apply_physics()
