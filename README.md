@@ -1,8 +1,14 @@
 # GambleDash
 
 #TASK LIST:
-#1. make ground
-#2. player movement (L & R)
-#3. gravity and jump
-#4. scroller
-#5. level selection
+1. Make ground
+2. Gravity and jump
+3. Scroller
+4. Level w/ coins
+5. Level selection
+6. Gambling
+
+
+Optional Tasks:
+- Level Editor
+- 
