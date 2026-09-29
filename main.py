@@ -33,14 +33,15 @@ class Spike:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.width = 50
-        self.height = 50
+        self.width = 40
+        self.height = 40
+        self.speed = 15
 
     def find_vertices(self):
         return [[self.x - self.width/2, self.y], [self.x, self.y - self.height], [self.x + self.width/2, self.y]]
 
     def scroll(self):
-        self.x -= 20
+        self.x -= self.speed
         if self.x < 0:
             self.__init__(screen.get_width() - 50, floor_y)
 
