@@ -14,8 +14,8 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (0, 200, 0)
         self.y_vel = 0
-        self.gravity = 0.8
-        self.jump_strength = -12
+        self.gravity = 1.5
+        self.jump_strength = -20
 
     def jump(self):
         self.y_vel = self.jump_strength
