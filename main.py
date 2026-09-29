@@ -13,7 +13,20 @@ class Player:
         self.x = (self.SCREENWIDTH - self.w) / 5
         self.y = (floor_y - self.h)
         self.color = (0, 200, 0)
+        self.y_vel = 0
+        self.gravity = 0.8
+        self.jump_strength = -12
 
+    def jump(self):
+        self.y_vel = self.jump_strength
+
+    def apply_physics(self):
+        self.y_vel += player.gravity
+        self.y += player.y_vel
+
+        if player.y >= math.ceil(floor_y - self.h):
+            self.y = math.ceil(floor_y - self.h)
+            self.y_vel = 0
 
 def draw_player(to_draw):
     global screen
@@ -33,20 +46,28 @@ floor_y = math.floor(0.66 * SCREENHEIGHT)
 floor_color = [0, 102, 255]
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
-pygame.display.update()
 
 player = Player(SCREENWIDTH, SCREENHEIGHT, floor_y)
 
 running = True
-
+jumping = 0
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                jumping = 1
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_SPACE:
+                jumping = 0
 
-    #1. Erase Old
-    screen.fill(0)
+    if jumping and player.y == math.ceil(floor_y - player.h):
+        player.jump()
+        print("Jump")
+
     #2. Make Changes
+    player.apply_physics()
 
     #3. Draw New
     draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)

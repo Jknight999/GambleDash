@@ -71,6 +71,7 @@ player = Player(SCREENWIDTH, SCREENHEIGHT)
 
 running = True
 
+jumping = 0
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -82,6 +83,9 @@ while running:
             if event.key == pygame.K_SPACE:
                 jumping = 0
 
+    if jumping:
+        player.jump()
+        print("Jump")
     #1. Erase Old
     screen.fill(0)
     #2. Make Changes
