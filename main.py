@@ -57,10 +57,10 @@ def draw_spike(to_draw):
     pygame.draw.polygon(screen, (255, 255, 255), to_draw.find_vertices())
 
 
-def draw_screen(s_w, s_h, floor_color):
+def draw_screen(s_w, s_h, color):
     screen.fill((0, 0, 102))
     #calculates so that it always draws 2/3 of the way down
-    pygame.draw.rect(screen, floor_color, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
+    pygame.draw.rect(screen, color, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
 
 #16:9 aspect ratio
 SCREENWIDTH = 800
@@ -95,7 +95,7 @@ while running:
             if event.key == pygame.K_SPACE:
                 jumping = 0
 
-    #coded in this way to allow for holding the spacebar
+    #coded in this way to allow for holding the space bar
     if jumping and player.y == math.ceil(floor_y - player.h):
         player.jump()
 
