@@ -31,9 +31,9 @@ def draw_player(to_draw):
 SCREENWIDTH = 600
 SCREENHEIGHT = 600
 
-def draw_screen(sw, sh, floor_color):
+def draw_screen(sw, sh, f_color):
     screen.fill((0, 0, 102))
-    pygame.draw.rect(screen, floor_color, (0, math.floor(0.66*sh), sw, math.ceil(0.34 * sh)))
+    pygame.draw.rect(screen, f_color, (0, math.floor(0.66*sh), sw, math.ceil(0.34 * sh)))
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
 
