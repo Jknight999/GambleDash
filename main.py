@@ -1,3 +1,5 @@
+# COMMENT YOUR FUCKING CODE
+# As we add more stuff it will become less readable
 import pygame
 from time import sleep
 import random
@@ -40,10 +42,11 @@ class Spike:
     def find_vertices(self):
         #calculates where the vertices should be based off x, y, w and h of the spike
         #needed because triangles drawn through draw.polygon()
+        # These vertices should not be used for hitboxes, spike hitboxes are rectangular
         return [[self.x - self.width/2, self.y], [self.x, self.y - self.height], [self.x + self.width/2, self.y]]
 
     def scroll(self):
-        # moves spike from left to right side of screen
+        # moves spike from left to right side of screen, and loops it back to right
         self.x -= self.speed
         if self.x < 0:
             self.__init__(screen.get_width() - 50, floor_y)
@@ -59,7 +62,7 @@ def draw_spike(to_draw):
 
 def draw_screen(s_w, s_h, floor_color):
     screen.fill((0, 0, 102))
-    #calculates so that it always draws 2/3 of the way down
+    #calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor_color, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
 
 #16:9 aspect ratio
@@ -81,7 +84,7 @@ spike = Spike(screen.get_width() - 50, floor_y)
 running = True
 jumping = 0
 while running:
-    #clear screen
+    # Clear screen
     draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
 
     #2. Make Changes
@@ -95,7 +98,7 @@ while running:
             if event.key == pygame.K_SPACE:
                 jumping = 0
 
-    #coded in this way to allow for holding the spacebar
+    # Coded in this way to allow for holding jump
     if jumping and player.y == math.ceil(floor_y - player.h):
         player.jump()
 
