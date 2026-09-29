@@ -1,30 +1,41 @@
 import pygame
 from time import sleep
 import random
+import math
 
 
 class Player:
-    def __init__(self, sw, sh):
+    def __init__(self, sw, sh, floor_y):
         self.SCREENWIDTH = sw
         self.SCREENHEIGHT = sh
-        self.w = 10
-        self.h = 10
-        self.x = (self.SCREENWIDTH - self.w) / 2
-        self.y = (self.SCREENHEIGHT - self.h) / 2
-        self.color = (255, 0, 0)
+        self.w = 40
+        self.h = 40
+        self.x = (self.SCREENWIDTH - self.w) / 5
+        self.y = (floor_y - self.h)
+        self.color = (0, 200, 0)
 
 
 def draw_player(to_draw):
     global screen
     pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
-SCREENWIDTH = 600
-SCREENHEIGHT = 600
+
+def draw_screen(s_w, s_h, floor_color):
+    screen.fill((0, 0, 102))
+    pygame.draw.rect(screen, floor_color, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
+
+
+SCREENWIDTH = 800
+SCREENHEIGHT = 450
+
+floor_y = math.floor(0.66 * SCREENHEIGHT)
+
+floor_color = [0, 102, 255]
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
 pygame.display.update()
 
-player = Player(SCREENWIDTH, SCREENHEIGHT)
+player = Player(SCREENWIDTH, SCREENHEIGHT, floor_y)
 
 running = True
 
@@ -38,6 +49,8 @@ while running:
     #2. Make Changes
 
     #3. Draw New
+    draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
     draw_player(player)
     #4. Update and Wait
     sleep(0.02)
+    pygame.display.flip()
