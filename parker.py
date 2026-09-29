@@ -20,6 +20,7 @@ def draw_player(to_draw):
     pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
 '''
+floor_y = math.floor(0.66 * s_h)
 def draw_screen(s_w, s_h, floor_color):
     screen.fill((0, 0, 102))
     pygame.draw.rect(screen, floor_color, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
