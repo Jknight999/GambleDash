@@ -38,9 +38,12 @@ class Spike:
         self.speed = 15
 
     def find_vertices(self):
+        #calculates where the vertices should be based off x, y, w and h of the spike
+        #needed because triangles drawn through draw.polygon()
         return [[self.x - self.width/2, self.y], [self.x, self.y - self.height], [self.x + self.width/2, self.y]]
 
     def scroll(self):
+        # moves spike from left to right side of screen
         self.x -= self.speed
         if self.x < 0:
             self.__init__(screen.get_width() - 50, floor_y)
@@ -56,24 +59,32 @@ def draw_spike(to_draw):
 
 def draw_screen(s_w, s_h, floor_color):
     screen.fill((0, 0, 102))
+    #calculates so that it always draws 2/3 of the way down
     pygame.draw.rect(screen, floor_color, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
 
-
+#16:9 aspect ratio
 SCREENWIDTH = 800
 SCREENHEIGHT = 450
 
+#where the top of the floor is (for collision physics principles)
 floor_y = math.floor(0.66 * SCREENHEIGHT)
 
+#in a list, so IT CAN CHANGE
 floor_color = [0, 102, 255]
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
 
+#initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, floor_y)
 spike = Spike(screen.get_width() - 50, floor_y)
 
 running = True
 jumping = 0
 while running:
+    #clear screen
+    draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
+
+    #2. Make Changes
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -84,17 +95,17 @@ while running:
             if event.key == pygame.K_SPACE:
                 jumping = 0
 
+    #coded in this way to allow for holding the spacebar
     if jumping and player.y == math.ceil(floor_y - player.h):
         player.jump()
 
-    #2. Make Changes
     player.apply_physics()
     spike.scroll()
 
     #3. Draw New
-    draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
     draw_player(player)
     draw_spike(spike)
+
     #4. Update and Wait
     sleep(1/FRAMERATE)
     pygame.display.flip()
