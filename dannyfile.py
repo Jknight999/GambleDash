@@ -1,6 +1,7 @@
 #imports
 import pygame
 from time import sleep
+import math
 import random
 
 #player class
@@ -14,10 +15,11 @@ class Player:
         self.x = (self.SCREENWIDTH - self.w) / 2
         self.y = (self.SCREENHEIGHT - self.h) / 2
         self.color = (255, 0, 0)
-        self.x_vel = 10
-        self.y_vel = 10
+        self.y_vel = 0
+        self.gravity = 0.8
+        self.jump_strength = -12
 
-    #jump function, only called when jumping = 1
+    #player jump function, only called when jumping = 1
     def jump(self):
         pass
 
@@ -28,12 +30,16 @@ def draw_player(to_draw):
 
 SCREENWIDTH = 600
 SCREENHEIGHT = 600
+
+def draw_screen(sw, sh, floor_color):
+    screen.fill((0, 0, 102))
+    pygame.draw.rect(screen, floor_color, (0, math.floor(0.66*sh), sw, math.ceil(0.34 * sh)))
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
 
 #creates the player
 player = Player(SCREENWIDTH, SCREENHEIGHT)
-
+floor_color = [0, 102, 255]
 running = True
 jumping = 0
 
@@ -55,6 +61,7 @@ while running:
     if jumping:
         player.jump()
     #3. Draw New
+    draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
     draw_player(player)
 
     #4. Update and Wait
