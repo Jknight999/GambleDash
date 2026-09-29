@@ -21,6 +21,7 @@ class Player:
 
     #player jump function, only called when jumping = 1
     def jump(self):
+
         pass
 
 #draws player to the screen
