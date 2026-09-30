@@ -42,7 +42,7 @@ player = Player(SCREENWIDTH, SCREENHEIGHT)
 floor_color = [0, 102, 255]
 running = True
 
-#why 0 instead of False? since it will only be True or False? I guess its the same thing
+#why 0 instead of False? since it will only be True or False? I guess it's the same thing
 jumping = 0
 
 while running:
@@ -53,22 +53,24 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         #jumping if space bar is pressed, otherwise not
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                if player.y == math.ceil(0.34 * SCREENHEIGHT):
-                    jumping = 1
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_SPACE:
-                jumping = 0
+
+
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_SPACE]:
+        if player.y >= math.ceil(0.66 * SCREENHEIGHT) - player.h:
+            player.y = math.ceil(0.66 * SCREENHEIGHT) - player.h
+            player.jump()
+
     #calls jump function if space bar is pushed
     if jumping:
-        player.jump()
         print("Jump")
     player.y_vel += player.gravity
     player.y += player.y_vel
 
-    if player.y >= math.ceil(0.34 * SCREENHEIGHT):
-        player.y = math.ceil(0.34 * SCREENHEIGHT)
+
+    if player.y >= math.ceil(0.66 * SCREENHEIGHT) - player.h:
+        player.y = math.ceil(0.66 * SCREENHEIGHT) - player.h
         player.y_vel = 0
     #3. Draw New
     draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
