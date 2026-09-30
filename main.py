@@ -60,7 +60,6 @@ def draw_spike(to_draw, amount):
     spike_to_draw = [None] * len(amount)
     global screen
     for i in amount:
-        print(i)
         spike_to_draw[i] = to_draw.find_vertices(i)
         pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i])
 
