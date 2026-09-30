@@ -1,8 +1,11 @@
+# COMMENT YOUR F***ING CODE
+# As we add more stuff it will become less readable
 import pygame
 from time import sleep
 import random
 import math
 
+FRAMERATE = 80
 
 class Player:
     def __init__(self, sw, sh, floor_y):
@@ -29,49 +32,68 @@ class Player:
             self.y_vel = 0
 
 class Spike:
-    def __init__(self, x, y):
+    def __init__(self, x, y, amount):
         self.x = x
         self.y = y
-        self.width = 50
-        self.height = 50
+        self.width = 40
+        self.height = 40
+        self.speed = 15
+        self.amount = [i for i in range(amount)]
 
-    def find_vertices(self):
-        return [[self.x - self.width/2, self.y], [self.x, self.y - self.height], [self.x + self.width/2, self.y]]
+    def find_vertices(self, spike_number):
+        #calculates where the vertices should be based off x, y, w and h of the spike
+        #needed because triangles drawn through draw.polygon()
+        # These vertices should not be used for hitboxes, spike hitboxes are rectangular
+        return [[self.x - self.width/2 + spike_number * self.width, self.y], [self.x + spike_number * self.width, self.y - self.height], [self.x + self.width/2 + spike_number * self.width, self.y]]
 
     def scroll(self):
-        self.x -= 20
+        # moves spike from left to right side of screen, and loops it back to right
+        self.x -= self.speed
         if self.x < 0:
-            self.__init__(screen.get_width() - 50, floor_y)
+            self.__init__(screen.get_width() - 50, floor_y, random.randint(1, 3))
 
 def draw_player(to_draw):
     global screen
     pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
-def draw_spike(to_draw):
+def draw_spike(to_draw, amount):
+    spike = [None] * len(amount)
     global screen
-    pygame.draw.polygon(screen, (255, 255, 255), to_draw.find_vertices())
+    for i in amount:
+        print(i)
+        spike[i] = to_draw.find_vertices(i)
+        pygame.draw.polygon(screen, (255, 255, 255), spike[i])
 
 
-def draw_screen(s_w, s_h, floor_color):
+def draw_screen(s_w, s_h, floor):
     screen.fill((0, 0, 102))
-    pygame.draw.rect(screen, floor_color, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
+    #calculates so that the floor always draws 2/3 of the way down
+    pygame.draw.rect(screen, floor, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
 
-
+#16:9 aspect ratio
 SCREENWIDTH = 800
 SCREENHEIGHT = 450
 
+#where the top of the floor is (for collision physics principles)
 floor_y = math.floor(0.66 * SCREENHEIGHT)
 
+#in a list, so IT CAN CHANGE
 floor_color = [0, 102, 255]
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
 
+
+#initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, floor_y)
-spike = Spike(screen.get_width() - 50, floor_y)
+spike = Spike(screen.get_width() - 50, floor_y, random.randint(1, 3))
 
 running = True
 jumping = 0
 while running:
+    # Clear screen
+    draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
+
+    #2. Make Changes
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -82,18 +104,17 @@ while running:
             if event.key == pygame.K_SPACE:
                 jumping = 0
 
+    # Coded in this way to allow for holding jump
     if jumping and player.y == math.ceil(floor_y - player.h):
         player.jump()
-        print("Jump")
 
-    #2. Make Changes
     player.apply_physics()
     spike.scroll()
 
     #3. Draw New
-    draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
     draw_player(player)
-    draw_spike(spike)
+    draw_spike(spike, spike.amount)
+
     #4. Update and Wait
-    sleep(0.02)
+    sleep(1/FRAMERATE)
     pygame.display.flip()
