@@ -1,4 +1,4 @@
-# COMMENT YOUR FUCKING CODE
+# COMMENT YOUR F***ING CODE
 # As we add more stuff it will become less readable
 import pygame
 from time import sleep
