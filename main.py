@@ -57,12 +57,12 @@ def draw_player(to_draw):
     pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
 def draw_spike(to_draw, amount):
-    spike = [None] * len(amount)
+    spike_to_draw = [None] * len(amount)
     global screen
     for i in amount:
         print(i)
-        spike[i] = to_draw.find_vertices(i)
-        pygame.draw.polygon(screen, (255, 255, 255), spike[i])
+        spike_to_draw[i] = to_draw.find_vertices(i)
+        pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i])
 
 
 def draw_screen(s_w, s_h, floor):
@@ -87,6 +87,9 @@ pygame.init()
 player = Player(SCREENWIDTH, SCREENHEIGHT, floor_y)
 spike = Spike(screen.get_width() - 50, floor_y, random.randint(1, 3))
 
+# List of buttons that can be used to jump
+jump_buttons = [pygame.K_w, pygame.K_SPACE]
+
 running = True
 jumping = 0
 while running:
@@ -98,10 +101,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
+            if event.key in jump_buttons:
                 jumping = 1
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_SPACE:
+            if event.key in jump_buttons:
                 jumping = 0
 
     # Coded in this way to allow for holding jump
