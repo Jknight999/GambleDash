@@ -1,11 +1,12 @@
 # COMMENT YOUR F***ING CODE
 # As we add more stuff it will become less readable
+# Also MULTIPLY ALL MOVEMENT BY "dt". dt stands for delta time
+# and makes physics independent of framerate.
 import pygame
-from time import sleep
 import random
 import math
 
-FRAMERATE = 80
+FRAMERATE = 120
 
 class Player:
     def __init__(self, sw, sh, floor_y):
@@ -17,15 +18,15 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (0, 200, 0)
         self.y_vel = 0
-        self.gravity = 1.5
-        self.jump_strength = -20
+        self.gravity = 120
+        self.jump_strength = -1600
 
     def jump(self):
         self.y_vel = self.jump_strength
 
     def apply_physics(self):
         self.y_vel += player.gravity
-        self.y += player.y_vel
+        self.y += player.y_vel * dt
 
         if player.y >= math.ceil(floor_y - self.h):
             self.y = math.ceil(floor_y - self.h)
@@ -37,7 +38,7 @@ class Spike:
         self.y = y
         self.width = 40
         self.height = 40
-        self.speed = 15
+        self.speed = 1200
         self.amount = [i for i in range(amount)]
 
     def find_vertices(self, spike_number):
@@ -48,7 +49,7 @@ class Spike:
 
     def scroll(self):
         # moves spike from left to right side of screen, and loops it back to right
-        self.x -= self.speed
+        self.x -= self.speed * dt
         if self.x < 0:
             self.__init__(screen.get_width() - 50, floor_y, random.randint(1, 3))
 
@@ -80,6 +81,7 @@ floor_y = math.floor(0.66 * SCREENHEIGHT)
 floor_color = [0, 102, 255]
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
+clock =  pygame.time.Clock()
 
 
 #initializes first instances of class
@@ -89,6 +91,7 @@ spike = Spike(screen.get_width() - 50, floor_y, random.randint(1, 3))
 # List of buttons that can be used to jump
 jump_buttons = [pygame.K_w, pygame.K_SPACE]
 
+dt = 0
 running = True
 jumping = 0
 while running:
@@ -118,5 +121,6 @@ while running:
     draw_spike(spike, spike.amount)
 
     #4. Update and Wait
-    sleep(1/FRAMERATE)
+    dt = clock.tick(FRAMERATE) / 1000
+    clock.tick(FRAMERATE)
     pygame.display.flip()
