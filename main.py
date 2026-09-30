@@ -57,10 +57,15 @@ def draw_player(to_draw):
     pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
 def draw_spike(to_draw, amount):
+    #creates a list of the spikes (so that it can be iterated through)
+    #empty so that it can be filled with the vertices of each spike
     spike_to_draw = [None] * len(amount)
     global screen
+    #loops once for each spike
     for i in amount:
+        #matches each spike to its vertices by passing in the spike number to the function, which returns its vertices
         spike_to_draw[i] = to_draw.find_vertices(i)
+        #draws each spike to the screeen
         pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i])
 
 
@@ -115,6 +120,7 @@ while running:
 
     #3. Draw New
     draw_player(player)
+    #new argument needs to be passed in - the amount of spikes wanted
     draw_spike(spike, spike.amount)
 
     #4. Update and Wait
