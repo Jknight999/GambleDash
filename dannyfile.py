@@ -14,10 +14,10 @@ class Player:
         self.y = 100
         self.color = (255, 0, 0)
         self.y_vel = 0
-        self.gravity = 120
-        self.jump_strength = -2000
+        self.gravity = 130
+        self.jump_strength = -1600
         self.angle = 0
-        self.rotation_speed = -4
+        self.rotation_speed = -9
         self.is_jumping = False
 
         #makes a transparent surface
