@@ -15,7 +15,9 @@ class Player:
         self.jump_strength = -900
         self.angle = 0
         self.rotation_speed = -450
+        #makes a sprite of the cube asset
         self.image = pygame.image.load("Assets/player_cube.png").convert_alpha()
+        #sets the size to 40 x 40
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
         self.rotated_surface = self.image
         # draws a box around the surface and snaps it to the center of the surface
