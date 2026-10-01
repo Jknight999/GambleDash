@@ -6,6 +6,15 @@ import pygame
 import random
 import math
 
+FRAMERATE = 120
+SCREENWIDTH = 800
+SCREENHEIGHT = SCREENWIDTH * 9 / 16
+screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
+pygame.init()
+clock =  pygame.time.Clock()
+
+player_sprite = pygame.image.load("Assets/player_cube.jpg").convert()
+player_sprite = pygame.transform.scale(player_sprite, (40,40))
 class Player:
     def __init__(self, sw, sh, floor_y):
         self.SCREENWIDTH = sw
@@ -19,11 +28,9 @@ class Player:
         self.gravity = 15000
         self.jump_strength = -1600
         self.angle = 0
-        self.rotation_speed = -9
+        self.rotation_speed = -7
         # makes a transparent surface
         self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
-        # draws the player onto the surface
-        pygame.draw.rect(self.surface, self.color, (0, 0, self.w, self.h))
         # makes a copy of the surface that will be rotated from the original surface by the turn angle
         self.rotated_surface = self.surface
         # draws a box around the surface and snaps it to the center of the surface
@@ -88,7 +95,7 @@ class Button:
 
 def draw_player(to_draw):
     global screen
-    screen.blit(to_draw.rotated_surface, to_draw.rect)
+    screen.blit(player_sprite, to_draw.rect)
     #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
 def draw_spike(to_draw, amount):
@@ -118,18 +125,13 @@ def parse_level(level,tick):
     if level[tick] == 1:
         spikes.append(Spike(screen.get_width() - 50, GROUND_Y, 1))
 
-# Forces 16:9 aspect ratio
-FRAMERATE = 120
-SCREENWIDTH = 800
-SCREENHEIGHT = SCREENWIDTH * 9 / 16
+
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.66 * SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
-screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
-pygame.init()
-clock =  pygame.time.Clock()
+
 
 # New level data list
 # 1 is a spike, 0 is nothing
