@@ -178,7 +178,7 @@ while running:
             player.rotate_player()
         for k in spikes:
             k.scroll()
-        if frame_counter % 4 == 0:
+        if frame_counter % 5 == 0:
             if tick_counter < len(level_1) - 1:
                 tick_counter += 1
             else:
