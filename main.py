@@ -3,7 +3,6 @@
 # Also MULTIPLY ALL MOVEMENT BY "dt". dt stands for delta time
 # and makes physics independent of framerate.
 import pygame
-import random
 import math
 
 FRAMERATE = 120
