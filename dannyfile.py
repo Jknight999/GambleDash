@@ -73,6 +73,10 @@ class Button:
             if click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1:
                 in_game = True
 
+#spike class
+class Spike:
+    pass
+
 #basic vars
 SCREENWIDTH = 1000
 SCREENHEIGHT = 600
