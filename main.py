@@ -101,7 +101,7 @@ def draw_spike(to_draw):
     global screen
     pygame.draw.polygon(screen, (0, 0, 0), to_draw.find_vertices())
     pygame.draw.polygon(screen, (255, 255, 255), to_draw.find_vertices(), width=3)
-    if SHOWHITBOXES:
+    if SHOW_SPIKE_HITBOXES:
         pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
     #loops once for each spike
     ''''
@@ -131,6 +131,7 @@ def parse_level(level,tick):
 FRAMERATE = 120
 SCREENWIDTH = 800
 SCREENHEIGHT = SCREENWIDTH * 9 / 16
+SHOW_SPIKE_HITBOXES = True
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.66 * SCREENHEIGHT)
 
