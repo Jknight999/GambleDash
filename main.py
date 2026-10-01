@@ -16,19 +16,38 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 15000
+        self.gravity = 130
         self.jump_strength = -1600
+        self.angle = 0
+        self.rotation_speed = -9
+        # makes a transparent surface
+        self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
+        # draws the player onto the surface
+        pygame.draw.rect(self.surface, self.color, (0, 0, self.w, self.h))
+        # makes a copy of the surface that will be rotated from the original surface by the turn angle
+        self.rotated_surface = self.surface
+        # draws a box around the surface and snaps it to the center of the surface
+        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
+
+    def rotate_player(self):
+        self.angle = (self.angle + self.rotation_speed) % 360
+        # rotates the surface
+        self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
+        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
     def jump(self):
         self.y_vel = self.jump_strength
 
     def apply_physics(self):
-        self.y_vel += self.gravity * dt
+        self.y_vel += self.gravity
         self.y += self.y_vel * dt
-
-        if player.y >= math.ceil(GROUND_Y - self.h):
-            self.y = math.ceil(GROUND_Y - self.h)
+        if self.y >= GROUND_Y - self.h:
+            self.y = GROUND_Y - self.h
             self.y_vel = 0
+            # snaps the cube back to flat on the ground
+            self.angle = round(self.angle / 90) * 90 % 360
+            self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
+        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
 class Spike:
     def __init__(self, x, y, amount):
@@ -46,7 +65,7 @@ class Spike:
         return [[self.x - self.width/2 + spike_number * self.width, self.y], [self.x + spike_number * self.width, self.y - self.height], [self.x + self.width/2 + spike_number * self.width, self.y]]
 
     def scroll(self):
-        # moves spike from left to right side of screen, and loops it back to right
+        # moves spike from left to right side of screen
         self.x -= self.speed * dt
 
 class Button:
@@ -69,7 +88,8 @@ class Button:
 
 def draw_player(to_draw):
     global screen
-    pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
+    screen.blit(to_draw.rotated_surface, to_draw.rect)
+    #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
 def draw_spike(to_draw, amount):
     #creates a list of the spikes (so that it can be iterated through)
@@ -90,6 +110,7 @@ def draw_platformer_screen(floor):
 
 #draws menu screen
 def draw_menu_screen():
+    screen.fill((17, 56, 171))
     play_button.draw_button(screen)
 
 # Takes the list of level data and puts a spike on 1s
@@ -112,12 +133,14 @@ clock =  pygame.time.Clock()
 
 # New level data list
 # 1 is a spike, 0 is nothing
+# Mess around and see if you can make something cool
+#could you possibly edit the construction of the list using the * string operator so that you just do '0' * 6, '1' * 3...
 level_1 = [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
 tick_counter = 0
 frame_counter = 0
 #initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
-play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (255, 0, 0))
+play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (14, 237, 70))
 # Allows multiple spikes to be on screen now
 spikes = []
 
@@ -129,8 +152,6 @@ running = True
 in_game = False
 jumping = 0
 while running:
-    # Clear screen
-
     #2. Make Changes
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -149,6 +170,8 @@ while running:
                 player.y = GROUND_Y - player.h
                 player.jump()
         player.apply_physics()
+        if player.y < GROUND_Y - player.h:
+            player.rotate_player()
         for k in spikes:
             k.scroll()
         if frame_counter % 4 == 0:
