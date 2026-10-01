@@ -1,6 +1,5 @@
 #imports
 import pygame
-
 import math
 
 #player class
