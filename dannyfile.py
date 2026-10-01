@@ -1,5 +1,4 @@
 import pygame
-import random
 import math
 
 class Player:
@@ -75,12 +74,13 @@ class Button:
         pygame.draw.rect(surface, self.color, self.rect)
 
     #checks if the button is clicked and loads GambleDash
-    def check_button_click(self, click_event):
+    def check_button_click(self, click_event, button_type):
         global in_game
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             if click_event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                in_game = True
+                if button_type == "Play":
+                    in_game = True
 
 def draw_player(to_draw):
     global screen
@@ -156,7 +156,7 @@ while running:
             if event.key == pygame.K_p:
                 in_game = not in_game
         # sends event to button to see if it's been clicked
-        play_button.check_button_click(event)
+        play_button.check_button_click(event, "Play")
 
     if in_game:
         # jumping if space bar is pressed, otherwise not
