@@ -53,8 +53,8 @@ class Spike:
     def __init__(self, x, y, amount):
         self.x = x
         self.y = y
-        self.width = 40
-        self.height = 40
+        self.width = SCREENWIDTH / 20
+        self.height = SCREENHEIGHT / 11.25
         self.speed = 1200
         self.amount = [i for i in range(amount)]
 
