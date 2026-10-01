@@ -83,7 +83,7 @@ floor_y = math.floor(0.66 * SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
 floor_color = [0, 102, 255]
-screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 pygame.init()
 clock =  pygame.time.Clock()
 
