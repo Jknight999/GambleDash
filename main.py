@@ -13,10 +13,10 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 4500
+        self.gravity = 1800000 / SCREENHEIGHT
         self.jump_strength = -900
         self.angle = 0
-        self.rotation_speed = -450
+        self.rotation_speed = -(self.gravity / 10)
 
         #makes a sprite of the cube asset
         self.image = pygame.image.load("Assets/player_cube.png").convert_alpha()
@@ -56,7 +56,7 @@ class Spike:
         self.width = SCREENWIDTH / 20
         self.height = SCREENHEIGHT / 10
         self.speed = 450
-        self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 5, self.width / 5, self.height / 1.8)
+        self.hitbox = pygame.Rect(x + self.width / 2.8, self.y + self.height / 3, self.width / 3.5, self.height / 2.3)
 
     def find_vertices(self):
         #calculates where the vertices should be based off x, y, w and h of the spike
@@ -67,7 +67,7 @@ class Spike:
     def scroll(self):
         # moves spike from left to right side of screen
         self.x -= self.speed * dt
-        self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 5, self.width / 5, self.height / 1.8)
+        self.hitbox = pygame.Rect(self.x + self.width / 2.8, self.y + self.height / 3, self.width / 3.5, self.height / 2.3)
 
     def check_collision(self):
         global running
@@ -130,11 +130,11 @@ def draw_menu_screen():
 # Takes the list of level data and puts a spike on 1s
 def parse_level(level,tick):
     if level[tick] == 1:
-        spikes.append(Spike(screen.get_width(), GROUND_Y - 40))
+        spikes.append(Spike(screen.get_width(), GROUND_Y - SCREENHEIGHT / 10))
 
 # Forces 16:9 aspect ratio
 FRAMERATE = 120
-SCREENWIDTH = 800
+SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
 SHOW_SPIKE_HITBOXES = True
 #where the top of the floor is (for collision physics principles)
@@ -191,7 +191,7 @@ while running:
             player.rotate_player()
         for k in spikes:
             k.scroll()
-        if frame_counter % 5 == 0:
+        if frame_counter % math.floor(SCREENWIDTH / 160) == 0:
             if tick_counter < len(level_1) - 1:
                 tick_counter += 1
             else:
