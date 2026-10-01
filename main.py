@@ -6,8 +6,6 @@ import pygame
 import random
 import math
 
-FRAMERATE = 120
-
 class Player:
     def __init__(self, sw, sh, floor_y):
         self.SCREENWIDTH = sw
@@ -28,8 +26,8 @@ class Player:
         self.y_vel += self.gravity
         self.y += self.y_vel * dt
 
-        if player.y >= math.ceil(floor_y - self.h):
-            self.y = math.ceil(floor_y - self.h)
+        if player.y >= math.ceil(GROUND_Y - self.h):
+            self.y = math.ceil(GROUND_Y - self.h)
             self.y_vel = 0
 
 class Spike:
@@ -51,7 +49,25 @@ class Spike:
         # moves spike from left to right side of screen, and loops it back to right
         self.x -= self.speed * dt
         if self.x < 0:
-            self.__init__(screen.get_width() - 50, floor_y, random.randint(1, 3))
+            self.__init__(screen.get_width() - 50, GROUND_Y, random.randint(1, 3))
+
+class Button:
+    #takes in characteristics as arguments and makes a rectangle with them
+    def __init__(self, x, y, w, h, color):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.color = color
+
+    #draws the button
+    def draw_button(self, surface):
+        pygame.draw.rect(surface, self.color, self.rect)
+
+    #checks if the button is clicked and loads GambleDash
+    def check_button_click(self, click_event):
+        global in_game
+        mouse_pos = pygame.mouse.get_pos()
+        if self.rect.collidepoint(mouse_pos):
+            if click_event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                in_game = True
 
 def draw_player(to_draw):
     global screen
@@ -69,18 +85,21 @@ def draw_spike(to_draw, amount):
         pygame.draw.polygon(screen, (0, 0, 0), spike_to_draw[i])
         pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i], width=3)
 
-
-def draw_screen(s_w, s_h, floor):
+def draw_platformer_screen(floor):
     screen.fill((17, 56, 171))
     #calculates so that the floor always draws 2/3 of the way down
-    pygame.draw.rect(screen, floor, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
+    pygame.draw.rect(screen, floor, (0, GROUND_Y, SCREENWIDTH, math.ceil(0.34 * SCREENHEIGHT)))
+
+#draws menu screen
+def draw_menu_screen():
+    play_button.draw_button(screen)
 
 #16:9 aspect ratio
+FRAMERATE = 120
 SCREENWIDTH = 800
 SCREENHEIGHT = 450
-
 #where the top of the floor is (for collision physics principles)
-floor_y = math.floor(0.66 * SCREENHEIGHT)
+GROUND_Y = math.floor(0.66 * SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
@@ -90,41 +109,48 @@ clock =  pygame.time.Clock()
 
 
 #initializes first instances of class
-player = Player(SCREENWIDTH, SCREENHEIGHT, floor_y)
-spike = Spike(screen.get_width() - 50, floor_y, random.randint(1, 3))
+player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
+spike = Spike(screen.get_width() - 50, GROUND_Y, random.randint(1, 3))
+play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (255, 0, 0))
 
 # List of buttons that can be used to jump
 jump_buttons = [pygame.K_w, pygame.K_SPACE]
 
 dt = 0
 running = True
+in_game = False
 jumping = 0
 while running:
     # Clear screen
-    draw_screen(SCREENWIDTH, SCREENHEIGHT, floor_color)
 
     #2. Make Changes
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key in jump_buttons:
-                jumping = 1
-        if event.type == pygame.KEYUP:
-            if event.key in jump_buttons:
-                jumping = 0
+            if event.key == pygame.K_p:
+                in_game = not in_game
+        # sends event to button to see if it's been clicked
+        play_button.check_button_click(event)
 
-    # Coded in this way to allow for holding jump
-    if jumping and player.y == math.ceil(floor_y - player.h):
-        player.jump()
+    if in_game:
+        # jumping if space bar is pressed, otherwise not
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            if player.y >= GROUND_Y - player.h:
+                player.y = GROUND_Y - player.h
+                player.jump()
+        player.apply_physics()
+        spike.scroll()
+    else:
+        pass
 
-    player.apply_physics()
-    spike.scroll()
-
-    #3. Draw New
-    draw_player(player)
-    #new argument needs to be passed in - the amount of spikes wanted
-    draw_spike(spike, spike.amount)
+    if in_game:
+        draw_platformer_screen(floor_color)
+        draw_player(player)
+        draw_spike(spike, spike.amount)
+    else:
+        draw_menu_screen()
 
     #4. Update and Wait
     dt = clock.tick(FRAMERATE) / 1000
