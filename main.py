@@ -16,7 +16,7 @@ class Player:
         self.h = 40
         self.x = (self.SCREENWIDTH - self.w) / 5
         self.y = (floor_y - self.h)
-        self.color = (0, 200, 0)
+        self.color = (14, 237, 70)
         self.y_vel = 0
         self.gravity = 120
         self.jump_strength = -1600
@@ -66,11 +66,12 @@ def draw_spike(to_draw, amount):
     for i in amount:
         #matches each spike to its vertices by passing in the spike number to the function, which returns its vertices
         spike_to_draw[i] = to_draw.find_vertices(i)
-        pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i])
+        pygame.draw.polygon(screen, (0, 0, 0), spike_to_draw[i])
+        pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i], width=3)
 
 
 def draw_screen(s_w, s_h, floor):
-    screen.fill((0, 0, 102))
+    screen.fill((17, 56, 171))
     #calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
 
@@ -82,7 +83,7 @@ SCREENHEIGHT = 450
 floor_y = math.floor(0.66 * SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
-floor_color = [0, 102, 255]
+floor_color = [9, 30, 92]
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 pygame.init()
 clock =  pygame.time.Clock()
