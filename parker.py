@@ -56,6 +56,7 @@ class Spike:
         self.width = 40
         self.height = 40
         self.speed = 450
+        self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 5, self.width / 5, self.height / 1.8)
 
     def find_vertices(self):
         #calculates where the vertices should be based off x, y, w and h of the spike
@@ -66,6 +67,7 @@ class Spike:
     def scroll(self):
         # moves spike from left to right side of screen
         self.x -= self.speed * dt
+        self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 5, self.width / 5, self.height / 1.8)
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
@@ -98,7 +100,9 @@ def draw_spike(to_draw):
     #spike_to_draw= [None] * amount
     global screen
     pygame.draw.polygon(screen, (0, 0, 0), to_draw.find_vertices())
-    pygame.draw.polygon(screen, (255, 255, 255), to_draw.find_vertices(), width=3)    #loops once for each spike
+    pygame.draw.polygon(screen, (255, 255, 255), to_draw.find_vertices(), width=3)
+    pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
+    #loops once for each spike
     ''''
     for i in amount:
         #matches each spike to its vertices by passing in the spike number to the function, which returns its vertices
@@ -120,7 +124,7 @@ def draw_menu_screen():
 # Takes the list of level data and puts a spike on 1s
 def parse_level(level,tick):
     if level[tick] == 1:
-        spikes.append(Spike(screen.get_width() - 50, GROUND_Y - 40))
+        spikes.append(Spike(screen.get_width(), GROUND_Y - 40))
 
 # Forces 16:9 aspect ratio
 FRAMERATE = 120
