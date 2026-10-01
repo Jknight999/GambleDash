@@ -16,7 +16,7 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 13000
+        self.gravity = 15000
         self.jump_strength = -1600
 
     def jump(self):
@@ -112,7 +112,6 @@ clock =  pygame.time.Clock()
 
 # New level data list
 # 1 is a spike, 0 is nothing
-# Mess around and see if you can make something cool
 level_1 = [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
 tick_counter = 0
 frame_counter = 0
