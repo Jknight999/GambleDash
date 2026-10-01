@@ -121,7 +121,7 @@ def parse_level(level,tick):
 # Forces 16:9 aspect ratio
 FRAMERATE = 120
 SCREENWIDTH = 800
-SCREENHEIGHT = SCREENWIDTH * 9 / 16
+SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.66 * SCREENHEIGHT)
 
