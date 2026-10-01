@@ -46,7 +46,7 @@ class Spike:
         return [[self.x - self.width/2 + spike_number * self.width, self.y], [self.x + spike_number * self.width, self.y - self.height], [self.x + self.width/2 + spike_number * self.width, self.y]]
 
     def scroll(self):
-        # moves spike from left to right side of screen, and loops it back to right
+        # moves spike from left to right side of screen
         self.x -= self.speed * dt
 
 class Button:
@@ -90,6 +90,7 @@ def draw_platformer_screen(floor):
 
 #draws menu screen
 def draw_menu_screen():
+    screen.fill((17, 56, 171))
     play_button.draw_button(screen)
 
 # Takes the list of level data and puts a spike on 1s
@@ -113,12 +114,13 @@ clock =  pygame.time.Clock()
 # New level data list
 # 1 is a spike, 0 is nothing
 # Mess around and see if you can make something cool
+#could you possibly edit the construction of the list using the * string operator so that you just do '0' * 6, '1' * 3...
 level_1 = [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
 tick_counter = 0
 frame_counter = 0
 #initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
-play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (255, 0, 0))
+play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (14, 237, 70))
 # Allows multiple spikes to be on screen now
 spikes = []
 
@@ -130,8 +132,6 @@ running = True
 in_game = False
 jumping = 0
 while running:
-    # Clear screen
-
     #2. Make Changes
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
