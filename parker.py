@@ -68,7 +68,7 @@ class Spike:
         self.x -= self.speed * dt
 
 class Button:
-    #takes in characteristics as arguments and makes a rectangle with them
+    #takes in characteristics as arguments and makes a rect with them
     def __init__(self, x, y, w, h, color):
         self.rect = pygame.Rect(x, y, w, h)
         self.color = color
