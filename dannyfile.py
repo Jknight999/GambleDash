@@ -86,6 +86,7 @@ def draw_player(to_draw):
     screen.blit(to_draw.rotated_surface, to_draw.rect)
     #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
+# noinspection bad-argument-type
 def draw_spike(to_draw, amount):
     #creates a list of the spikes (so that it can be iterated through)
     #empty so that it can be filled with the vertices of each spike
