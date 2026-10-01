@@ -28,6 +28,9 @@ class Player:
         self.jump_strength = -1600
         self.angle = 0
         self.rotation_speed = -7
+        self.image = pygame.image.load("Assets/player_cube.jpg").convert()
+        self.image = pygame.transform.scale(player_sprite, (40,40))
+        self.rect = self.image.get_rect()
         # makes a transparent surface
         self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
         # makes a copy of the surface that will be rotated from the original surface by the turn angle
@@ -93,8 +96,9 @@ class Button:
                 in_game = True
 
 def draw_player(to_draw):
+    global player_sprite
     global screen
-    screen.blit(player_sprite, to_draw.rect)
+    screen.blit(to_draw.rotated_surface, player_sprite.get_rect())
     #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
 def draw_spike(to_draw, amount):

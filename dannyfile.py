@@ -11,10 +11,10 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 15000
-        self.jump_strength = -1600
+        self.gravity = 4500
+        self.jump_strength = -900
         self.angle = 0
-        self.rotation_speed = -7
+        self.rotation_speed = -450
         # makes a transparent surface
         self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
         # draws the player onto the surface
@@ -25,7 +25,7 @@ class Player:
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
     def rotate_player(self):
-        self.angle = (self.angle + self.rotation_speed) % 360
+        self.angle = (self.angle + self.rotation_speed * dt) % 360
         # rotates the surface
         self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
@@ -50,7 +50,7 @@ class Spike:
         self.y = y
         self.width = 40
         self.height = 40
-        self.speed = 1200
+        self.speed = 450
         self.amount = [i for i in range(amount)]
 
     def find_vertices(self, spike_number):
@@ -78,7 +78,7 @@ class Button:
         global in_game
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
-            if click_event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1:
                 if button_type == "Play":
                     in_game = True
 
@@ -191,5 +191,4 @@ while running:
 
     #4. Update and Wait
     dt = clock.tick(FRAMERATE) / 1000
-    clock.tick(FRAMERATE)
     pygame.display.flip()
