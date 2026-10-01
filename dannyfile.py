@@ -52,6 +52,7 @@ clock = pygame.time.Clock()
 dt = 0
 floor_color = [0, 102, 255]
 running = True
+in_platformer = False
 
 #creates the player
 player = Player(SCREENWIDTH, SCREENHEIGHT)
@@ -64,18 +65,23 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                in_platformer = not in_platformer
 
-    #jumping if space bar is pressed, otherwise not
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
-        if player.y >= GROUND_Y - player.h:
-            player.y = GROUND_Y - player.h
-            player.jump()
-    player.apply_physics()
+    if in_platformer:
+        #jumping if space bar is pressed, otherwise not
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            if player.y >= GROUND_Y - player.h:
+                player.y = GROUND_Y - player.h
+                player.jump()
+        player.apply_physics()
 
     #3. Draw New
-    draw_screen(floor_color)
-    draw_player(player)
+    if in_platformer:
+        draw_screen(floor_color)
+        draw_player(player)
 
     #4. Update and Wait
     dt = clock.tick(FRAMERATE) / 1000
