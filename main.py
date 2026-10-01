@@ -66,7 +66,6 @@ def draw_spike(to_draw, amount):
     for i in amount:
         #matches each spike to its vertices by passing in the spike number to the function, which returns its vertices
         spike_to_draw[i] = to_draw.find_vertices(i)
-        #draws each spike to the screeen
         pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i])
 
 
