@@ -16,7 +16,7 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 130
+        self.gravity = 15000
         self.jump_strength = -1600
         self.angle = 0
         self.rotation_speed = -9
@@ -39,7 +39,7 @@ class Player:
         self.y_vel = self.jump_strength
 
     def apply_physics(self):
-        self.y_vel += self.gravity
+        self.y_vel += self.gravity * dt
         self.y += self.y_vel * dt
         if self.y >= GROUND_Y - self.h:
             self.y = GROUND_Y - self.h
