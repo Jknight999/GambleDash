@@ -136,13 +136,14 @@ tick_counter = 0
 frame_counter = 0
 #initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
-play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (14, 237, 70))
+play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 4, SCREENHEIGHT / 2 - SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 2, (14, 237, 70))
 # Allows multiple spikes to be on screen now
 spikes = []
 
 # List of buttons that can be used to jump
 jump_buttons = [pygame.K_w, pygame.K_SPACE]
 
+pygame.display.set_caption("GambleDash")
 dt = 0
 running = True
 in_game = False
