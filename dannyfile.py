@@ -48,6 +48,7 @@ class Button:
         if self.rect.collidepoint(mouse_pos):
             if click_event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 in_game = True
+
 #basic vars
 SCREENWIDTH = 1000
 SCREENHEIGHT = 600
