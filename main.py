@@ -50,26 +50,25 @@ class Player:
 #spike class
 class Spike:
     #spike characteristics
-    def __init__(self, x, y, amount):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
         self.width = 40
         self.height = 40
         self.speed = 450
-        self.amount = [i for i in range(amount)]
 
-    def find_vertices(self, spike_number):
+    def find_vertices(self):
         #calculates where the vertices should be based off x, y, w and h of the spike
         #needed because triangles drawn through draw.polygon()
         # These vertices should not be used for hitboxes, spike hitboxes are rectangular
-        return [[self.x - self.width/2 + spike_number * self.width, self.y], [self.x + spike_number * self.width, self.y - self.height], [self.x + self.width/2 + spike_number * self.width, self.y]]
+        return [[self.x, self.y + self.height], [self.x + self.width / 2, self.y], [self.x + self.width, self.y + self.height]]
 
     def scroll(self):
         # moves spike from left to right side of screen
         self.x -= self.speed * dt
 
 class Button:
-    #takes in characteristics as arguments and makes a rectangle with them
+    #takes in characteristics as arguments and makes a rect with them
     def __init__(self, x, y, w, h, color):
         self.rect = pygame.Rect(x, y, w, h)
         self.color = color
@@ -93,17 +92,20 @@ def draw_player(to_draw):
     #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
 # noinspection bad-argument-type
-def draw_spike(to_draw, amount):
+def draw_spike(to_draw):
     #creates a list of the spikes (so that it can be iterated through)
     #empty so that it can be filled with the vertices of each spike
-    spike_to_draw = [None] * len(amount)
+    #spike_to_draw= [None] * amount
     global screen
-    #loops once for each spike
+    pygame.draw.polygon(screen, (0, 0, 0), to_draw.find_vertices())
+    pygame.draw.polygon(screen, (255, 255, 255), to_draw.find_vertices(), width=3)    #loops once for each spike
+    ''''
     for i in amount:
         #matches each spike to its vertices by passing in the spike number to the function, which returns its vertices
         spike_to_draw[i] = to_draw.find_vertices(i)
         pygame.draw.polygon(screen, (0, 0, 0), spike_to_draw[i])
         pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i], width=3)
+    '''
 
 def draw_platformer_screen(floor):
     screen.fill((17, 56, 171))
@@ -118,7 +120,7 @@ def draw_menu_screen():
 # Takes the list of level data and puts a spike on 1s
 def parse_level(level,tick):
     if level[tick] == 1:
-        spikes.append(Spike(screen.get_width() - 50, GROUND_Y, 1))
+        spikes.append(Spike(screen.get_width() - 50, GROUND_Y - 40))
 
 # Forces 16:9 aspect ratio
 FRAMERATE = 120
@@ -178,7 +180,7 @@ while running:
             player.rotate_player()
         for k in spikes:
             k.scroll()
-        if frame_counter % 4 == 0:
+        if frame_counter % 5 == 0:
             if tick_counter < len(level_1) - 1:
                 tick_counter += 1
             else:
@@ -192,7 +194,7 @@ while running:
         draw_platformer_screen(floor_color)
         draw_player(player)
         for k in spikes:
-            draw_spike(k, k.amount)
+            draw_spike(k)
     else:
         draw_menu_screen()
 
