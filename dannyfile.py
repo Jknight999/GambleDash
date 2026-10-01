@@ -18,6 +18,8 @@ class Player:
         self.jump_strength = -2000
         self.angle = 0
         self.rotation_speed = -4
+        self.is_jumping = False
+
         #makes a transparent surface
         self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
         #draws the player onto the surface
@@ -36,6 +38,7 @@ class Player:
     #player jump function, only called when jumping = 1
     def jump(self):
         self.y_vel = self.jump_strength
+        self.is_jumping = True
 
     #applies gravity and ground collision detection
     def apply_physics(self):
@@ -45,6 +48,7 @@ class Player:
         if self.y >= GROUND_Y - self.h:
             self.y = GROUND_Y - self.h
             self.y_vel = 0
+            self.is_jumping = False
             #snaps the cube back to flat on the ground
             self.angle = round(self.angle / 90) * 90 % 360
             self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
@@ -122,7 +126,7 @@ while running:
     if in_game:
         #jumping if space bar is pressed, otherwise not
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and not player.is_jumping:
             if player.y >= GROUND_Y - player.h:
                 player.y = GROUND_Y - player.h
                 player.jump()
