@@ -15,7 +15,7 @@ class Player:
         self.color = (255, 0, 0)
         self.y_vel = 0
         self.gravity = 120
-        self.jump_strength = -1600
+        self.jump_strength = -2000
 
     #player jump function, only called when jumping = 1
     def jump(self):
@@ -82,7 +82,7 @@ in_game = False
 player = Player(SCREENWIDTH, SCREENHEIGHT)
 
 #creates the play button
-play_button = Button(100, 100, 50, 50, (255, 0, 0))
+play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (255, 0, 0))
 
 while running:
     #1. Erase Old
