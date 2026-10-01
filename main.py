@@ -12,7 +12,7 @@ screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 pygame.init()
 clock =  pygame.time.Clock()
 
-player_sprite = pygame.image.load("Assets/player_cube.jpg").convert()
+player_sprite = pygame.image.load("Assets/player_cube.png").convert()
 player_sprite = pygame.transform.scale(player_sprite, (40,40))
 class Player:
     def __init__(self, sw, sh, floor_y):
