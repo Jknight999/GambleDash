@@ -17,7 +17,7 @@ class Player:
         self.gravity = 130
         self.jump_strength = -1600
         self.angle = 0
-        self.rotation_speed = -9
+        self.rotation_speed = -7
         self.is_jumping = False
 
         #makes a transparent surface
