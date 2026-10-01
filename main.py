@@ -1,19 +1,6 @@
-# COMMENT YOUR F***ING CODE
-# As we add more stuff it will become less readable
-# Also MULTIPLY ALL MOVEMENT BY "dt". dt stands for delta time
-# and makes physics independent of framerate.
 import pygame
 import math
 
-FRAMERATE = 120
-SCREENWIDTH = 800
-SCREENHEIGHT = SCREENWIDTH * 9 / 16
-screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
-pygame.init()
-clock =  pygame.time.Clock()
-
-player_sprite = pygame.image.load("Assets/player_cube.png").convert()
-player_sprite = pygame.transform.scale(player_sprite, (40,40))
 class Player:
     def __init__(self, sw, sh, floor_y):
         self.SCREENWIDTH = sw
@@ -24,24 +11,22 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 15000
-        self.jump_strength = -1600
+        self.gravity = 4500
+        self.jump_strength = -900
         self.angle = 0
-        self.rotation_speed = -7
-        self.image = pygame.image.load("Assets/player_cube.jpg").convert()
-        self.image = pygame.transform.scale(player_sprite, (40,40))
-        self.rect = self.image.get_rect()
-        # makes a transparent surface
-        self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
-        # makes a copy of the surface that will be rotated from the original surface by the turn angle
-        self.rotated_surface = self.surface
+        self.rotation_speed = -450
+        #makes a sprite of the cube asset
+        self.image = pygame.image.load("Assets/player_cube.png").convert_alpha()
+        #sets the size to 40 x 40
+        self.image = pygame.transform.scale(self.image, (self.w, self.h))
+        self.rotated_surface = self.image
         # draws a box around the surface and snaps it to the center of the surface
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
     def rotate_player(self):
-        self.angle = (self.angle + self.rotation_speed) % 360
+        self.angle = (self.angle + self.rotation_speed * dt) % 360
         # rotates the surface
-        self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
+        self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
     def jump(self):
@@ -55,7 +40,7 @@ class Player:
             self.y_vel = 0
             # snaps the cube back to flat on the ground
             self.angle = round(self.angle / 90) * 90 % 360
-            self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
+            self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
 class Spike:
@@ -64,7 +49,7 @@ class Spike:
         self.y = y
         self.width = 40
         self.height = 40
-        self.speed = 1200
+        self.speed = 450
         self.amount = [i for i in range(amount)]
 
     def find_vertices(self, spike_number):
@@ -88,17 +73,17 @@ class Button:
         pygame.draw.rect(surface, self.color, self.rect)
 
     #checks if the button is clicked and loads GambleDash
-    def check_button_click(self, click_event):
+    def check_button_click(self, click_event, button_type):
         global in_game
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
-            if click_event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                in_game = True
+            if click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1:
+                if button_type == "Play":
+                    in_game = True
 
 def draw_player(to_draw):
-    global player_sprite
     global screen
-    screen.blit(to_draw.rotated_surface, player_sprite.get_rect())
+    screen.blit(to_draw.rotated_surface, to_draw.rect)
     #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
 def draw_spike(to_draw, amount):
@@ -128,13 +113,18 @@ def parse_level(level,tick):
     if level[tick] == 1:
         spikes.append(Spike(screen.get_width() - 50, GROUND_Y, 1))
 
-
+# Forces 16:9 aspect ratio
+FRAMERATE = 120
+SCREENWIDTH = 800
+SCREENHEIGHT = SCREENWIDTH * 9 / 16
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.66 * SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
-
+screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
+pygame.init()
+clock =  pygame.time.Clock()
 
 # New level data list
 # 1 is a spike, 0 is nothing
@@ -145,13 +135,14 @@ tick_counter = 0
 frame_counter = 0
 #initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
-play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (14, 237, 70))
+play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 4, SCREENHEIGHT / 2 - SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 2, (14, 237, 70))
 # Allows multiple spikes to be on screen now
 spikes = []
 
 # List of buttons that can be used to jump
 jump_buttons = [pygame.K_w, pygame.K_SPACE]
 
+pygame.display.set_caption("GambleDash")
 dt = 0
 running = True
 in_game = False
@@ -165,7 +156,7 @@ while running:
             if event.key == pygame.K_p:
                 in_game = not in_game
         # sends event to button to see if it's been clicked
-        play_button.check_button_click(event)
+        play_button.check_button_click(event, "Play")
 
     if in_game:
         # jumping if space bar is pressed, otherwise not
@@ -199,5 +190,4 @@ while running:
 
     #4. Update and Wait
     dt = clock.tick(FRAMERATE) / 1000
-    clock.tick(FRAMERATE)
     pygame.display.flip()
