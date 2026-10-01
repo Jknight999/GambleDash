@@ -15,19 +15,16 @@ class Player:
         self.jump_strength = -900
         self.angle = 0
         self.rotation_speed = -450
-        # makes a transparent surface
-        self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
-        # draws the player onto the surface
-        pygame.draw.rect(self.surface, self.color, (0, 0, self.w, self.h))
-        # makes a copy of the surface that will be rotated from the original surface by the turn angle
-        self.rotated_surface = self.surface
+        self.image = pygame.image.load("Assets/player_cube.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (self.w, self.h))
+        self.rotated_surface = self.image
         # draws a box around the surface and snaps it to the center of the surface
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
     def rotate_player(self):
         self.angle = (self.angle + self.rotation_speed * dt) % 360
         # rotates the surface
-        self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
+        self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
     def jump(self):
@@ -41,7 +38,7 @@ class Player:
             self.y_vel = 0
             # snaps the cube back to flat on the ground
             self.angle = round(self.angle / 90) * 90 % 360
-            self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
+            self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
 class Spike:
