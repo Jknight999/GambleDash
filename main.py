@@ -16,7 +16,7 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 13000
+        self.gravity = 130
         self.jump_strength = -1600
         self.angle = 0
         self.rotation_speed = -4
@@ -39,11 +39,10 @@ class Player:
         self.y_vel = self.jump_strength
 
     def apply_physics(self):
-        self.y_vel += self.gravity * dt
+        self.y_vel += self.gravity
         self.y += self.y_vel * dt
-
-        if player.y >= math.ceil(GROUND_Y - self.h):
-            self.y = math.ceil(GROUND_Y - self.h)
+        if self.y >= GROUND_Y - self.h:
+            self.y = GROUND_Y - self.h
             self.y_vel = 0
             # snaps the cube back to flat on the ground
             self.angle = round(self.angle / 90) * 90 % 360
@@ -89,7 +88,8 @@ class Button:
 
 def draw_player(to_draw):
     global screen
-    pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
+    screen.blit(to_draw.rotated_surface, to_draw.rect)
+    #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
 def draw_spike(to_draw, amount):
     #creates a list of the spikes (so that it can be iterated through)
