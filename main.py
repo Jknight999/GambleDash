@@ -19,7 +19,7 @@ class Player:
         self.gravity = 15000
         self.jump_strength = -1600
         self.angle = 0
-        self.rotation_speed = -9
+        self.rotation_speed = -7
         # makes a transparent surface
         self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
         # draws the player onto the surface
@@ -53,8 +53,8 @@ class Spike:
     def __init__(self, x, y, amount):
         self.x = x
         self.y = y
-        self.width = 40
-        self.height = 40
+        self.width = SCREENWIDTH / 20
+        self.height = SCREENHEIGHT / 11.25
         self.speed = 1200
         self.amount = [i for i in range(amount)]
 
