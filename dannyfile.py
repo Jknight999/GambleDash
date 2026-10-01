@@ -1,7 +1,9 @@
 import pygame
 import math
 
+#player class
 class Player:
+    #player characteristics
     def __init__(self, sw, sh, floor_y):
         self.SCREENWIDTH = sw
         self.SCREENHEIGHT = sh
@@ -15,6 +17,7 @@ class Player:
         self.jump_strength = -900
         self.angle = 0
         self.rotation_speed = -450
+
         #makes a sprite of the cube asset
         self.image = pygame.image.load("Assets/player_cube.png").convert_alpha()
         #sets the size to 40 x 40
@@ -33,6 +36,7 @@ class Player:
         self.y_vel = self.jump_strength
 
     def apply_physics(self):
+        #applies gravity and ground collision detection
         self.y_vel += self.gravity * dt
         self.y += self.y_vel * dt
         if self.y >= GROUND_Y - self.h:
@@ -43,7 +47,9 @@ class Player:
             self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
+#spike class
 class Spike:
+    #spike characteristics
     def __init__(self, x, y, amount):
         self.x = x
         self.y = y
@@ -167,6 +173,7 @@ while running:
                 player.y = GROUND_Y - player.h
                 player.jump()
         player.apply_physics()
+        #rotate player if they're in the air
         if player.y < GROUND_Y - player.h:
             player.rotate_player()
         for k in spikes:
