@@ -91,7 +91,7 @@ def draw_platformer_screen(f_color):
 def draw_menu_screen():
     play_button.draw_button(screen)
 
-screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 pygame.init()
 clock = pygame.time.Clock()
 dt = 0
