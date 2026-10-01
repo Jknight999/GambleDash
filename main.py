@@ -75,15 +75,8 @@ def draw_screen(s_w, s_h, floor):
     pygame.draw.rect(screen, floor, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
 
 #16:9 aspect ratio
-screen_sizes = ('small', 'big', 's', 'b')
-screen_size = input("small or big screen (s/b)")
-while screen_size not in screen_sizes: screen_size = input("small or big screen (s/b)")
-if screen_size == 'small' or screen_size == 's':
-    SCREENWIDTH = 800
-    SCREENHEIGHT = 450
-else:
-    SCREENWIDTH = 1600
-    SCREENHEIGHT = 900
+SCREENWIDTH = 800
+SCREENHEIGHT = 450
 
 #where the top of the floor is (for collision physics principles)
 floor_y = math.floor(0.66 * SCREENHEIGHT)
