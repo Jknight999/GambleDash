@@ -19,7 +19,7 @@ class Player:
         self.gravity = 130
         self.jump_strength = -1600
         self.angle = 0
-        self.rotation_speed = -4
+        self.rotation_speed = -9
         # makes a transparent surface
         self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
         # draws the player onto the surface
