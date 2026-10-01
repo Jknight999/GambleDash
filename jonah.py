@@ -1,5 +1,7 @@
 # COMMENT YOUR F***ING CODE
 # As we add more stuff it will become less readable
+# Also MULTIPLY ALL MOVEMENT BY "dt". dt stands for delta time
+# and makes physics independent of framerate.
 import pygame
 import random
 import math
@@ -48,17 +50,19 @@ class Spike:
     def scroll(self):
         # moves spike from left to right side of screen, and loops it back to right
         self.x -= self.speed * dt
-        if self.x < 0:
-            self.__init__(screen.get_width() - 50, floor_y, random.randint(1, 3))
 
 def draw_player(to_draw):
     global screen
     pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
 def draw_spike(to_draw, amount):
+    #creates a list of the spikes (so that it can be iterated through)
+    #empty so that it can be filled with the vertices of each spike
     spike_to_draw = [None] * len(amount)
     global screen
+    #loops once for each spike
     for i in amount:
+        #matches each spike to its vertices by passing in the spike number to the function, which returns its vertices
         spike_to_draw[i] = to_draw.find_vertices(i)
         pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i])
 
@@ -68,23 +72,29 @@ def draw_screen(s_w, s_h, floor):
     #calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor, (0, math.floor(0.66 * s_h), s_w, math.ceil(0.34 * s_h)))
 
-#16:9 aspect ratio
+def parse_level(level,tick):
+    if level[tick] == 1:
+            spikes.append(Spike(screen.get_width() - 50, floor_y, 1))
+
+# Forces 16:9 aspect ratio
 SCREENWIDTH = 800
-SCREENHEIGHT = 450
+SCREENHEIGHT = SCREENWIDTH * 9 / 16
 
 #where the top of the floor is (for collision physics principles)
 floor_y = math.floor(0.66 * SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
 floor_color = [0, 102, 255]
-screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 pygame.init()
 clock =  pygame.time.Clock()
 
-
+level_1 = [0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+tick_counter = 0
+frame_counter = 0
 #initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, floor_y)
-spike = Spike(screen.get_width() - 50, floor_y, random.randint(1, 3))
+spikes = []
 
 # List of buttons that can be used to jump
 jump_buttons = [pygame.K_w, pygame.K_SPACE]
@@ -112,11 +122,21 @@ while running:
         player.jump()
 
     player.apply_physics()
-    spike.scroll()
+    for k in spikes:
+        k.scroll()
+    if frame_counter % 8 == 0:
+        if tick_counter < len(level_1) - 1:
+            tick_counter += 1
+        else:
+            tick_counter = 0
+        parse_level(level_1, tick_counter)
+    frame_counter += 1
 
     #3. Draw New
     draw_player(player)
-    draw_spike(spike, spike.amount)
+    #new argument needs to be passed in - the amount of spikes wanted
+    for k in spikes:
+        draw_spike(k,k.amount)
 
     #4. Update and Wait
     dt = clock.tick(FRAMERATE) / 1000
