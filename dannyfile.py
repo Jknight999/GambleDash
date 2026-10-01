@@ -1,60 +1,69 @@
-#imports
 import pygame
+import random
 import math
 
-#player class
 class Player:
-    def __init__(self, sw, sh):
-        #setting char properties
-        self.screen_w = sw
-        self.screen_h = sh
+    def __init__(self, sw, sh, floor_y):
+        self.SCREENWIDTH = sw
+        self.SCREENHEIGHT = sh
         self.w = 40
         self.h = 40
-        self.x = 100
-        self.y = 100
-        self.color = (255, 0, 0)
+        self.x = (self.SCREENWIDTH - self.w) / 5
+        self.y = (floor_y - self.h)
+        self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 130
+        self.gravity = 15000
         self.jump_strength = -1600
         self.angle = 0
         self.rotation_speed = -7
-        self.is_jumping = False
-
-        #makes a transparent surface
+        # makes a transparent surface
         self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
-        #draws the player onto the surface
+        # draws the player onto the surface
         pygame.draw.rect(self.surface, self.color, (0, 0, self.w, self.h))
-        #makes a copy of the surface that will be rotated from the original surface by the turn angle
+        # makes a copy of the surface that will be rotated from the original surface by the turn angle
         self.rotated_surface = self.surface
-        #draws a box around the surface and snaps it to the center of the surface
-        self.rect = self.rotated_surface.get_rect(center = (self.x + self.w//2, self.y + self.h//2))
+        # draws a box around the surface and snaps it to the center of the surface
+        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
     def rotate_player(self):
         self.angle = (self.angle + self.rotation_speed) % 360
-        #rotates the surface
+        # rotates the surface
         self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
-        self.rect = self.rotated_surface.get_rect(center = (self.x + self.w//2, self.y + self.h//2))
+        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
-    #player jump function, only called when jumping = 1
     def jump(self):
         self.y_vel = self.jump_strength
-        self.is_jumping = True
 
-    #applies gravity and ground collision detection
     def apply_physics(self):
-        global GROUND_Y
-        self.y_vel += self.gravity
+        self.y_vel += self.gravity * dt
         self.y += self.y_vel * dt
         if self.y >= GROUND_Y - self.h:
             self.y = GROUND_Y - self.h
             self.y_vel = 0
-            self.is_jumping = False
-            #snaps the cube back to flat on the ground
+            # snaps the cube back to flat on the ground
             self.angle = round(self.angle / 90) * 90 % 360
             self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
-#button class
+class Spike:
+    def __init__(self, x, y, amount):
+        self.x = x
+        self.y = y
+        self.width = 40
+        self.height = 40
+        self.speed = 1200
+        self.amount = [i for i in range(amount)]
+
+    def find_vertices(self, spike_number):
+        #calculates where the vertices should be based off x, y, w and h of the spike
+        #needed because triangles drawn through draw.polygon()
+        # These vertices should not be used for hitboxes, spike hitboxes are rectangular
+        return [[self.x - self.width/2 + spike_number * self.width, self.y], [self.x + spike_number * self.width, self.y - self.height], [self.x + self.width/2 + spike_number * self.width, self.y]]
+
+    def scroll(self):
+        # moves spike from left to right side of screen
+        self.x -= self.speed * dt
+
 class Button:
     #takes in characteristics as arguments and makes a rectangle with them
     def __init__(self, x, y, w, h, color):
@@ -70,53 +79,75 @@ class Button:
         global in_game
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
-            if click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1:
+            if click_event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 in_game = True
 
-#spike class
-class Spike:
-    pass
-
-#basic vars
-SCREENWIDTH = 1000
-SCREENHEIGHT = 500
-GROUND_Y = math.floor(0.66*SCREENHEIGHT)
-FRAMERATE = 120
-
-#draws player to the screen
 def draw_player(to_draw):
     global screen
     screen.blit(to_draw.rotated_surface, to_draw.rect)
     #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
-#draws the game screen
-def draw_platformer_screen(f_color):
-    global GROUND_Y, SCREENHEIGHT
-    screen.fill((0, 0, 102))
-    pygame.draw.rect(screen, f_color, (0, GROUND_Y, SCREENWIDTH, math.ceil(0.34 * SCREENHEIGHT)))
+def draw_spike(to_draw, amount):
+    #creates a list of the spikes (so that it can be iterated through)
+    #empty so that it can be filled with the vertices of each spike
+    spike_to_draw = [None] * len(amount)
+    global screen
+    #loops once for each spike
+    for i in amount:
+        #matches each spike to its vertices by passing in the spike number to the function, which returns its vertices
+        spike_to_draw[i] = to_draw.find_vertices(i)
+        pygame.draw.polygon(screen, (0, 0, 0), spike_to_draw[i])
+        pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i], width=3)
+
+def draw_platformer_screen(floor):
+    screen.fill((17, 56, 171))
+    #calculates so that the floor always draws 2/3 of the way down
+    pygame.draw.rect(screen, floor, (0, GROUND_Y, SCREENWIDTH, math.ceil(0.34 * SCREENHEIGHT)))
 
 #draws menu screen
 def draw_menu_screen():
+    screen.fill((17, 56, 171))
     play_button.draw_button(screen)
 
+# Takes the list of level data and puts a spike on 1s
+def parse_level(level,tick):
+    if level[tick] == 1:
+        spikes.append(Spike(screen.get_width() - 50, GROUND_Y, 1))
+
+# Forces 16:9 aspect ratio
+FRAMERATE = 120
+SCREENWIDTH = 800
+SCREENHEIGHT = SCREENWIDTH * 9 / 16
+#where the top of the floor is (for collision physics principles)
+GROUND_Y = math.floor(0.66 * SCREENHEIGHT)
+
+#in a list, so IT CAN CHANGE
+floor_color = [9, 30, 92]
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 pygame.init()
-clock = pygame.time.Clock()
+clock =  pygame.time.Clock()
+
+# New level data list
+# 1 is a spike, 0 is nothing
+# Mess around and see if you can make something cool
+#could you possibly edit the construction of the list using the * string operator so that you just do '0' * 6, '1' * 3...
+level_1 = [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+tick_counter = 0
+frame_counter = 0
+#initializes first instances of class
+player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
+play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (14, 237, 70))
+# Allows multiple spikes to be on screen now
+spikes = []
+
+# List of buttons that can be used to jump
+jump_buttons = [pygame.K_w, pygame.K_SPACE]
+
 dt = 0
-floor_color = [0, 102, 255]
 running = True
 in_game = False
-
-#creates the player
-player = Player(SCREENWIDTH, SCREENHEIGHT)
-
-#creates the play button
-play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (255, 0, 0))
-
+jumping = 0
 while running:
-    #1. Erase Old
-    screen.fill(0)
-
     #2. Make Changes
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -124,30 +155,40 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_p:
                 in_game = not in_game
-        #sends event to button to see if it's been clicked
+        # sends event to button to see if it's been clicked
         play_button.check_button_click(event)
 
     if in_game:
-        #jumping if space bar is pressed, otherwise not
+        # jumping if space bar is pressed, otherwise not
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and not player.is_jumping:
+        if keys[pygame.K_SPACE]:
             if player.y >= GROUND_Y - player.h:
                 player.y = GROUND_Y - player.h
                 player.jump()
         player.apply_physics()
-
         if player.y < GROUND_Y - player.h:
             player.rotate_player()
+        for k in spikes:
+            k.scroll()
+        if frame_counter % 4 == 0:
+            if tick_counter < len(level_1) - 1:
+                tick_counter += 1
+            else:
+                tick_counter = 0
+            parse_level(level_1, tick_counter)
+        frame_counter += 1
     else:
         pass
 
-    #3. Draw New
     if in_game:
         draw_platformer_screen(floor_color)
         draw_player(player)
+        for k in spikes:
+            draw_spike(k, k.amount)
     else:
         draw_menu_screen()
 
     #4. Update and Wait
     dt = clock.tick(FRAMERATE) / 1000
-    pygame.display.update()
+    clock.tick(FRAMERATE)
+    pygame.display.flip()
