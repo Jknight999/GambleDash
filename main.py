@@ -16,14 +16,14 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 120
+        self.gravity = 13000
         self.jump_strength = -1600
 
     def jump(self):
         self.y_vel = self.jump_strength
 
     def apply_physics(self):
-        self.y_vel += self.gravity
+        self.y_vel += self.gravity * dt
         self.y += self.y_vel * dt
 
         if player.y >= math.ceil(GROUND_Y - self.h):
@@ -46,10 +46,8 @@ class Spike:
         return [[self.x - self.width/2 + spike_number * self.width, self.y], [self.x + spike_number * self.width, self.y - self.height], [self.x + self.width/2 + spike_number * self.width, self.y]]
 
     def scroll(self):
-        # moves spike from left to right side of screen, and loops it back to right
+        # moves spike from left to right side of screen
         self.x -= self.speed * dt
-        if self.x < 0:
-            self.__init__(screen.get_width() - 50, GROUND_Y, random.randint(1, 3))
 
 class Button:
     #takes in characteristics as arguments and makes a rectangle with them
@@ -92,12 +90,18 @@ def draw_platformer_screen(floor):
 
 #draws menu screen
 def draw_menu_screen():
+    screen.fill((17, 56, 171))
     play_button.draw_button(screen)
 
-#16:9 aspect ratio
+# Takes the list of level data and puts a spike on 1s
+def parse_level(level,tick):
+    if level[tick] == 1:
+        spikes.append(Spike(screen.get_width() - 50, GROUND_Y, 1))
+
+# Forces 16:9 aspect ratio
 FRAMERATE = 120
 SCREENWIDTH = 800
-SCREENHEIGHT = 450
+SCREENHEIGHT = SCREENWIDTH * 9 / 16
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.66 * SCREENHEIGHT)
 
@@ -107,11 +111,18 @@ screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 pygame.init()
 clock =  pygame.time.Clock()
 
-
+# New level data list
+# 1 is a spike, 0 is nothing
+# Mess around and see if you can make something cool
+#could you possibly edit the construction of the list using the * string operator so that you just do '0' * 6, '1' * 3...
+level_1 = [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+tick_counter = 0
+frame_counter = 0
 #initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
-spike = Spike(screen.get_width() - 50, GROUND_Y, random.randint(1, 3))
-play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (255, 0, 0))
+play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 8, SCREENHEIGHT / 2 - SCREENHEIGHT / 8, SCREENWIDTH / 4, SCREENHEIGHT / 4, (14, 237, 70))
+# Allows multiple spikes to be on screen now
+spikes = []
 
 # List of buttons that can be used to jump
 jump_buttons = [pygame.K_w, pygame.K_SPACE]
@@ -121,8 +132,6 @@ running = True
 in_game = False
 jumping = 0
 while running:
-    # Clear screen
-
     #2. Make Changes
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -141,14 +150,23 @@ while running:
                 player.y = GROUND_Y - player.h
                 player.jump()
         player.apply_physics()
-        spike.scroll()
+        for k in spikes:
+            k.scroll()
+        if frame_counter % 4 == 0:
+            if tick_counter < len(level_1) - 1:
+                tick_counter += 1
+            else:
+                tick_counter = 0
+            parse_level(level_1, tick_counter)
+        frame_counter += 1
     else:
         pass
 
     if in_game:
         draw_platformer_screen(floor_color)
         draw_player(player)
-        draw_spike(spike, spike.amount)
+        for k in spikes:
+            draw_spike(k, k.amount)
     else:
         draw_menu_screen()
 
