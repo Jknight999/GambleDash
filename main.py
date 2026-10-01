@@ -18,6 +18,22 @@ class Player:
         self.y_vel = 0
         self.gravity = 13000
         self.jump_strength = -1600
+        self.angle = 0
+        self.rotation_speed = -4
+        # makes a transparent surface
+        self.surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
+        # draws the player onto the surface
+        pygame.draw.rect(self.surface, self.color, (0, 0, self.w, self.h))
+        # makes a copy of the surface that will be rotated from the original surface by the turn angle
+        self.rotated_surface = self.surface
+        # draws a box around the surface and snaps it to the center of the surface
+        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
+
+    def rotate_player(self):
+        self.angle = (self.angle + self.rotation_speed) % 360
+        # rotates the surface
+        self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
+        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
     def jump(self):
         self.y_vel = self.jump_strength
@@ -29,6 +45,10 @@ class Player:
         if player.y >= math.ceil(GROUND_Y - self.h):
             self.y = math.ceil(GROUND_Y - self.h)
             self.y_vel = 0
+            # snaps the cube back to flat on the ground
+            self.angle = round(self.angle / 90) * 90 % 360
+            self.rotated_surface = pygame.transform.rotate(self.surface, self.angle)
+        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
 class Spike:
     def __init__(self, x, y, amount):
@@ -150,6 +170,8 @@ while running:
                 player.y = GROUND_Y - player.h
                 player.jump()
         player.apply_physics()
+        if player.y < GROUND_Y - player.h:
+            player.rotate_player()
         for k in spikes:
             k.scroll()
         if frame_counter % 4 == 0:
