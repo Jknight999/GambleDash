@@ -24,8 +24,8 @@ class Player:
         self.y_vel = self.jump_strength
 
     def apply_physics(self):
-        self.y_vel += player.gravity
-        self.y += player.y_vel
+        self.y_vel += self.gravity
+        self.y += self.y_vel
 
         if player.y >= math.ceil(floor_y - self.h):
             self.y = math.ceil(floor_y - self.h)

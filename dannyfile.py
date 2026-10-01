@@ -6,8 +6,8 @@ import math
 class Player:
     def __init__(self, sw, sh):
         #setting char properties
-        self.scrw = sw
-        self.scrh = sh
+        self.screen_w = sw
+        self.screen_h = sh
         self.w = 40
         self.h = 40
         self.x = 100
@@ -30,6 +30,25 @@ class Player:
             self.y = GROUND_Y - self.h
             self.y_vel = 0
 
+#button class
+class Button:
+    #takes in characteristics as arguments and makes a rectangle with them
+    def __init__(self, x, y, w, h, color):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.color = color
+
+    #draws the button
+    def draw_button(self, surface):
+        pygame.draw.rect(surface, self.color, self.rect)
+
+    #checks if the button is clicked and loads GambleDash
+    def check_button_click(self, click_event):
+        global in_game
+        mouse_pos = pygame.mouse.get_pos()
+        if self.rect.collidepoint(mouse_pos):
+            if click_event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                in_game = True
+
 #basic vars
 SCREENWIDTH = 1000
 SCREENHEIGHT = 600
@@ -41,10 +60,15 @@ def draw_player(to_draw):
     global screen
     pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
 
-def draw_screen(f_color):
+#draws the game screen
+def draw_platformer_screen(f_color):
     global GROUND_Y, SCREENHEIGHT
     screen.fill((0, 0, 102))
     pygame.draw.rect(screen, f_color, (0, GROUND_Y, SCREENWIDTH, math.ceil(0.34 * SCREENHEIGHT)))
+
+#draws menu screen
+def draw_menu_screen():
+    play_button.draw_button(screen)
 
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.init()
@@ -52,10 +76,13 @@ clock = pygame.time.Clock()
 dt = 0
 floor_color = [0, 102, 255]
 running = True
-in_platformer = False
+in_game = False
 
 #creates the player
 player = Player(SCREENWIDTH, SCREENHEIGHT)
+
+#creates the play button
+play_button = Button(100, 100, 50, 50, (255, 0, 0))
 
 while running:
     #1. Erase Old
@@ -67,9 +94,11 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_p:
-                in_platformer = not in_platformer
+                in_game = not in_game
+        #sends event to button to see if it's been clicked
+        play_button.check_button_click(event)
 
-    if in_platformer:
+    if in_game:
         #jumping if space bar is pressed, otherwise not
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
@@ -77,11 +106,15 @@ while running:
                 player.y = GROUND_Y - player.h
                 player.jump()
         player.apply_physics()
+    else:
+        pass
 
     #3. Draw New
-    if in_platformer:
-        draw_screen(floor_color)
+    if in_game:
+        draw_platformer_screen(floor_color)
         draw_player(player)
+    else:
+        draw_menu_screen()
 
     #4. Update and Wait
     dt = clock.tick(FRAMERATE) / 1000
