@@ -7,8 +7,8 @@ class Player:
     def __init__(self, sw, sh, floor_y):
         self.SCREENWIDTH = sw
         self.SCREENHEIGHT = sh
-        self.w = 40
-        self.h = 40
+        self.w = SCREENWIDTH / 20
+        self.h = SCREENHEIGHT / 10
         self.x = (self.SCREENWIDTH - self.w) / 5
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
@@ -53,8 +53,8 @@ class Spike:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.width = 40
-        self.height = 40
+        self.width = SCREENWIDTH / 20
+        self.height = SCREENHEIGHT / 10
         self.speed = 450
         self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 5, self.width / 5, self.height / 1.8)
 
@@ -68,6 +68,11 @@ class Spike:
         # moves spike from left to right side of screen
         self.x -= self.speed * dt
         self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 5, self.width / 5, self.height / 1.8)
+
+    def check_collision(self):
+        global running
+        if player.rect.colliderect(self.hitbox):
+            screen.fill((255, 0, 0))
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
@@ -101,7 +106,8 @@ def draw_spike(to_draw):
     global screen
     pygame.draw.polygon(screen, (0, 0, 0), to_draw.find_vertices())
     pygame.draw.polygon(screen, (255, 255, 255), to_draw.find_vertices(), width=3)
-    pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
+    if SHOW_SPIKE_HITBOXES:
+        pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
     #loops once for each spike
     ''''
     for i in amount:
@@ -129,7 +135,8 @@ def parse_level(level,tick):
 # Forces 16:9 aspect ratio
 FRAMERATE = 120
 SCREENWIDTH = 800
-SCREENHEIGHT = SCREENWIDTH * 9 / 16
+SCREENHEIGHT = SCREENWIDTH * 0.5
+SHOW_SPIKE_HITBOXES = True
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.66 * SCREENHEIGHT)
 
@@ -143,7 +150,7 @@ clock =  pygame.time.Clock()
 # 1 is a spike, 0 is nothing
 # Mess around and see if you can make something cool
 #could you possibly edit the construction of the list using the * string operator so that you just do '0' * 6, '1' * 3...
-level_1 = [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+level_1 =(0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1)
 tick_counter = 0
 frame_counter = 0
 #initializes first instances of class
@@ -199,6 +206,7 @@ while running:
         draw_player(player)
         for k in spikes:
             draw_spike(k)
+            k.check_collision()
     else:
         draw_menu_screen()
 

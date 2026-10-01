@@ -69,6 +69,11 @@ class Spike:
         self.x -= self.speed * dt
         self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 5, self.width / 5, self.height / 1.8)
 
+    def check_collision(self):
+        global running
+        if player.rect.colliderect(self.hitbox):
+            screen.fill((255, 0, 0))
+
 class Button:
     #takes in characteristics as arguments and makes a rect with them
     def __init__(self, x, y, w, h, color):
@@ -201,6 +206,7 @@ while running:
         draw_player(player)
         for k in spikes:
             draw_spike(k)
+            k.check_collision()
     else:
         draw_menu_screen()
 
