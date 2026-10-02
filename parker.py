@@ -56,7 +56,7 @@ class Spike:
         self.width = SCREENWIDTH / 20
         self.height = SCREENHEIGHT / 10
         self.speed = 450
-        self.hitbox = pygame.Rect(x + self.width / 2.8, self.y + self.height / 3, self.width / 3.5, self.height / 2.3)
+        self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def find_vertices(self):
         #calculates where the vertices should be based off x, y, w and h of the spike
@@ -67,7 +67,7 @@ class Spike:
     def scroll(self):
         # moves spike from left to right side of screen
         self.x -= self.speed * dt
-        self.hitbox = pygame.Rect(self.x + self.width / 2.8, self.y + self.height / 3, self.width / 3.5, self.height / 2.3)
+        self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def check_collision(self):
         global running
@@ -88,8 +88,6 @@ class Block:
         # moves spike from left to right side of screen
         self.x -= self.speed * dt
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
-        print(self.x)
-
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
@@ -184,13 +182,13 @@ clock =  pygame.time.Clock()
 # Mess around and see if you can make something cool
 #could you possibly edit the construction of the list using the * string operator so that you just do '0' * 6, '1' * 3...
 level_1 =[
-    '                                    ',
-    '                                    ',
-    '                                    ',
-    '                                    ',
-    '                                    ',
-    '         0                          ',
-    '000   00111        1       1     001',
+    '                                                                       ',
+    '                                                                       ',
+    '                                                                       ',
+    '                                                                       ',
+    '                                                                       ',
+    '                                                                       ',
+    '        111        1       1     1        111           11       1      '
 ]
 
 tick_counter = 0
