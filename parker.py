@@ -13,10 +13,10 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 4500
+        self.gravity = 1800000 / SCREENHEIGHT
         self.jump_strength = -900
         self.angle = 0
-        self.rotation_speed = -450
+        self.rotation_speed = -(self.gravity / 10)
 
         #makes a sprite of the cube asset
         self.image = pygame.image.load("Assets/player_cube.png").convert_alpha()
@@ -56,7 +56,7 @@ class Spike:
         self.width = SCREENWIDTH / 20
         self.height = SCREENHEIGHT / 10
         self.speed = 450
-        self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 5, self.width / 5, self.height / 1.8)
+        self.hitbox = pygame.Rect(x + self.width / 2.8, self.y + self.height / 3, self.width / 3.5, self.height / 2.3)
 
     def find_vertices(self):
         #calculates where the vertices should be based off x, y, w and h of the spike
@@ -67,12 +67,29 @@ class Spike:
     def scroll(self):
         # moves spike from left to right side of screen
         self.x -= self.speed * dt
-        self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 5, self.width / 5, self.height / 1.8)
+        self.hitbox = pygame.Rect(self.x + self.width / 2.8, self.y + self.height / 3, self.width / 3.5, self.height / 2.3)
 
     def check_collision(self):
         global running
         if player.rect.colliderect(self.hitbox):
             screen.fill((255, 0, 0))
+
+class Block:
+    #spike characteristics
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.width = SCREENWIDTH / 20
+        self.height = SCREENHEIGHT / 10
+        self.speed = 450
+        self.block = pygame.Rect(self.x, self.y, self.width, self.height)
+
+    def scroll(self):
+        # moves spike from left to right side of screen
+        self.x -= self.speed * dt
+        self.block = pygame.Rect(self.x, self.y, self.width, self.height)
+        print(self.x)
+
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
@@ -104,8 +121,16 @@ def draw_spike(to_draw):
     #empty so that it can be filled with the vertices of each spike
     #spike_to_draw= [None] * amount
     global screen
-    pygame.draw.polygon(screen, (0, 0, 0), to_draw.find_vertices())
-    pygame.draw.polygon(screen, (255, 255, 255), to_draw.find_vertices(), width=3)
+    #giving myself the ability to separate the vertices
+    v_a, v_b, v_c = to_draw.find_vertices()
+    pygame.draw.polygon(screen, (0, 0, 0), (v_a, v_b, v_c))
+    #shrinking the vertices inwards so that the outline doesn't go outside the block allotted
+    v_a[0] += 5
+    v_a[1] -= 3
+    v_b[1] += 3
+    v_c[0] -= 5
+    v_c[1] -= 3
+    pygame.draw.polygon(screen, (255, 255, 255), (v_a, v_b, v_c), width=3)
     if SHOW_SPIKE_HITBOXES:
         pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
     #loops once for each spike
@@ -117,10 +142,14 @@ def draw_spike(to_draw):
         pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i], width=3)
     '''
 
+def draw_block(to_draw):
+    global screen
+    pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
+
 def draw_platformer_screen(floor):
     screen.fill((17, 56, 171))
     #calculates so that the floor always draws 2/3 of the way down
-    pygame.draw.rect(screen, floor, (0, GROUND_Y, SCREENWIDTH, math.ceil(0.34 * SCREENHEIGHT)))
+    pygame.draw.rect(screen, floor, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
 
 #draws menu screen
 def draw_menu_screen():
@@ -129,16 +158,20 @@ def draw_menu_screen():
 
 # Takes the list of level data and puts a spike on 1s
 def parse_level(level,tick):
-    if level[tick] == 1:
-        spikes.append(Spike(screen.get_width(), GROUND_Y - 40))
+    for row_number in range(len(level)):
+         if level[row_number][tick] == '1':
+             spikes.append(Spike(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
+         elif level[row_number][tick] == '0':
+             print('Block!')
+             blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
 
 # Forces 16:9 aspect ratio
 FRAMERATE = 120
-SCREENWIDTH = 800
+SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
 SHOW_SPIKE_HITBOXES = True
 #where the top of the floor is (for collision physics principles)
-GROUND_Y = math.floor(0.66 * SCREENHEIGHT)
+GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
@@ -150,7 +183,16 @@ clock =  pygame.time.Clock()
 # 1 is a spike, 0 is nothing
 # Mess around and see if you can make something cool
 #could you possibly edit the construction of the list using the * string operator so that you just do '0' * 6, '1' * 3...
-level_1 =(0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1)
+level_1 =[
+    '                                    ',
+    '                                    ',
+    '                                    ',
+    '                                    ',
+    '                                    ',
+    '         0                          ',
+    '000   00111        1       1     001',
+]
+
 tick_counter = 0
 frame_counter = 0
 #initializes first instances of class
@@ -158,6 +200,7 @@ player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 play_button = Button(SCREENWIDTH / 2 - SCREENWIDTH / 4, SCREENHEIGHT / 2 - SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 2, (14, 237, 70))
 # Allows multiple spikes to be on screen now
 spikes = []
+blocks = []
 
 # List of buttons that can be used to jump
 jump_buttons = [pygame.K_w, pygame.K_SPACE]
@@ -189,10 +232,12 @@ while running:
         #rotate player if they're in the air
         if player.y < GROUND_Y - player.h:
             player.rotate_player()
-        for k in spikes:
-            k.scroll()
-        if frame_counter % 5 == 0:
-            if tick_counter < len(level_1) - 1:
+        for spike in spikes:
+            spike.scroll()
+        for block in blocks:
+            block.scroll()
+        if frame_counter % math.floor(SCREENWIDTH / 160) == 0:
+            if tick_counter < len(level_1[0]) - 1:
                 tick_counter += 1
             else:
                 tick_counter = 0
@@ -207,6 +252,8 @@ while running:
         for k in spikes:
             draw_spike(k)
             k.check_collision()
+        for k in blocks:
+            draw_block(k)
     else:
         draw_menu_screen()
 
