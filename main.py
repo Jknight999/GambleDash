@@ -56,7 +56,7 @@ class Spike:
         self.y = y
         self.width = SCREENWIDTH / 20
         self.height = SCREENHEIGHT / 10
-        self.speed = 450
+        self.speed = 550
         self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def find_vertices(self):
@@ -82,7 +82,7 @@ class Block:
         self.y = y
         self.width = SCREENWIDTH / 20
         self.height = SCREENHEIGHT / 10
-        self.speed = 450
+        self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def scroll(self):
@@ -246,7 +246,7 @@ level_1 =[
     '                                                                       ',
     '                                                                       ',
     '                                                                       ',
-    '        111        1       1     1        111           11       1      '
+    '        111       1       1     1        111           11       1      '
 ]
 
 tick_counter = 0
@@ -296,7 +296,7 @@ while running:
             spike.scroll()
         for block in blocks:
             block.scroll()
-        if frame_counter % math.floor(SCREENWIDTH / 160) == 0:
+        if frame_counter % math.floor(SCREENWIDTH / 200) == 0:
             if tick_counter < len(level_1[0]) - 1:
                 tick_counter += 1
             else:
