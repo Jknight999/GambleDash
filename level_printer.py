@@ -1,5 +1,9 @@
+#this is the code to test out a level generator
+import random
+
 import pygame
 import math
+
 
 #player class
 class Player:
@@ -135,7 +139,7 @@ def parse_level(level,tick):
 
 # Forces 16:9 aspect ratio
 FRAMERATE = 120
-SCREENWIDTH = 1000
+SCREENWIDTH = 1600
 SCREENHEIGHT = SCREENWIDTH * 0.5
 SHOW_SPIKE_HITBOXES = True
 #where the top of the floor is (for collision physics principles)
@@ -206,6 +210,7 @@ while running:
                 tick_counter += 1
             else:
                 tick_counter = 0
+            print(tick_counter)
             parse_level(level_1, tick_counter)
         frame_counter += 1
     else:
