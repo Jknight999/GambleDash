@@ -297,7 +297,7 @@ while running:
             spike.scroll()
         for block in blocks:
             block.scroll()
-        if frame_counter % math.floor(SCREENWIDTH / 160) == 0:
+        if frame_counter % math.floor(SCREENWIDTH / 200) == 0:
             if tick_counter < len(levels[current_level][0]) - 1:
                 tick_counter += 1
             else:
