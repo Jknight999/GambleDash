@@ -170,9 +170,13 @@ def draw_menu_screen():
     play_button.draw_button(screen)
     play_button.render_text()
     casino_button.draw_button(screen)
+    casino_button.render_text()
 
 def draw_casino_screen():
+    global casino_font
     screen.fill((94, 6, 6))
+    CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
+    CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 4), f'Your Chips: {chips}', (255, 255, 255))
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
 
 # Takes the list of level data and puts a spike on 1s
@@ -188,9 +192,28 @@ def parse_level(level,tick):
 FRAMERATE = 120
 SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
+chips = 100
 SHOW_SPIKE_HITBOXES = True
 pygame.freetype.init()
-gd_font = pygame.freetype.Font("Assets/pusab.otf", 40)
+gd_font_size = 80
+gd_font = pygame.freetype.Font("Assets/pusab.otf", gd_font_size)
+GD_FONTS = {
+    14: pygame.freetype.Font('Assets/pusab.otf', 14),
+    18: pygame.freetype.Font('Assets/pusab.otf', 18),
+    24: pygame.freetype.Font('Assets/pusab.otf', 24),
+    32: pygame.freetype.Font('Assets/pusab.otf', 32),
+    50: pygame.freetype.Font('Assets/pusab.otf', 50)
+}
+casino_font_size = 100
+casino_font = pygame.freetype.Font("Assets/casino.ttf", casino_font_size)
+CASINO_FONTS = {
+    14: pygame.freetype.Font('Assets/casino.ttf', 14),
+    18: pygame.freetype.Font('Assets/casino.ttf', 18),
+    24: pygame.freetype.Font('Assets/casino.ttf', 24),
+    32: pygame.freetype.Font('Assets/casino.ttf', 32),
+    50: pygame.freetype.Font('Assets/casino.ttf', 50)
+
+}
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
 
@@ -219,7 +242,7 @@ frame_counter = 0
 #initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
-casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (200, 0, 0), 0)
+casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 # Allows multiple spikes to be on screen now
 spikes = []
 blocks = []
