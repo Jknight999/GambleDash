@@ -56,7 +56,7 @@ class Spike:
         self.width = SCREENWIDTH / 20
         self.height = SCREENHEIGHT / 10
         self.speed = 450
-        self.hitbox = pygame.Rect(x + self.width / 2.8, self.y + self.height / 3, self.width / 3.5, self.height / 2.3)
+        self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def find_vertices(self):
         #calculates where the vertices should be based off x, y, w and h of the spike
@@ -67,7 +67,7 @@ class Spike:
     def scroll(self):
         # moves spike from left to right side of screen
         self.x -= self.speed * dt
-        self.hitbox = pygame.Rect(self.x + self.width / 2.8, self.y + self.height / 3, self.width / 3.5, self.height / 2.3)
+        self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def check_collision(self):
         global running
