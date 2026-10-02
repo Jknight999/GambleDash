@@ -265,13 +265,13 @@ blocks = []
 jump_buttons = [pygame.K_w, pygame.K_SPACE]
 
 pygame.display.set_caption("GambleDash")
+chips= 100
 dt = 0
 running = True
 in_game = False
 in_casino = False
 current_level = 1
 while running:
-    #2. Make Changes
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
