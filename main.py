@@ -199,6 +199,8 @@ SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
 chips = 100
 SHOW_SPIKE_HITBOXES = True
+
+#Text Stuff
 pygame.freetype.init()
 #default size
 gd_font_size = 80
@@ -215,6 +217,7 @@ GD_FONTS = {
     50: pygame.freetype.Font('Assets/pusab.otf', 50),
     100: pygame.freetype.Font('Assets/pusab.otf', 100)
 }
+
 #initializes the font with default size
 casino_font_size = 100
 casino_font = pygame.freetype.Font("Assets/casino.ttf", casino_font_size)
@@ -226,6 +229,7 @@ CASINO_FONTS = {
     50: pygame.freetype.Font('Assets/casino.ttf', 50),
     100: pygame.freetype.Font('Assets/casino.ttf', 100)
 }
+
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
 
@@ -236,7 +240,7 @@ pygame.init()
 clock =  pygame.time.Clock()
 
 # New level data list
-# 1 is a spike, 0 is nothing
+# 1 is a spike, 0 is a block
 # Mess around and see if you can make something cool
 #could you possibly edit the construction of the list using the * string operator so that you just do '0' * 6, '1' * 3...
 level_1 =[
