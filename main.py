@@ -73,7 +73,7 @@ class Spike:
         global running, in_game, player
         if player.rect.colliderect(self.hitbox):
             screen.fill((255, 0, 0))
-            sleep(1)
+            sleep(0.2)
             reset_game()
 
 
@@ -275,9 +275,6 @@ casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCR
 spikes = []
 blocks = []
 
-# List of buttons that can be used to jump
-jump_buttons = [pygame.K_w, pygame.K_SPACE]
-
 pygame.display.set_caption("GambleDash")
 chips= 100
 dt = 0
@@ -299,7 +296,7 @@ while running:
     if in_game:
         # jumping if space bar is pressed, otherwise not
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE or pygame.K_w]:
             if player.y >= GROUND_Y - player.h:
                 player.y = GROUND_Y - player.h
                 player.jump()
