@@ -267,7 +267,7 @@ levels = {
     '                        0                                              ',
     '                                                                       ',
     '                                       0                               ',
-    '        111        1       1     1        111           11       1      '
+    '        111        1       1     1        111           11       1     '
     )
 }
 
@@ -307,7 +307,7 @@ while running:
     if in_game:
         # jumping if space bar is pressed, otherwise not
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE or pygame.K_w]:
+        if keys[pygame.K_SPACE] or keys[pygame.K_w]:
             if player.y >= GROUND_Y - player.h:
                 player.y = GROUND_Y - player.h
                 player.jump()
