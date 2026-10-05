@@ -75,7 +75,6 @@ class Spike:
             screen.fill((255, 0, 0))
             sleep(0.2)
             reset_game()
-            in_game = True
 
 class Block:
     # spike characteristics
@@ -220,6 +219,7 @@ def reset_game():
     blocks = []
     tick_counter = 0
     frame_counter = 0
+    in_game = True
 
 #screen setup
 FRAMERATE = 120
