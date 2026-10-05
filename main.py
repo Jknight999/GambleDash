@@ -86,7 +86,7 @@ class Spike:
         self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def check_collision(self):
-        global running, in_game, player
+        global in_game, player
 
         # finds offset amount from the hitbox to the player
         offset_x = int(self.hitbox.x - player.rect.x)
@@ -95,9 +95,8 @@ class Spike:
         # if the player and mask overlap then reset the level
         if player.mask.overlap(self.mask, (offset_x, offset_y)):
             screen.fill((255, 0, 0))
-            sleep(0.2)
             reset_game()
-            in_game = True
+
 class Block:
     # spike characteristics
     def __init__(self, x, y):
@@ -228,20 +227,16 @@ def parse_level(level,tick):
          if level[row_number][tick] == '1':
              spikes.append(Spike(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
          elif level[row_number][tick] == '0':
-             print('Block!')
              blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
 
 def reset_game():
-    global in_game, in_casino, in_menu, player, spikes, blocks, tick_counter, frame_counter
-    in_game = False
-    in_casino = False
-    in_menu = False
+    global player, spikes, blocks, tick_counter, frame_counter
     player.__init__(SCREENWIDTH,SCREENHEIGHT,GROUND_Y)
     spikes = []
     blocks = []
     tick_counter = 0
     frame_counter = 0
-    in_game = True
+
 
 #screen setup
 FRAMERATE = 120
