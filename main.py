@@ -1,6 +1,7 @@
 import pygame
 import pygame.freetype
 import math
+from time import sleep
 
 class Player:
     #player characteristics
@@ -69,9 +70,12 @@ class Spike:
         self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def check_collision(self):
-        global running
+        global running, in_game, player
         if player.rect.colliderect(self.hitbox):
             screen.fill((255, 0, 0))
+            sleep(1)
+            reset_game()
+
 
 class Block:
     #spike characteristics
@@ -187,6 +191,16 @@ def parse_level(level,tick):
          elif level[row_number][tick] == '0':
              print('Block!')
              blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
+
+def reset_game():
+    global in_game, in_casino, player, spikes, blocks, tick_counter, frame_counter
+    in_game = False
+    in_casino = False
+    player.__init__(SCREENWIDTH,SCREENHEIGHT,GROUND_Y)
+    spikes = []
+    blocks = []
+    tick_counter = 0
+    frame_counter = 0
 
 #screen setup
 FRAMERATE = 120
