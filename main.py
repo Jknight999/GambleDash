@@ -69,8 +69,10 @@ class Spike:
         self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def check_collision(self):
+        global in_game
         global running
         if player.rect.colliderect(self.hitbox):
+            in_game = False
             screen.fill((255, 0, 0))
 
 class Block:
