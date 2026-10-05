@@ -175,7 +175,7 @@ def draw_block(to_draw):
     pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
 
 def draw_platformer_screen(floor):
-    screen.fill((17, 56, 171))
+    screen.blit(bg)
     #calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
 
@@ -274,6 +274,7 @@ levels = {
 tick_counter = 0
 frame_counter = 0
 
+bg = pygame.image.load("assets/background.jpg").convert()
 #initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 
