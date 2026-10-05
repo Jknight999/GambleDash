@@ -138,6 +138,11 @@ class Button:
                         in_menu = False
                     else:
                         pass
+                elif button_type == "Back":
+                    if not in_menu:
+                        in_menu = True
+                        in_casino = False
+                        in_game = False
 
 def draw_player(to_draw):
     global screen
@@ -178,6 +183,8 @@ def draw_platformer_screen(floor):
     screen.fill((17, 56, 171))
     #calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
+    back_button.draw_button(screen)
+    back_button.render_text()
 
 def draw_menu_screen():
     screen.fill((17, 56, 171))
@@ -192,6 +199,8 @@ def draw_casino_screen():
     CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
     CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 4), f'Your Chips: {chips}', (255, 255, 255))
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
+    back_button.draw_button(screen)
+    back_button.render_text()
 
 def parse_level(level,tick):
     for row_number in range(len(level)):
@@ -205,7 +214,7 @@ def reset_game():
     global in_game, in_casino, in_menu, player, spikes, blocks, tick_counter, frame_counter
     in_game = False
     in_casino = False
-    in_menu = True
+    in_menu = False
     player.__init__(SCREENWIDTH,SCREENHEIGHT,GROUND_Y)
     spikes = []
     blocks = []
@@ -280,6 +289,7 @@ player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 #now takes a text argument - ('text', 'font file name', size, color(R,G,B))
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
+back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 
 # lists of generated instances of the classes to allow for multiple to be on screen
 spikes = []
@@ -303,6 +313,7 @@ while running:
         # sends event to button to see if it's been clicked
         play_button.check_button_click(event, "Play")
         casino_button.check_button_click(event, "Gamble")
+        back_button.check_button_click(event, "Back")
 
     if in_game:
         # jumping if space bar is pressed, otherwise not

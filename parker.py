@@ -1,6 +1,7 @@
 import pygame
 import pygame.freetype
 import math
+from time import sleep
 
 class Player:
     #player characteristics
@@ -54,7 +55,7 @@ class Spike:
         self.y = y
         self.width = SCREENWIDTH / 20
         self.height = SCREENHEIGHT / 10
-        self.speed = 450
+        self.speed = 550
         self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def find_vertices(self):
@@ -69,18 +70,21 @@ class Spike:
         self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def check_collision(self):
-        global running
+        global running, in_game, player
         if player.rect.colliderect(self.hitbox):
             screen.fill((255, 0, 0))
+            sleep(0.2)
+            reset_game()
+            in_game = True
 
 class Block:
-    #spike characteristics
+    # spike characteristics
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.width = SCREENWIDTH / 20
         self.height = SCREENHEIGHT / 10
-        self.speed = 450
+        self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def scroll(self):
@@ -116,15 +120,29 @@ class Button:
 
     #checks if the button is clicked and loads GambleDash
     def check_button_click(self, click_event, button_type):
+        global in_menu
         global in_game
         global in_casino
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             if click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1:
                 if button_type == "Play":
-                    in_game = True
+                    if in_menu:
+                        in_game = True
+                        in_menu = False
+                    else:
+                        pass
                 elif button_type == "Gamble":
-                    in_casino = True
+                    if in_menu:
+                        in_casino = True
+                        in_menu = False
+                    else:
+                        pass
+                elif button_type == "Back":
+                    if not in_menu:
+                        in_menu = True
+                        in_casino = False
+                        in_game = False
 
 def draw_player(to_draw):
     global screen
@@ -165,6 +183,8 @@ def draw_platformer_screen(floor):
     screen.fill((17, 56, 171))
     #calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
+    back_button.draw_button(screen)
+    back_button.render_text()
 
 def draw_menu_screen():
     screen.fill((17, 56, 171))
@@ -179,6 +199,8 @@ def draw_casino_screen():
     CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
     CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 4), f'Your Chips: {chips}', (255, 255, 255))
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
+    back_button.draw_button(screen)
+    back_button.render_text()
 
 def parse_level(level,tick):
     for row_number in range(len(level)):
@@ -187,6 +209,17 @@ def parse_level(level,tick):
          elif level[row_number][tick] == '0':
              print('Block!')
              blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
+
+def reset_game():
+    global in_game, in_casino, in_menu, player, spikes, blocks, tick_counter, frame_counter
+    in_game = False
+    in_casino = False
+    in_menu = False
+    player.__init__(SCREENWIDTH,SCREENHEIGHT,GROUND_Y)
+    spikes = []
+    blocks = []
+    tick_counter = 0
+    frame_counter = 0
 
 #screen setup
 FRAMERATE = 120
@@ -236,15 +269,15 @@ clock =  pygame.time.Clock()
 # New level data list
 # 1 is a spike, 0 is a block, ' ' is nothing
 levels = {
-    1: [
+    1: (
     '                                                                       ',
     '                                                                       ',
     '                                                                       ',
+    '                        0                                              ',
     '                                                                       ',
-    '                                                                       ',
-    '                                                                       ',
-    '        111        1       1     1       111           11       1      '
-]
+    '                                       0                               ',
+    '        111        1       1     1        111           11       1     '
+    )
 }
 
 tick_counter = 0
@@ -256,18 +289,17 @@ player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 #now takes a text argument - ('text', 'font file name', size, color(R,G,B))
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
+back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 
 # lists of generated instances of the classes to allow for multiple to be on screen
 spikes = []
 blocks = []
 
-# List of buttons that can be used to jump
-jump_buttons = [pygame.K_w, pygame.K_SPACE]
-
 pygame.display.set_caption("GambleDash")
 chips= 100
 dt = 0
 running = True
+in_menu = True
 in_game = False
 in_casino = False
 current_level = 1
@@ -281,11 +313,12 @@ while running:
         # sends event to button to see if it's been clicked
         play_button.check_button_click(event, "Play")
         casino_button.check_button_click(event, "Gamble")
+        back_button.check_button_click(event, "Back")
 
     if in_game:
         # jumping if space bar is pressed, otherwise not
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] or keys[pygame.K_w]:
             if player.y >= GROUND_Y - player.h:
                 player.y = GROUND_Y - player.h
                 player.jump()
@@ -297,13 +330,15 @@ while running:
             spike.scroll()
         for block in blocks:
             block.scroll()
-        if frame_counter % math.floor(SCREENWIDTH / 160) == 0:
+        if frame_counter % math.floor(SCREENWIDTH / 200) == 0:
             if tick_counter < len(levels[current_level][0]) - 1:
                 tick_counter += 1
             else:
                 tick_counter = 0
             parse_level(levels[current_level], tick_counter)
         frame_counter += 1
+    elif in_casino:
+        pass
     else:
         pass
 
@@ -317,7 +352,7 @@ while running:
             draw_block(k)
     elif in_casino:
         draw_casino_screen()
-    else:
+    elif in_menu:
         draw_menu_screen()
 
     #4. Update and Wait
