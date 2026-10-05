@@ -27,11 +27,17 @@ class Player:
         # draws a box around the surface and snaps it to the center of the surface
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
+        #creates mask for collision handling
+        self.mask = pygame.mask.from_surface(self.rotated_surface)
+
     def rotate_player(self):
         self.angle = (self.angle + self.rotation_speed * dt) % 360
         # rotates the surface
         self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
+
+        #updates collision mask
+        self.mask = pygame.mask.from_surface(self.rotated_surface)
 
     def jump(self):
         self.y_vel = self.jump_strength
@@ -48,6 +54,9 @@ class Player:
             self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
+        #updates mask again
+        self.mask = pygame.mask.from_surface(self.rotated_surface)
+
 class Spike:
     #spike characteristics
     def __init__(self, x, y):
@@ -57,6 +66,13 @@ class Spike:
         self.height = SCREENHEIGHT / 10
         self.speed = 550
         self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
+
+        #makes the hitbox into a surface
+        self.surface = pygame.Surface((self.hitbox.width, self.hitbox.height), pygame.SRCALPHA)
+        self.surface.fill((255, 0, 0))
+
+        #draws a mask around the surface
+        self.mask = pygame.mask.from_surface(self.surface)
 
     def find_vertices(self):
         #calculates where the vertices should be based off x, y, w and h of the spike
@@ -71,11 +87,16 @@ class Spike:
 
     def check_collision(self):
         global running, in_game, player
-        if player.rect.colliderect(self.hitbox):
+        #finds offset amount from the hitbox to the player
+        offset_x = int(self.hitbox.x - player.rect.x)
+        offset_y = int(self.hitbox.y - player.rect.y)
+
+        #if the player and mask overlap then reset the level
+        if player.mask.overlap(self.mask, (offset_x, offset_y)):
             screen.fill((255, 0, 0))
             sleep(0.2)
             reset_game()
-
+            in_game = True
 
 class Block:
     # spike characteristics
@@ -267,7 +288,7 @@ levels = {
     '                        0                                              ',
     '                                                                       ',
     '                                       0                               ',
-    '        111        1       1     1        111           11       1      '
+    '        111        1       1     1        111           11       1     '
     )
 }
 
@@ -307,7 +328,7 @@ while running:
     if in_game:
         # jumping if space bar is pressed, otherwise not
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE or pygame.K_w]:
+        if keys[pygame.K_SPACE] or keys[pygame.K_w]:
             if player.y >= GROUND_Y - player.h:
                 player.y = GROUND_Y - player.h
                 player.jump()
