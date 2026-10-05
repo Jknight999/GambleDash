@@ -146,7 +146,7 @@ class Button:
 def draw_player(to_draw):
     global screen
     screen.blit(to_draw.rotated_surface, to_draw.rect)
-    #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
+    #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))l
 
 def draw_spike(to_draw):
     #creates a list of the spikes (so that it can be iterated through)
