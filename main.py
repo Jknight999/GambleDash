@@ -75,7 +75,7 @@ class Spike:
             screen.fill((255, 0, 0))
             sleep(0.2)
             reset_game()
-
+            in_game = True
 
 class Block:
     # spike characteristics
