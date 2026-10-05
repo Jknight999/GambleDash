@@ -120,15 +120,24 @@ class Button:
 
     #checks if the button is clicked and loads GambleDash
     def check_button_click(self, click_event, button_type):
+        global in_menu
         global in_game
         global in_casino
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             if click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1:
                 if button_type == "Play":
-                    in_game = True
+                    if in_menu:
+                        in_game = True
+                        in_menu = False
+                    else:
+                        pass
                 elif button_type == "Gamble":
-                    in_casino = True
+                    if in_menu:
+                        in_casino = True
+                        in_menu = False
+                    else:
+                        pass
 
 def draw_player(to_draw):
     global screen
@@ -193,9 +202,10 @@ def parse_level(level,tick):
              blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
 
 def reset_game():
-    global in_game, in_casino, player, spikes, blocks, tick_counter, frame_counter
+    global in_game, in_casino, in_menu, player, spikes, blocks, tick_counter, frame_counter
     in_game = False
     in_casino = False
+    in_menu = True
     player.__init__(SCREENWIDTH,SCREENHEIGHT,GROUND_Y)
     spikes = []
     blocks = []
@@ -279,6 +289,7 @@ pygame.display.set_caption("GambleDash")
 chips= 100
 dt = 0
 running = True
+in_menu = True
 in_game = False
 in_casino = False
 current_level = 1
@@ -315,6 +326,8 @@ while running:
                 tick_counter = 0
             parse_level(levels[current_level], tick_counter)
         frame_counter += 1
+    elif in_casino:
+        pass
     else:
         pass
 
@@ -328,7 +341,7 @@ while running:
             draw_block(k)
     elif in_casino:
         draw_casino_screen()
-    else:
+    elif in_menu:
         draw_menu_screen()
 
     #4. Update and Wait
