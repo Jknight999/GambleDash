@@ -236,15 +236,15 @@ clock =  pygame.time.Clock()
 # New level data list
 # 1 is a spike, 0 is a block, ' ' is nothing
 levels = {
-    1: [
+    1: (
     '                                                                       ',
     '                                                                       ',
     '                                                                       ',
+    '                        0                                              ',
     '                                                                       ',
-    '                                                                       ',
-    '                                                                       ',
+    '                                       0                               ',
     '        111        1       1     1        111           11       1      '
-]
+    )
 }
 
 tick_counter = 0
