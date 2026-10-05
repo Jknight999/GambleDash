@@ -78,7 +78,7 @@ class Spike:
 
 
 class Block:
-    #spike characteristics
+    # spike characteristics
     def __init__(self, x, y):
         self.x = x
         self.y = y
