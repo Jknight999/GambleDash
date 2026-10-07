@@ -237,7 +237,6 @@ def reset_game():
     tick_counter = 0
     frame_counter = 0
 
-
 #screen setup
 FRAMERATE = 120
 SCREENWIDTH = 1000
