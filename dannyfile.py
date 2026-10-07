@@ -17,6 +17,8 @@ class Player:
         self.jump_strength = -900
         self.angle = 0
         self.rotation_speed = -(self.gravity / 10)
+        self.center_x = self.x + self.w // 2
+        self.center_y = self.y + self.h // 2
 
         #makes a sprite of the cube asset
         self.image = pygame.image.load("Assets/playerskin1.png").convert_alpha()
@@ -24,7 +26,7 @@ class Player:
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
         self.rotated_surface = self.image
         # draws a box around the surface and snaps it to the center of the surface
-        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
+        self.rect = self.rotated_surface.get_rect(center=(self.center_x, self.center_y))
 
         # creates mask for collision handling
         self.mask = pygame.mask.from_surface(self.rotated_surface)
@@ -33,7 +35,7 @@ class Player:
         self.angle = (self.angle + self.rotation_speed * dt) % 360
         # rotates the surface
         self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
-        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
+        self.rect = self.rotated_surface.get_rect(center=(self.center_x, self.center_y))
 
         # updates collision mask
         self.mask = pygame.mask.from_surface(self.rotated_surface)
@@ -51,7 +53,7 @@ class Player:
             # snaps the cube back to flat on the ground
             self.angle = round(self.angle / 90) * 90 % 360
             self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
-        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
+        self.rect = self.rotated_surface.get_rect(center=(self.center_x, self.center_y))
 
         # updates mask again
         self.mask = pygame.mask.from_surface(self.rotated_surface)
