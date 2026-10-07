@@ -11,7 +11,7 @@ class Card:
         return f'{self.rank} of {self.suit}'
 class Deck:
     def __init__(self):
-        suits = ("hearts", "diamonds", "spades", "clubs")
+        suits = ("hearts", "diamonds", "spades", "crosses")
         ranks = ('A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K')
         # list comprehension stuff -- but basically just initializes a card for each suit and rank by looping through their iterables
         self.cards = [Card(suit, rank) for suit in suits for rank in ranks]
