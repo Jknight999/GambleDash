@@ -1,7 +1,6 @@
 import pygame
 import pygame.freetype
 import math
-from time import sleep
 
 class Player:
     #player characteristics
