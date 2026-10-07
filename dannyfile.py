@@ -17,9 +17,11 @@ class Player:
         self.jump_strength = -900
         self.angle = 0
         self.rotation_speed = -(self.gravity / 10)
+        self.center_x = self.x + self.w // 2
+        self.center_y = self.y + self.h // 2
 
         #makes a sprite of the cube asset
-        self.image = pygame.image.load("Assets/playerskin1.png").convert_alpha()
+        self.image = pygame.image.load("Assets/playerskin01.png").convert_alpha()
         #sets the size to 40 x 40
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
         self.rotated_surface = self.image
@@ -186,14 +188,6 @@ def draw_spike(to_draw):
     pygame.draw.polygon(screen, (255, 255, 255), (v_a, v_b, v_c), width=3)
     if SHOW_SPIKE_HITBOXES:
         pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
-    #loops once for each spike
-    ''''
-    for i in amount:
-        #matches each spike to its vertices by passing in the spike number to the function, which returns its vertices
-        spike_to_draw[i] = to_draw.find_vertices(i)
-        pygame.draw.polygon(screen, (0, 0, 0), spike_to_draw[i])
-        pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i], width=3)
-    '''
 
 def draw_block(to_draw):
     global screen
@@ -284,6 +278,7 @@ clock =  pygame.time.Clock()
 
 # New level data list
 # 1 is a spike, 0 is a block, ' ' is nothing
+#72 things long
 levels = {
     1: (
     '                                                                       ',
@@ -292,7 +287,7 @@ levels = {
     '                        0                                              ',
     '                                                                       ',
     '                                       0                               ',
-    '        111        1       1     1        111           11       1     '
+    '        000        1       1     1        111           11       1     '
     )
 }
 
