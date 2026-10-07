@@ -124,7 +124,7 @@ class Block:
         offset_x = int(self.block.x - player.rect.x)
         offset_y = int(self.block.y - player.rect.y)
 
-        # if the player and the mask overlap then reset the level
+        #if the player and the mask overlap then reset the level
         if player.mask.overlap(self.mask, (offset_x, offset_y)):
             print('overlap')
             print(self.block.x - player.w, player.x, self.block.x + self.block.width)
