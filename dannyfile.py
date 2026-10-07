@@ -1,7 +1,6 @@
 import pygame
 import pygame.freetype
 import math
-from time import sleep
 
 class Player:
     #player characteristics
@@ -27,7 +26,7 @@ class Player:
         # draws a box around the surface and snaps it to the center of the surface
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
-        #creates mask for collision handling
+        # creates mask for collision handling
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
     def rotate_player(self):
@@ -36,7 +35,7 @@ class Player:
         self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
-        #updates collision mask
+        # updates collision mask
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
     def jump(self):
@@ -54,7 +53,7 @@ class Player:
             self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
-        #updates mask again
+        # updates mask again
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
 class Spike:
@@ -67,11 +66,11 @@ class Spike:
         self.speed = 550
         self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
-        #makes the hitbox into a surface
+        # makes the hitbox into a surface
         self.surface = pygame.Surface((self.hitbox.width, self.hitbox.height), pygame.SRCALPHA)
         self.surface.fill((255, 0, 0))
 
-        #draws a mask around the surface
+        # draws a mask around the surface
         self.mask = pygame.mask.from_surface(self.surface)
 
     def find_vertices(self):
@@ -86,17 +85,16 @@ class Spike:
         self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
     def check_collision(self):
-        global running, in_game, player
-        #finds offset amount from the hitbox to the player
+        global in_game, player
+
+        # finds offset amount from the hitbox to the player
         offset_x = int(self.hitbox.x - player.rect.x)
         offset_y = int(self.hitbox.y - player.rect.y)
 
-        #if the player and mask overlap then reset the level
+        # if the player and mask overlap then reset the level
         if player.mask.overlap(self.mask, (offset_x, offset_y)):
             screen.fill((255, 0, 0))
-            sleep(0.2)
             reset_game()
-            in_game = True
 
 class Block:
     # spike characteristics
@@ -149,6 +147,7 @@ class Button:
             if click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1:
                 if button_type == "Play":
                     if in_menu:
+                        reset_game()
                         in_game = True
                         in_menu = False
                     else:
@@ -159,11 +158,16 @@ class Button:
                         in_menu = False
                     else:
                         pass
+                elif button_type == "Back":
+                    if not in_menu:
+                        in_menu = True
+                        in_casino = False
+                        in_game = False
 
 def draw_player(to_draw):
     global screen
     screen.blit(to_draw.rotated_surface, to_draw.rect)
-    #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))
+    #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))l
 
 def draw_spike(to_draw):
     #creates a list of the spikes (so that it can be iterated through)
@@ -196,9 +200,11 @@ def draw_block(to_draw):
     pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
 
 def draw_platformer_screen(floor):
-    screen.fill((17, 56, 171))
+    screen.blit(bg)
     #calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
+    back_button.draw_button(screen)
+    back_button.render_text()
 
 def draw_menu_screen():
     screen.fill((17, 56, 171))
@@ -213,20 +219,18 @@ def draw_casino_screen():
     CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
     CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 4), f'Your Chips: {chips}', (255, 255, 255))
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
+    back_button.draw_button(screen)
+    back_button.render_text()
 
 def parse_level(level,tick):
     for row_number in range(len(level)):
          if level[row_number][tick] == '1':
              spikes.append(Spike(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
          elif level[row_number][tick] == '0':
-             print('Block!')
              blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
 
 def reset_game():
-    global in_game, in_casino, in_menu, player, spikes, blocks, tick_counter, frame_counter
-    in_game = False
-    in_casino = False
-    in_menu = True
+    global player, spikes, blocks, tick_counter, frame_counter
     player.__init__(SCREENWIDTH,SCREENHEIGHT,GROUND_Y)
     spikes = []
     blocks = []
@@ -295,12 +299,14 @@ levels = {
 tick_counter = 0
 frame_counter = 0
 
+bg = pygame.image.load("assets/background.jpg").convert()
 #initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 
 #now takes a text argument - ('text', 'font file name', size, color(R,G,B))
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
+back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 
 # lists of generated instances of the classes to allow for multiple to be on screen
 spikes = []
@@ -324,6 +330,7 @@ while running:
         # sends event to button to see if it's been clicked
         play_button.check_button_click(event, "Play")
         casino_button.check_button_click(event, "Gamble")
+        back_button.check_button_click(event, "Back")
 
     if in_game:
         # jumping if space bar is pressed, otherwise not

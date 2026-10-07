@@ -10,5 +10,4 @@
 
 Optional Tasks:
 - Ingame level editor
-- skins
 - microtransactions to steal christopher's money
