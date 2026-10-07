@@ -20,7 +20,7 @@ class Player:
         self.rotation_speed = -(self.gravity / 10)
 
         #makes a sprite of the cube asset
-        self.image = pygame.image.load("Assets/playerskin1.png").convert_alpha()
+        self.image = pygame.image.load("Assets/playerskin2.png").convert_alpha()
         #sets the size to 40 x 40
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
         self.rotated_surface = self.image
@@ -148,6 +148,7 @@ class Button:
             if click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1:
                 if button_type == "Play":
                     if in_menu:
+                        reset_game()
                         in_game = True
                         in_menu = False
                     else:
