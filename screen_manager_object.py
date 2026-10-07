@@ -3,6 +3,8 @@ import pygame.freetype
 import math
 from time import sleep
 
+#to push
+
 class Player:
     #player characteristics
     def __init__(self, sw, sh, floor_y):
