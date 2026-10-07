@@ -108,10 +108,20 @@ class Block:
         self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
 
+        # makes the hitbox into a surface
+        self.surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        self.surface.fill((255, 0, 0))
+
+        # draws a mask around the surface
+        self.mask = pygame.mask.from_surface(self.surface)
+
     def scroll(self):
         # moves spike from left to right side of screen
         self.x -= self.speed * dt
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
+
+    def check_collision(self):
+        pass
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
@@ -362,6 +372,7 @@ while running:
             k.check_collision()
         for k in blocks:
             draw_block(k)
+            k.check_collision()
     elif in_casino:
         draw_casino_screen()
     elif in_menu:
