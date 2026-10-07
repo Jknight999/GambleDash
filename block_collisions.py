@@ -46,7 +46,7 @@ class Player:
         #applies gravity and ground collision detection
         self.y_vel += self.gravity * dt
         self.y += self.y_vel * dt
-        if self.y >= GROUND_Y - self.h:
+        if self.y >= GROUND_Y - self.h and not on_block:
             self.y = GROUND_Y - self.h
             self.y_vel = 0
             # snaps the cube back to flat on the ground
@@ -118,7 +118,7 @@ class Block:
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def check_collision(self):
-        global in_game, player
+        global in_game, player, on_block
 
         # finds offset amount from the hitbox to the player
         offset_x = int(self.block.x - player.rect.x)
@@ -129,12 +129,14 @@ class Block:
             print('overlap')
             print(self.block.x - player.w, player.x, self.block.x + self.block.width)
             print(self.block.y, player.rect.y + player.rect.h, self.block.y + SCREENHEIGHT / 50)
-            if self.block.x - player.rect.w <= player.rect.x <= self.block.x + self.block.width and self.block.y <= player.rect.y + player.rect.h <= self.block.y + SCREENHEIGHT / 5:
+            if self.block.x - player.rect.w <= player.rect.x <= self.block.x + self.block.width and self.block.y <= player.rect.y + player.rect.h <= self.block.y + SCREENHEIGHT / 50:
+                on_block = True
                 print('collision\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
                 player.y_vel = 0
-                player.rect.y = 0
+                player.rect.y = self.block.y - player.rect.h
                 player.angle = round(player.angle / 90) * 90 % 360
                 player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
+            else: on_block = False
 
         else:
             pass
@@ -347,6 +349,7 @@ running = True
 in_menu = True
 in_game = False
 in_casino = False
+on_block = False
 current_level = 1
 while running:
     for event in pygame.event.get():
@@ -364,12 +367,12 @@ while running:
         # jumping if space bar is pressed, otherwise not
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] or keys[pygame.K_w]:
-            if player.y >= GROUND_Y - player.h:
+            if player.y >= GROUND_Y - player.h or on_block:
                 player.y = GROUND_Y - player.h
                 player.jump()
         player.apply_physics()
         #rotate player if they're in the air
-        if player.y < GROUND_Y - player.h:
+        if player.y < GROUND_Y - player.h and not on_block:
             player.rotate_player()
         for spike in spikes:
             spike.scroll()
