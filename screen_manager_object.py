@@ -1,7 +1,6 @@
 import pygame
 import pygame.freetype
 import math
-from time import sleep
 
 #to push
 
@@ -178,7 +177,7 @@ class GameScreenManager:
     )
 }
         self.current_structure = 1
-        self.player_block_colliding, self.colliding_with = self.is_block_colliding(self.blocks)
+        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
 
     def scroll(self):
         for spike in self.spikes:
@@ -196,10 +195,13 @@ class GameScreenManager:
                 self.blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
 
     def tick(self, current_player):
-        self.player_block_colliding, self.colliding_with = self.is_block_colliding(self.blocks)
-        #scrolls
+        #converts the tuple into two variables to work with throughout the code
+        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
+
+        #scrolls the whole level
         self.scroll()
-        #count ticks
+
+        # counts frames and converts into ticks
         if self.frame_counter % math.floor(SCREENWIDTH / 200) == 0:
             if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
                 self.tick_counter += 1
@@ -207,43 +209,69 @@ class GameScreenManager:
                 self.tick_counter = 0
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
+
+        # calculates delta time from framerate
         self.dt = self.clock.tick(FRAMERATE) / 1000
-        self.draw_screen(floor_color)
+
+        #draws the game screen and the objects contained
+        GameScreenManager.draw_screen(floor_color)
         self.draw_objects()
+
+        # checks the collisions - rn the spike collision check is outside the class and the block is within
+        # fix it if you have time
         for k in self.spikes:
             k.check_collision()
         for k in self.blocks:
             self.check_block_player_collision(k)
+
+        # checks for jumping every tick and applies gravity
         self.check_jump(current_player)
-        self.apply_physics(current_player)
+        GameScreenManager.apply_physics(current_player)
+
+        # keeps the player above the floor and the blocks
         self.check_ground_collisions(current_player)
-        # rotate player if they're in the air
+
+        # rotates the player if they're in the air
         if current_player.y < GROUND_Y - current_player.h and not self.player_block_colliding:
             current_player.rotate_player()
+
+        # draws the player to the screen
         self.surface.blit(current_player.rotated_surface, current_player.rect)
 
     def check_jump(self, current_player):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] or keys[pygame.K_w]:
+            # touching a block
             if self.player_block_colliding:
                 current_player.y = self.colliding_with.y - current_player.h
                 current_player.y_vel = current_player.jump_strength
-            elif current_player.y >= GROUND_Y - current_player.h:
+
+            # touching the ground
+            if current_player.y >= GROUND_Y - current_player.h:
                 current_player.y = GROUND_Y - current_player.h
                 current_player.y_vel = current_player.jump_strength
 
-
-    def draw_screen(self, floor_c):
+    # these can be static methods since they do not edit any objects within this class, but should still be here for organization
+    @staticmethod
+    def draw_screen(floor_c):
         screen.blit(bg)
         # calculates so that the floor always draws 2/3 of the way down
         pygame.draw.rect(screen, floor_c, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
         back_button.draw_button(screen)
         back_button.render_text()
 
-    def apply_physics(self, current_player):
+    @staticmethod
+    def apply_physics(current_player):
         # applies gravity and ground collision detection
         current_player.y_vel += current_player.gravity * game_screen.dt
         current_player.y += current_player.y_vel * game_screen.dt
+
+    @staticmethod
+    def is_block_colliding(all_blocks):
+        for b in all_blocks:
+            if b.colliding:
+                return True, b
+        return False, None
 
     def check_ground_collisions(self, current_player):
         if current_player.y >= GROUND_Y - current_player.h:
@@ -255,7 +283,7 @@ class GameScreenManager:
         current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
         # updates mask again
         current_player.mask = pygame.mask.from_surface(current_player.rotated_surface)
-        self.player_block_colliding, self.colliding_with = self.is_block_colliding(self.blocks)
+        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
         if self.player_block_colliding:
             current_player.y = self.colliding_with.y - current_player.h
             current_player.y_vel = 0
@@ -281,12 +309,6 @@ class GameScreenManager:
             player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
         else:
             block.colliding = False
-
-    def is_block_colliding(self, all_blocks):
-        for b in all_blocks:
-            if b.colliding:
-                return True, b
-        return False, None
 
     def draw_objects(self):
         for to_draw in self.spikes:
