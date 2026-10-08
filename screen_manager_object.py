@@ -22,7 +22,7 @@ class Player:
         self.rotation_speed = -(self.gravity / 10)
 
         #makes a sprite of the cube asset
-        self.image = pygame.image.load("Assets/playerskin01.png").convert_alpha()
+        self.image = pygame.image.load("Assets/playerskin02.png").convert_alpha()
         #sets the size to 40 x 40
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
         self.rotated_surface = self.image
@@ -156,7 +156,7 @@ class GameScreenManager:
         self.tick_counter = 0
         self.frame_counter = 0
         self.dt = 0
-        self.levels = {
+        self.structures = {
     1: (
     '                                                                           ',
     '                                                                           ',
@@ -164,10 +164,20 @@ class GameScreenManager:
     '                                                                           ',
     '                                            0                              ',
     '                                       0    0                              ',
-    '        111        1       1      0    0    0111            11       1     '
+    '        111        1       1      01111011110111            11       1     '
+    ),
+
+    2: (
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           '
     )
 }
-        self.current_level = 1
+        self.current_structure = 1
         self.player_block_colliding, self.colliding_with = self.is_block_colliding(self.blocks)
 
     def scroll(self):
@@ -191,19 +201,18 @@ class GameScreenManager:
         self.scroll()
         #count ticks
         if self.frame_counter % math.floor(SCREENWIDTH / 200) == 0:
-            if self.tick_counter < len(self.levels[current_level][0]) - 1:
+            if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
                 self.tick_counter += 1
             else:
                 self.tick_counter = 0
-            self.print_level(self.levels[current_level], self.tick_counter)
+            self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
         self.dt = self.clock.tick(FRAMERATE) / 1000
         self.draw_screen(floor_color)
+        self.draw_objects()
         for k in self.spikes:
-            draw_spike(k)
             k.check_collision()
         for k in self.blocks:
-            draw_block(k)
             self.check_block_player_collision(k)
         self.check_jump(current_player)
         self.apply_physics(current_player)
@@ -265,7 +274,6 @@ class GameScreenManager:
             self.reset_game(player)
         # if the player and mask overlap then reset the level
         if block.block.x - player.rect.w <= player.rect.x <= block.block.x + block.width and block.block.y - SCREENHEIGHT / 200 <= player.rect.y + player.rect.h <= block.block.y + SCREENHEIGHT / 100:
-            print(block.block.y)
             block.colliding = True
             player.rect.y = block.block.y - player.rect.h
             player.y_vel = 0
@@ -280,6 +288,24 @@ class GameScreenManager:
                 return True, b
         return False, None
 
+    def draw_objects(self):
+        for to_draw in self.spikes:
+            # giving myself the ability to separate the vertices
+            v_a, v_b, v_c = to_draw.find_vertices()
+            pygame.draw.polygon(screen, (0, 0, 0), (v_a, v_b, v_c))
+            # shrinking the vertices inwards so that the outline doesn't go outside the block allotted
+            v_a[0] += 5
+            v_a[1] -= 3
+            v_b[1] += 3
+            v_c[0] -= 5
+            v_c[1] -= 3
+            pygame.draw.polygon(screen, (255, 255, 255), (v_a, v_b, v_c), width=3)
+            if SHOW_SPIKE_HITBOXES:
+                pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
+        for to_draw in self.blocks:
+            pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
+
+
     def reset_game(self, current_player):
         current_player.__init__(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
         self.spikes = []
@@ -287,36 +313,6 @@ class GameScreenManager:
         self.tick_counter = 0
         self.frame_counter = 0
 
-
-def draw_spike(to_draw):
-    #creates a list of the spikes (so that it can be iterated through)
-    #empty so that it can be filled with the vertices of each spike
-    #spike_to_draw= [None] * amount
-    global screen
-    #giving myself the ability to separate the vertices
-    v_a, v_b, v_c = to_draw.find_vertices()
-    pygame.draw.polygon(screen, (0, 0, 0), (v_a, v_b, v_c))
-    #shrinking the vertices inwards so that the outline doesn't go outside the block allotted
-    v_a[0] += 5
-    v_a[1] -= 3
-    v_b[1] += 3
-    v_c[0] -= 5
-    v_c[1] -= 3
-    pygame.draw.polygon(screen, (255, 255, 255), (v_a, v_b, v_c), width=3)
-    if SHOW_SPIKE_HITBOXES:
-        pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
-    #loops once for each spike
-    ''''
-    for i in amount:
-        #matches each spike to its vertices by passing in the spike number to the function, which returns its vertices
-        spike_to_draw[i] = to_draw.find_vertices(i)
-        pygame.draw.polygon(screen, (0, 0, 0), spike_to_draw[i])
-        pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i], width=3)
-    '''
-
-def draw_block(to_draw):
-    global screen
-    pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
 
 def draw_menu_screen():
     screen.fill((17, 56, 171))
@@ -339,7 +335,7 @@ def draw_casino_screen():
 FRAMERATE = 120
 SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
-SHOW_SPIKE_HITBOXES = True
+SHOW_SPIKE_HITBOXES = False
 
 #Text Stuff
 pygame.freetype.init()
