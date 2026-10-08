@@ -22,7 +22,7 @@ class Player:
         self.rotation_speed = -(self.gravity / 10)
 
         #makes a sprite of the cube asset
-        self.image = pygame.image.load("Assets/player_cube.png").convert_alpha()
+        self.image = pygame.image.load("Assets/playerskin01.png").convert_alpha()
         #sets the size to 40 x 40
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
         self.rotated_surface = self.image
@@ -33,7 +33,7 @@ class Player:
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
     def rotate_player(self):
-        self.angle = (self.angle + self.rotation_speed * dt) % 360
+        self.angle = (self.angle + self.rotation_speed * game_screen.dt) % 360
         # rotates the surface
         self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
@@ -41,23 +41,6 @@ class Player:
         # updates collision mask
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
-    def jump(self):
-        self.y_vel = self.jump_strength
-
-    def apply_physics(self):
-        #applies gravity and ground collision detection
-        self.y_vel += self.gravity * dt
-        self.y += self.y_vel * dt
-        if self.y >= GROUND_Y - self.h:
-            self.y = GROUND_Y - self.h
-            self.y_vel = 0
-            # snaps the cube back to flat on the ground
-            self.angle = round(self.angle / 90) * 90 % 360
-            self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
-        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
-
-        # updates mask again
-        self.mask = pygame.mask.from_surface(self.rotated_surface)
 
 class Spike:
     #spike characteristics
@@ -82,11 +65,6 @@ class Spike:
         # These vertices should not be used for hitboxes, spike hitboxes are rectangular
         return [[self.x, self.y + self.height], [self.x + self.width / 2, self.y], [self.x + self.width, self.y + self.height]]
 
-    def scroll(self):
-        # moves spike from left to right side of screen
-        self.x -= self.speed * dt
-        self.hitbox.x = self.x + self.width / 2.5
-
     def check_collision(self):
         global in_game, player
 
@@ -97,7 +75,7 @@ class Spike:
         # if the player and mask overlap then reset the level
         if player.mask.overlap(self.mask, (offset_x, offset_y)):
             screen.fill((255, 0, 0))
-            reset_game()
+            game_screen.reset_game(player)
 
 class Block:
     # spike characteristics
@@ -108,11 +86,6 @@ class Block:
         self.height = SCREENHEIGHT / 10
         self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
-
-    def scroll(self):
-        # moves spike from left to right side of screen
-        self.x -= self.speed * dt
-        self.block.x = self.x
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
@@ -166,9 +139,10 @@ class Button:
                         in_casino = False
                         in_game = False
 
-class ScreenManager:
-    def __init__(self, screen_to_draw):
-        self.screen = screen_to_draw
+class GameScreenManager:
+    def __init__(self, screen_to_draw, current_player):
+        self.surface = screen_to_draw
+        self.player = current_player
         self.spikes = []
         self.blocks = []
         self.buttons = []
@@ -176,40 +150,96 @@ class ScreenManager:
         self.clock = pygame.time.Clock()
         self.tick_counter = 0
         self.frame_counter = 0
+        self.dt = 0
+        self.levels = {
+    1: (
+    '                                                                       ',
+    '                                                                       ',
+    '                                                                       ',
+    '                        0                                              ',
+    '                                                                       ',
+    '                                       0                               ',
+    '        111        1       1     1        111           11       1     '
+    )
+}
+        self.current_level = 1
 
     def scroll(self):
         for spike in self.spikes:
-            spike.x -= spike.scroll_speed * dt
+            spike.x -= self.scroll_speed * self.dt
             spike.hitbox.x = spike.x + spike.width / 2.5
         for block in self.blocks:
-            block.x -= block.scroll_speed * dt
+            block.x -= self.scroll_speed * self.dt
             block.block.x = block.x
 
-    def parse_level(self, level, tick):
+    def print_level(self, level, tick):
         for row_number in range(len(level)):
             if level[row_number][tick] == '1':
-                spikes.append(Spike(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
+                self.spikes.append(Spike(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
             elif level[row_number][tick] == '0':
-                blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
+                self.blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
 
-    def tick(self):
-        if frame_counter % math.floor(SCREENWIDTH / 200) == 0:
-            if tick_counter < len(levels[current_level][0]) - 1:
-                tick_counter += 1
+    def tick(self, current_player):
+        #scrolls
+        self.scroll()
+        #count ticks
+        if self.frame_counter % math.floor(SCREENWIDTH / 200) == 0:
+            if self.tick_counter < len(self.levels[current_level][0]) - 1:
+                self.tick_counter += 1
             else:
-                tick_counter = 0
-            parse_level(levels[current_level], tick_counter)
-        frame_counter += 1
+                self.tick_counter = 0
+            self.print_level(self.levels[current_level], self.tick_counter)
+        self.frame_counter += 1
+        self.dt = self.clock.tick(FRAMERATE) / 1000
+        self.draw_screen(floor_color)
+        for k in self.spikes:
+            draw_spike(k)
+            k.check_collision()
+        for k in self.blocks:
+            draw_block(k)
+        self.check_jump(current_player)
+        self.apply_physics(current_player)
+        # rotate player if they're in the air
+        if current_player.y < GROUND_Y - current_player.h:
+            current_player.rotate_player()
+        self.surface.blit(current_player.rotated_surface, current_player.rect)
 
-        dt = self.clock.tick(FRAMERATE) / 1000
+    def check_jump(self, current_player):
+        global GROUND_Y
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] or keys[pygame.K_w]:
+            if current_player.y >= GROUND_Y - current_player.h:
+                current_player.y = GROUND_Y - current_player.h
+                current_player.y_vel = current_player.jump_strength
 
+    def draw_screen(self, floor_c):
+        screen.blit(bg)
+        # calculates so that the floor always draws 2/3 of the way down
+        pygame.draw.rect(screen, floor_c, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
+        back_button.draw_button(screen)
+        back_button.render_text()
 
+    def apply_physics(self, current_player):
+        # applies gravity and ground collision detection
+        current_player.y_vel += current_player.gravity * game_screen.dt
+        current_player.y += current_player.y_vel * game_screen.dt
+        if current_player.y >= GROUND_Y - current_player.h:
+            current_player.y = GROUND_Y - current_player.h
+            current_player.y_vel = 0
+            # snaps the cube back to flat on the ground
+            current_player.angle = round(current_player.angle / 90) * 90 % 360
+            current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
+        current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
+        # updates mask again
+        current_player.mask = pygame.mask.from_surface(current_player.rotated_surface)
 
+    def reset_game(self, current_player):
+        current_player.__init__(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
+        self.spikes = []
+        self.blocks = []
+        self.tick_counter = 0
+        self.frame_counter = 0
 
-def draw_player(to_draw):
-    global screen
-    screen.blit(to_draw.rotated_surface, to_draw.rect)
-    #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))l
 
 def draw_spike(to_draw):
     #creates a list of the spikes (so that it can be iterated through)
@@ -241,13 +271,6 @@ def draw_block(to_draw):
     global screen
     pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
 
-def draw_platformer_screen(floor):
-    screen.blit(bg)
-    #calculates so that the floor always draws 2/3 of the way down
-    pygame.draw.rect(screen, floor, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
-    back_button.draw_button(screen)
-    back_button.render_text()
-
 def draw_menu_screen():
     screen.fill((17, 56, 171))
     play_button.draw_button(screen)
@@ -263,14 +286,6 @@ def draw_casino_screen():
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
     back_button.draw_button(screen)
     back_button.render_text()
-
-def reset_game():
-    global player, spikes, blocks, tick_counter, frame_counter
-    player.__init__(SCREENWIDTH,SCREENHEIGHT,GROUND_Y)
-    spikes = []
-    blocks = []
-    tick_counter = 0
-    frame_counter = 0
 
 
 #screen setup
@@ -319,17 +334,6 @@ pygame.init()
 
 # New level data list
 # 1 is a spike, 0 is a block, ' ' is nothing
-levels = {
-    1: (
-    '                                                                       ',
-    '                                                                       ',
-    '                                                                       ',
-    '                        0                                              ',
-    '                                                                       ',
-    '                                       0                               ',
-    '        111        1       1     1        111           11       1     '
-    )
-}
 
 bg = pygame.image.load("assets/background.jpg").convert()
 #initializes first instances of class
@@ -341,9 +345,8 @@ casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCR
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 
 # lists of generated instances of the classes to allow for multiple to be on screen
-spikes = []
-blocks = []
 
+game_screen = GameScreenManager(screen, player)
 pygame.display.set_caption("GambleDash")
 chips= 100
 dt = 0
@@ -365,29 +368,7 @@ while running:
         back_button.check_button_click(event, "Back")
 
     if in_game:
-        # jumping if space bar is pressed, otherwise not
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] or keys[pygame.K_w]:
-            if player.y >= GROUND_Y - player.h:
-                player.y = GROUND_Y - player.h
-                player.jump()
-        player.apply_physics()
-        #rotate player if they're in the air
-        if player.y < GROUND_Y - player.h:
-            player.rotate_player()
-    elif in_casino:
-        pass
-    else:
-        pass
-
-    if in_game:
-        draw_platformer_screen(floor_color)
-        draw_player(player)
-        for k in spikes:
-            draw_spike(k)
-            k.check_collision()
-        for k in blocks:
-            draw_block(k)
+        game_screen.tick(player)
     elif in_casino:
         draw_casino_screen()
     elif in_menu:

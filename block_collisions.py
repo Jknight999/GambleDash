@@ -20,7 +20,7 @@ class Player:
         self.rotation_speed = -(self.gravity / 10)
 
         #makes a sprite of the cube asset
-        self.image = pygame.image.load("Assets/player_cube.png").convert_alpha()
+        self.image = pygame.image.load("Assets/playerskin01.png").convert_alpha()
         #sets the size to 40 x 40
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
         self.rotated_surface = self.image
