@@ -52,8 +52,13 @@ class Player:
             # snaps the cube back to flat on the ground
             self.angle = round(self.angle / 90) * 90 % 360
             self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
-        self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
-
+        is_block_colliding, colliding_with = check_block_colliding(blocks)
+        if is_block_colliding:
+            self.y = colliding_with.y - self.h
+            self.y_vel = 0
+            # snaps the cube back to flat on the ground
+            self.angle = round(self.angle / 90) * 90 % 360
+            self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         # updates mask again
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
@@ -106,6 +111,7 @@ class Block:
         self.height = SCREENHEIGHT / 10
         self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.colliding = False
 
         self.surface = pygame.Surface((self.block.width, self.block.height), pygame.SRCALPHA)
         self.surface.fill((255, 0, 0))
@@ -126,19 +132,24 @@ class Block:
 
         # if the player and mask overlap then reset the level
         if player.mask.overlap(self.mask, (offset_x, offset_y)):
-            print('overlap')
-            print(self.block.x - player.w, player.x, self.block.x + self.block.width)
-            print(self.block.y, player.rect.y + player.rect.h, self.block.y + SCREENHEIGHT / 50)
-            if self.block.x - player.rect.w <= player.rect.x <= self.block.x + self.block.width and self.block.y <= player.rect.y + player.rect.h <= self.block.y + SCREENHEIGHT / 50:
-                on_block = True
-                print('collision\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
-                player.y_vel = 0
+            #print('overlap')
+            #print(self.block.x - player.w, player.x, self.block.x + self.block.width)
+            #print(self.block.y, player.rect.y + player.rect.h, self.block.y + SCREENHEIGHT / 50)
+            if self.block.x - player.rect.w <= player.rect.x <= self.block.x + self.block.width and self.block.y - SCREENHEIGHT / 50 <= player.rect.y + player.rect.h <= self.block.y + SCREENHEIGHT / 50:
+                self.colliding = True
                 player.rect.y = self.block.y - player.rect.h
+                player.y_vel = 0
                 player.angle = round(player.angle / 90) * 90 % 360
                 player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
-
         else:
-            pass
+            self.colliding = False
+
+def check_block_colliding(all_blocks):
+    for b in all_blocks:
+        if b.colliding:
+            return True, b
+    return False, None
+
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
@@ -351,6 +362,8 @@ in_casino = False
 on_block = False
 current_level = 1
 while running:
+    on_block, block_collided_with = check_block_colliding(blocks)
+    print(on_block)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
