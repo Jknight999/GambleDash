@@ -158,13 +158,13 @@ class GameScreenManager:
         self.dt = 0
         self.levels = {
     1: (
-    '                                                                       ',
-    '                                                                       ',
-    '                                                                       ',
-    '                                                                       ',
-    '                                        0                              ',
-    '                                     0  0                              ',
-    '        111        1       1      0  0  0111            11       1     '
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                            0                              ',
+    '                                       0    0                              ',
+    '        111        1       1      0    0    0111            11       1     '
     )
 }
         self.current_level = 1
@@ -260,6 +260,9 @@ class GameScreenManager:
         offset_x = int(block.block.x - player.rect.x)
         offset_y = int(block.block.y - player.rect.y)
 
+        if player.mask.overlap(player.mask, (offset_x, offset_y)) and player.y > block.block.y + SCREENHEIGHT/ 100 - player.h:
+            screen.fill((255, 0, 0))
+            self.reset_game(player)
         # if the player and mask overlap then reset the level
         if block.block.x - player.rect.w <= player.rect.x <= block.block.x + block.width and block.block.y - SCREENHEIGHT / 200 <= player.rect.y + player.rect.h <= block.block.y + SCREENHEIGHT / 100:
             print(block.block.y)
@@ -268,7 +271,6 @@ class GameScreenManager:
             player.y_vel = 0
             player.angle = round(player.angle / 90) * 90 % 360
             player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
-
         else:
             block.colliding = False
 
