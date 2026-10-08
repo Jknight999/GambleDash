@@ -162,12 +162,13 @@ class GameScreenManager:
     '                                                                       ',
     '                                                                       ',
     '                                                                       ',
-    '                                                                       ',
-    '                                                                       ',
-    '        111        1       1      00000   111           11       1     '
+    '                                        0                              ',
+    '                                     0  0                              ',
+    '        111        1       1      0  0  0111            11       1     '
     )
 }
         self.current_level = 1
+        self.player_block_colliding, self.colliding_with = self.is_block_colliding(self.blocks)
 
     def scroll(self):
         for spike in self.spikes:
@@ -185,6 +186,7 @@ class GameScreenManager:
                 self.blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
 
     def tick(self, current_player):
+        self.player_block_colliding, self.colliding_with = self.is_block_colliding(self.blocks)
         #scrolls
         self.scroll()
         #count ticks
@@ -207,17 +209,20 @@ class GameScreenManager:
         self.apply_physics(current_player)
         self.check_ground_collisions(current_player)
         # rotate player if they're in the air
-        if current_player.y < GROUND_Y - current_player.h:
+        if current_player.y < GROUND_Y - current_player.h and not self.player_block_colliding:
             current_player.rotate_player()
         self.surface.blit(current_player.rotated_surface, current_player.rect)
 
     def check_jump(self, current_player):
-        global GROUND_Y
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] or keys[pygame.K_w]:
-            if current_player.y >= GROUND_Y - current_player.h:
+            if self.player_block_colliding:
+                current_player.y = self.colliding_with.y - current_player.h
+                current_player.y_vel = current_player.jump_strength
+            elif current_player.y >= GROUND_Y - current_player.h:
                 current_player.y = GROUND_Y - current_player.h
                 current_player.y_vel = current_player.jump_strength
+
 
     def draw_screen(self, floor_c):
         screen.blit(bg)
@@ -241,9 +246,9 @@ class GameScreenManager:
         current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
         # updates mask again
         current_player.mask = pygame.mask.from_surface(current_player.rotated_surface)
-        is_block_colliding, colliding_with = self.is_block_colliding(self.blocks)
-        if is_block_colliding:
-            current_player.y = colliding_with.y - current_player.h
+        self.player_block_colliding, self.colliding_with = self.is_block_colliding(self.blocks)
+        if self.player_block_colliding:
+            current_player.y = self.colliding_with.y - current_player.h
             current_player.y_vel = 0
             # snaps the cube back to flat on the ground
             current_player.angle = round(current_player.angle / 90) * 90 % 360
@@ -256,16 +261,14 @@ class GameScreenManager:
         offset_y = int(block.block.y - player.rect.y)
 
         # if the player and mask overlap then reset the level
-        if player.mask.overlap(block.mask, (offset_x, offset_y)):
-            # print('overlap')
-            # print(self.block.x - player.w, player.x, self.block.x + self.block.width)
-            # print(self.block.y, player.rect.y + player.rect.h, self.block.y + SCREENHEIGHT / 50)
-            if block.block.x - player.rect.w <= player.rect.x <= block.block.x + block.width and block.block.y - SCREENHEIGHT / 50 <= player.rect.y + player.rect.h <= block.block.y + SCREENHEIGHT / 50:
-                block.colliding = True
-                player.rect.y = block.block.y - player.rect.h
-                player.y_vel = 0
-                player.angle = round(player.angle / 90) * 90 % 360
-                player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
+        if block.block.x - player.rect.w <= player.rect.x <= block.block.x + block.width and block.block.y - SCREENHEIGHT / 200 <= player.rect.y + player.rect.h <= block.block.y + SCREENHEIGHT / 100:
+            print(block.block.y)
+            block.colliding = True
+            player.rect.y = block.block.y - player.rect.h
+            player.y_vel = 0
+            player.angle = round(player.angle / 90) * 90 % 360
+            player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
+
         else:
             block.colliding = False
 
