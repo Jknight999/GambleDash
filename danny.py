@@ -2,6 +2,9 @@ import pygame
 import pygame.freetype
 import math
 
+from jonah import reset_game
+
+
 class Player:
     #player characteristics
     def __init__(self, sw, sh, floor_y):
@@ -106,7 +109,7 @@ class Button:
     def draw_button(self, surface):
         pygame.draw.rect(surface, self.color, self.rect)
 
-    #checks if the button is clicked and loads GambleDash
+    #checks if the button is clicked
     def check_button_click(self, click_event, button_type):
         global in_menu, in_game, in_casino
         mouse_pos = pygame.mouse.get_pos()
@@ -164,9 +167,9 @@ class GameScreenManager:
     '                                                                           ',
     '                                                                           ',
     '                                   11                                      ',
-    '                   000000    0000000000000                                 ',
-    '            000000000000011110000000000000000                              ',
-    '     00000000000000000000000000000000000000000000000                       '
+    '                   000000    000000000000                                  ',
+    '            00000000000001111000000000000                                  ',
+    '     000000000000000000000000000000000000                                  '
     )
 }
         self.current_structure = 2
@@ -367,6 +370,8 @@ def draw_casino_screen():
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
     back_button.draw_button(screen)
     back_button.render_text()
+    higher_or_lower_button.draw_button(screen)
+    higher_or_lower_button.render_text()
 
 #screen setup
 FRAMERATE = 120
@@ -426,6 +431,7 @@ player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
+higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
 
 # lists of generated instances of the classes to allow for multiple to be on screen
 
@@ -448,6 +454,7 @@ while running:
         play_button.check_button_click(event, "Play")
         casino_button.check_button_click(event, "Gamble")
         back_button.check_button_click(event, "Back")
+        higher_or_lower_button.check_button_click(event, "Higher or Lower")
 
     if in_game:
         game_screen.tick(player)
