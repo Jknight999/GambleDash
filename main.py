@@ -179,6 +179,15 @@ class GameScreenManager:
         for block in self.blocks:
             block.x -= self.scroll_speed * self.dt
             block.block.x = block.x
+        self.discard_objects()
+
+    def discard_objects(self):
+        for spike in self.spikes:
+            if spike.x + spike.width < 0:
+                self.spikes.remove(spike)
+        for block in self.blocks:
+            if block.x + block.width < 0:
+                self.blocks.remove(block)
 
     def print_level(self, level, tick):
         #goes through each item in the structures list
