@@ -68,7 +68,6 @@ class Block:
         self.height = SCREENHEIGHT / 10
         self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.colliding = False
 
         #makes the block a sprite
         self.image = pygame.image.load("Assets/gambledashblock.png").convert_alpha()
@@ -104,7 +103,7 @@ class Button:
     def draw_button(self, surface):
         pygame.draw.rect(surface, self.color, self.rect)
 
-    #checks if the button is clicked and loads GambleDash
+    #checks if the button is clicked
     def check_button_click(self, click_event, button_type):
         global in_menu, in_game, in_casino
         mouse_pos = pygame.mouse.get_pos()
@@ -130,13 +129,12 @@ class Button:
 
 class GameScreenManager:
     #basic characteristics
-    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_r, g_y):
+    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_r):
         self.surface = screen_to_draw
         self.screen_width = s_w
         self.screen_height = s_h
         self.f_c = fl_color
         self.framerate = f_r
-        self.ground_y = g_y
         self.player = current_player
         self.spikes = []
         self.blocks = []
@@ -165,7 +163,7 @@ class GameScreenManager:
     '                                   11                                      ',
     '                   000000    000000000000                                  ',
     '            000000000000011110000000000000000000                           ',
-    '     000000000000000000000000000000000000000000000000                      '
+    '     0000000000000000000000000000000000000000000000                        '
     )
 }
         self.current_structure = 2
@@ -181,7 +179,6 @@ class GameScreenManager:
         for block in self.blocks:
             block.x -= self.scroll_speed * self.dt
             block.block.x = block.x
-
 
     def print_level(self, level, tick):
         #goes through each item in the structures list
@@ -224,13 +221,13 @@ class GameScreenManager:
 
         # checks for jumping every tick and applies gravity
         self.check_jump(current_player)
-        self.apply_physics(current_player)
+        GameScreenManager.apply_physics(current_player)
 
         # keeps the player above the floor and the blocks
         self.check_ground_collisions(current_player)
 
         # rotates the player if they're in the air
-        if current_player.y < self.ground_y - current_player.h and not self.player_block_colliding:
+        if current_player.y < GROUND_Y - current_player.h and not self.player_block_colliding:
             current_player.rotate_player()
 
         # draws the player to the screen
@@ -245,23 +242,24 @@ class GameScreenManager:
                 current_player.y_vel = current_player.jump_strength
 
             # touching the ground
-            if current_player.y >= self.ground_y - current_player.h:
-                current_player.y = self.ground_y - current_player.h
+            if current_player.y >= GROUND_Y - current_player.h:
+                current_player.y = GROUND_Y - current_player.h
                 current_player.y_vel = current_player.jump_strength
 
     # these can be static methods since they do not edit any objects within this class, but should still be here for organization
     def draw_screen(self, floor_c):
         screen.blit(bg)
         # calculates so that the floor always draws 2/3 of the way down
-        pygame.draw.rect(screen, floor_c, (0, self.ground_y, self.screen_width, self.screen_height - self.ground_y))
+        pygame.draw.rect(screen, floor_c, (0, GROUND_Y, self.screen_width, SCREENHEIGHT - GROUND_Y))
         #draws the back button to the screen
         back_button.draw_button(screen)
         back_button.render_text()
 
-    def apply_physics(self, current_player):
+    @staticmethod
+    def apply_physics(current_player):
         # applies gravity and ground collision detection
-        current_player.y_vel += current_player.gravity * self.dt
-        current_player.y += current_player.y_vel * self.dt
+        current_player.y_vel += current_player.gravity * game_screen.dt
+        current_player.y += current_player.y_vel * game_screen.dt
 
     @staticmethod
     def is_block_colliding(all_blocks):
@@ -273,8 +271,8 @@ class GameScreenManager:
 
     def check_ground_collisions(self, current_player):
         #checks if the player is on the ground
-        if current_player.y >= self.ground_y - current_player.h:
-            current_player.y = self.ground_y - current_player.h
+        if current_player.y >= GROUND_Y - current_player.h:
+            current_player.y = GROUND_Y - current_player.h
             current_player.y_vel = 0
 
             # snaps the cube back to flat on the ground
@@ -299,18 +297,19 @@ class GameScreenManager:
         offset_y = int(blk.block.y - current_player.rect.y)
 
         #if the player hits the side of the block then reset the game
-        if blk.block.x - current_player.rect.w <= current_player.rect.x <= blk.block.x + blk.width:
-            if current_player.mask.overlap(blk.mask, (offset_x, offset_y)):
-                if current_player.rect.y + current_player.rect.h <= blk.block.y + SCREENHEIGHT / 100:
-                    blk.colliding = True
-                    current_player.angle = round(player.angle / 90) * 90 % 360
-                    current_player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
-                    current_player.rect.y = blk.block.y - player.rect.h
-                    current_player.y_vel = 0
-                else:
-                    blk.colliding = False
-                    screen.fill((0, 0, 0))
-                    self.reset_game(current_player)
+        if current_player.mask.overlap(current_player.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + SCREENHEIGHT/ 100 - current_player.h:
+            screen.fill((0, 0, 0))
+            self.reset_game(current_player)
+
+        # if the player and mask overlap then reset the level
+        if blk.block.x - current_player.rect.w <= current_player.rect.x <= blk.block.x + blk.width and blk.block.y - SCREENHEIGHT / 200 <= current_player.rect.y + current_player.rect.h <= blk.block.y + SCREENHEIGHT / 100:
+            blk.colliding = True
+            current_player.rect.y = blk.block.y - player.rect.h
+            current_player.y_vel = 0
+            current_player.angle = round(player.angle / 90) * 90 % 360
+            current_player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
+        else:
+            blk.colliding = False
 
     def check_spike_player_collision(self, spk, current_player):
         # finds offset amount from the hitbox to the player
@@ -318,7 +317,7 @@ class GameScreenManager:
         offset_y = int(spk.hitbox.y - current_player.rect.y)
 
         # if the player and mask overlap then reset the level
-        if current_player.mask.overlap(spk.mask, (offset_x, offset_y)):
+        if player.mask.overlap(spk.mask, (offset_x, offset_y)):
             screen.fill((0, 0, 0))
             self.reset_game(current_player)
 
@@ -344,7 +343,7 @@ class GameScreenManager:
 
     #resets the game
     def reset_game(self, current_player):
-        current_player.__init__(self.screen_width, self.screen_height, self.ground_y)
+        current_player.__init__(self.screen_width, SCREENHEIGHT, GROUND_Y)
         self.spikes = []
         self.blocks = []
         self.tick_counter = 0
@@ -365,6 +364,8 @@ def draw_casino_screen():
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
     back_button.draw_button(screen)
     back_button.render_text()
+    higher_or_lower_button.draw_button(screen)
+    higher_or_lower_button.render_text()
 
 #screen setup
 FRAMERATE = 120
@@ -424,10 +425,11 @@ player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
+higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
 
 # lists of generated instances of the classes to allow for multiple to be on screen
 
-game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE, GROUND_Y)
+game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE)
 pygame.display.set_caption("GambleDash")
 chips= 100
 dt = 0
@@ -446,6 +448,7 @@ while running:
         play_button.check_button_click(event, "Play")
         casino_button.check_button_click(event, "Gamble")
         back_button.check_button_click(event, "Back")
+        higher_or_lower_button.check_button_click(event, "Higher or Lower")
 
     if in_game:
         game_screen.tick(player)
