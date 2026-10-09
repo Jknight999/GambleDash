@@ -332,6 +332,7 @@ while running:
             if in_menu:
                 in_game = True
                 in_menu = False
+                GameScreenManager.reset_game(game_screen, player)
         if casino_button.check_button_click(event):
             if in_menu:
                 in_casino = True
