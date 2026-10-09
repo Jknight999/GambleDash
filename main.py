@@ -298,19 +298,20 @@ class GameScreenManager:
         offset_x = int(blk.block.x - current_player.rect.x)
         offset_y = int(blk.block.y - current_player.rect.y)
 
-        #if the player hits the side of the block then reset the game
-        if blk.block.x - current_player.rect.w <= current_player.rect.x <= blk.block.x + blk.width:
-            if current_player.mask.overlap(blk.mask, (offset_x, offset_y)):
-                if current_player.rect.y + current_player.rect.h <= blk.block.y + SCREENHEIGHT / 100:
-                    blk.colliding = True
-                    current_player.angle = round(player.angle / 90) * 90 % 360
-                    current_player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
-                    current_player.rect.y = blk.block.y - player.rect.h
-                    current_player.y_vel = 0
-                else:
-                    blk.colliding = False
-                    screen.fill((0, 0, 0))
-                    self.reset_game(current_player)
+        # if the player hits the side of the block then reset the game
+        if current_player.mask.overlap(blk.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + self.screen_height / 100 - current_player.h:
+            screen.fill((0, 0, 0))
+            self.reset_game(current_player)
+
+            # if the player and mask overlap then reset the level
+        if blk.block.x - current_player.rect.w <= current_player.rect.x <= blk.block.x + blk.width and blk.block.y - self.screen_height / 200 <= current_player.rect.y + current_player.rect.h <= blk.block.y + SCREENHEIGHT / 100:
+            blk.colliding = True
+            current_player.rect.y = blk.block.y - player.rect.h
+            current_player.y_vel = 0
+            current_player.angle = round(player.angle / 90) * 90 % 360
+            current_player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
+        else:
+            blk.colliding = False
 
     def check_spike_player_collision(self, spk, current_player):
         # finds offset amount from the hitbox to the player
