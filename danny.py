@@ -131,7 +131,6 @@ class GameScreenManager:
                 current_player.y = GROUND_Y - current_player.h
                 current_player.y_vel = current_player.jump_strength
 
-    # these can be static methods since they do not edit any objects within this class, but should still be here for organization
     def draw_screen(self, floor_c):
         screen.blit(bg)
         # calculates so that the floor always draws 2/3 of the way down
@@ -139,20 +138,6 @@ class GameScreenManager:
         #draws the back button to the screen
         back_button.draw_button(screen)
         back_button.render_text(self.surface)
-
-    @staticmethod
-    def apply_physics(current_player):
-        # applies gravity and ground collision detection
-        current_player.y_vel += current_player.gravity * game_screen.dt
-        current_player.y += current_player.y_vel * game_screen.dt
-
-    @staticmethod
-    def is_block_colliding(all_blocks):
-        #if the player is colliding with a block then return true and the block
-        for b in all_blocks:
-            if b.colliding:
-                return True, b
-        return False, None
 
     def check_ground_collisions(self, current_player):
         #checks if the player is on the ground
@@ -233,6 +218,20 @@ class GameScreenManager:
         self.blocks = []
         self.tick_counter = 0
         self.frame_counter = 0
+
+    @staticmethod
+    def apply_physics(current_player):
+        # applies gravity and ground collision detection
+        current_player.y_vel += current_player.gravity * game_screen.dt
+        current_player.y += current_player.y_vel * game_screen.dt
+
+    @staticmethod
+    def is_block_colliding(all_blocks):
+        # if the player is colliding with a block then return true and the block
+        for b in all_blocks:
+            if b.colliding:
+                return True, b
+        return False, None
 
 def draw_menu_screen():
     screen.fill((17, 56, 171))
