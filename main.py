@@ -36,9 +36,6 @@ class Player:
         self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
-        # updates collision mask
-        #self.mask = pygame.mask.from_surface(self.rotated_surface)
-
 class Spike:
     #spike characteristics
     def __init__(self, x, y):
