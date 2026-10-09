@@ -38,7 +38,6 @@ class Player:
         # updates collision mask
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
-
 class Spike:
     #spike characteristics
     def __init__(self, x, y):
@@ -72,10 +71,10 @@ class Block:
         self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
 
-        self.surface = pygame.Surface((self.block.width, self.block.height), pygame.SRCALPHA)
-        self.surface.fill((255, 0, 0))
+        self.image = pygame.image.load("Assets/blockskin.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (self.width, self.height))
 
-        self.mask = pygame.mask.from_surface(self.surface)
+        self.mask = pygame.mask.from_surface(self.image)
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
@@ -323,7 +322,7 @@ class GameScreenManager:
             if SHOW_SPIKE_HITBOXES:
                 pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
         for to_draw in self.blocks:
-            pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
+            screen.blit(to_draw.image, to_draw.block)
 
 
     def reset_game(self, current_player):
