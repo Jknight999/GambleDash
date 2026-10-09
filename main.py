@@ -163,13 +163,13 @@ class GameScreenManager:
     '                                                                           ',
     '                                                                           ',
     '                                                                           ',
-    '                                                                           ',
-    '                                                                           ',
-    '                                                                           ',
-    '                                                                           '
+    '                                   11                                      ',
+    '                   000000    0000000000000                                 ',
+    '            000000000000011110000000000000000                              ',
+    '     00000000000000000000000000000000000000000000000                       '
     )
 }
-        self.current_structure = 1
+        self.current_structure = 2
         #returns tuple of if the player is colliding with a block
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
 
