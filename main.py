@@ -301,7 +301,7 @@ class GameScreenManager:
 
         #if the player hits the side of the block then reset the game
         if current_player.mask.overlap(current_player.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + SCREENHEIGHT/ 100 - current_player.h:
-            screen.fill((255, 0, 0))
+            screen.fill((0, 0, 0))
             self.reset_game(current_player)
 
         # if the player and mask overlap then reset the level
@@ -321,7 +321,7 @@ class GameScreenManager:
 
         # if the player and mask overlap then reset the level
         if player.mask.overlap(spk.mask, (offset_x, offset_y)):
-            screen.fill((255, 0, 0))
+            screen.fill((0, 0, 0))
             self.reset_game(current_player)
 
     def draw_objects(self):
