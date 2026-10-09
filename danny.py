@@ -346,8 +346,8 @@ GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
-screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 pygame.init()
+screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 
 # New level data list
 # 1 is a spike, 0 is a block, ' ' is nothing
