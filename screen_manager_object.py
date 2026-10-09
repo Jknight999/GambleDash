@@ -2,8 +2,6 @@ import pygame
 import pygame.freetype
 import math
 
-#to push
-
 class Player:
     #player characteristics
     def __init__(self, sw, sh, floor_y):
