@@ -132,12 +132,13 @@ class Button:
 
 class GameScreenManager:
     #basic characteristics
-    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_r):
+    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_r, g_y):
         self.surface = screen_to_draw
         self.screen_width = s_w
         self.screen_height = s_h
         self.f_c = fl_color
         self.framerate = f_r
+        self.ground_y = g_y
         self.player = current_player
         self.spikes = []
         self.blocks = []
@@ -182,6 +183,7 @@ class GameScreenManager:
         for block in self.blocks:
             block.x -= self.scroll_speed * self.dt
             block.block.x = block.x
+
 
     def print_level(self, level, tick):
         #goes through each item in the structures list
@@ -230,7 +232,7 @@ class GameScreenManager:
         self.check_ground_collisions(current_player)
 
         # rotates the player if they're in the air
-        if current_player.y < GROUND_Y - current_player.h and not self.player_block_colliding:
+        if current_player.y < self.ground_y - current_player.h and not self.player_block_colliding:
             current_player.rotate_player()
 
         # draws the player to the screen
@@ -245,15 +247,15 @@ class GameScreenManager:
                 current_player.y_vel = current_player.jump_strength
 
             # touching the ground
-            if current_player.y >= GROUND_Y - current_player.h:
-                current_player.y = GROUND_Y - current_player.h
+            if current_player.y >= self.ground_y - current_player.h:
+                current_player.y = self.ground_y - current_player.h
                 current_player.y_vel = current_player.jump_strength
 
     # these can be static methods since they do not edit any objects within this class, but should still be here for organization
     def draw_screen(self, floor_c):
         screen.blit(bg)
         # calculates so that the floor always draws 2/3 of the way down
-        pygame.draw.rect(screen, floor_c, (0, GROUND_Y, self.screen_width, SCREENHEIGHT - GROUND_Y))
+        pygame.draw.rect(screen, floor_c, (0, self.ground_y, self.screen_width, self.screen_height - self.ground_y))
         #draws the back button to the screen
         back_button.draw_button(screen)
         back_button.render_text()
@@ -274,8 +276,8 @@ class GameScreenManager:
 
     def check_ground_collisions(self, current_player):
         #checks if the player is on the ground
-        if current_player.y >= GROUND_Y - current_player.h:
-            current_player.y = GROUND_Y - current_player.h
+        if current_player.y >= self.ground_y - current_player.h:
+            current_player.y = self.ground_y - current_player.h
             current_player.y_vel = 0
 
             # snaps the cube back to flat on the ground
@@ -300,12 +302,12 @@ class GameScreenManager:
         offset_y = int(blk.block.y - current_player.rect.y)
 
         #if the player hits the side of the block then reset the game
-        if current_player.mask.overlap(current_player.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + SCREENHEIGHT/ 100 - current_player.h:
+        if current_player.mask.overlap(blk.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + self.screen_height/ 100 - current_player.h:
             screen.fill((0, 0, 0))
             self.reset_game(current_player)
 
         # if the player and mask overlap then reset the level
-        if blk.block.x - current_player.rect.w <= current_player.rect.x <= blk.block.x + blk.width and blk.block.y - SCREENHEIGHT / 200 <= current_player.rect.y + current_player.rect.h <= blk.block.y + SCREENHEIGHT / 100:
+        if blk.block.x - current_player.rect.w <= current_player.rect.x <= blk.block.x + blk.width and blk.block.y - self.screen_height / 200 <= current_player.rect.y + current_player.rect.h <= blk.block.y + SCREENHEIGHT / 100:
             blk.colliding = True
             current_player.rect.y = blk.block.y - player.rect.h
             current_player.y_vel = 0
@@ -346,7 +348,7 @@ class GameScreenManager:
 
     #resets the game
     def reset_game(self, current_player):
-        current_player.__init__(self.screen_width, SCREENHEIGHT, GROUND_Y)
+        current_player.__init__(self.screen_width, self.screen_height, self.ground_y)
         self.spikes = []
         self.blocks = []
         self.tick_counter = 0
@@ -429,7 +431,7 @@ back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCR
 
 # lists of generated instances of the classes to allow for multiple to be on screen
 
-game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE)
+game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE, GROUND_Y)
 pygame.display.set_caption("GambleDash")
 chips= 100
 dt = 0
