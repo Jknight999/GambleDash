@@ -64,18 +64,6 @@ class Spike:
         # These vertices should not be used for hitboxes, spike hitboxes are rectangular
         return [[self.x, self.y + self.height], [self.x + self.width / 2, self.y], [self.x + self.width, self.y + self.height]]
 
-    def check_collision(self):
-        global in_game, player
-
-        # finds offset amount from the hitbox to the player
-        offset_x = int(self.hitbox.x - player.rect.x)
-        offset_y = int(self.hitbox.y - player.rect.y)
-
-        # if the player and mask overlap then reset the level
-        if player.mask.overlap(self.mask, (offset_x, offset_y)):
-            screen.fill((255, 0, 0))
-            game_screen.reset_game(player)
-
 class Block:
     # spike characteristics
     def __init__(self, x, y):
@@ -220,7 +208,7 @@ class GameScreenManager:
         # checks the collisions - rn the spike collision check is outside the class and the block is within
         # fix it if you have time
         for k in self.spikes:
-            k.check_collision()
+            self.check_spike_player_collision(k)
         for k in self.blocks:
             self.check_block_player_collision(k)
 
@@ -291,7 +279,6 @@ class GameScreenManager:
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
 
-
     def check_block_player_collision(self, block):
         # finds offset amount from the hitbox to the player
         offset_x = int(block.block.x - player.rect.x)
@@ -309,6 +296,17 @@ class GameScreenManager:
             player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
         else:
             block.colliding = False
+
+    def check_spike_player_collision(self, spike):
+
+        # finds offset amount from the hitbox to the player
+        offset_x = int(spike.hitbox.x - player.rect.x)
+        offset_y = int(spike.hitbox.y - player.rect.y)
+
+        # if the player and mask overlap then reset the level
+        if player.mask.overlap(spike.mask, (offset_x, offset_y)):
+            screen.fill((255, 0, 0))
+            self.reset_game(player)
 
     def draw_objects(self):
         for to_draw in self.spikes:
