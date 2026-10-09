@@ -71,7 +71,7 @@ class Block:
         self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
 
-        self.image = pygame.image.load("Assets/blockskin.png").convert_alpha()
+        self.image = pygame.image.load("Assets/gambledashblock.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
 
         self.mask = pygame.mask.from_surface(self.image)
