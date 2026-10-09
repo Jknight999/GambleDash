@@ -1,7 +1,7 @@
 import pygame
 import pygame.freetype
 import math
-from time import sleep
+import random
 
 class Player:
     #player characteristics
@@ -20,7 +20,7 @@ class Player:
         self.rotation_speed = -(self.gravity / 10)
 
         #makes a sprite of the cube asset
-        self.image = pygame.image.load("Assets/playerskin01.png").convert_alpha()
+        self.image = pygame.image.load("Assets/playerskin02.png").convert_alpha()
         #sets the size to 40 x 40
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
         self.rotated_surface = self.image
@@ -31,35 +31,12 @@ class Player:
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
     def rotate_player(self):
-        self.angle = (self.angle + self.rotation_speed * dt) % 360
+        self.angle = (self.angle + self.rotation_speed * game_screen.dt) % 360
         # rotates the surface
         self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
         # updates collision mask
-        self.mask = pygame.mask.from_surface(self.rotated_surface)
-
-    def jump(self):
-        self.y_vel = self.jump_strength
-
-    def apply_physics(self):
-        #applies gravity and ground collision detection
-        self.y_vel += self.gravity * dt
-        self.y += self.y_vel * dt
-        if self.y >= GROUND_Y - self.h:
-            self.y = GROUND_Y - self.h
-            self.y_vel = 0
-            # snaps the cube back to flat on the ground
-            self.angle = round(self.angle / 90) * 90 % 360
-            self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
-        is_block_colliding, colliding_with = check_block_colliding(blocks)
-        if is_block_colliding:
-            self.y = colliding_with.y - self.h
-            self.y_vel = 0
-            # snaps the cube back to flat on the ground
-            self.angle = round(self.angle / 90) * 90 % 360
-            self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
-        # updates mask again
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
 class Spike:
@@ -85,11 +62,6 @@ class Spike:
         # These vertices should not be used for hitboxes, spike hitboxes are rectangular
         return [[self.x, self.y + self.height], [self.x + self.width / 2, self.y], [self.x + self.width, self.y + self.height]]
 
-    def scroll(self):
-        # moves spike from left to right side of screen
-        self.x -= self.speed * dt
-        self.hitbox = pygame.Rect(self.x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
-
     def check_collision(self):
         global in_game, player
 
@@ -100,7 +72,7 @@ class Spike:
         # if the player and mask overlap then reset the level
         if player.mask.overlap(self.mask, (offset_x, offset_y)):
             screen.fill((255, 0, 0))
-            reset_game()
+            game_screen.reset_game(player)
 
 class Block:
     # spike characteristics
@@ -111,45 +83,11 @@ class Block:
         self.height = SCREENHEIGHT / 10
         self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.colliding = False
 
         self.surface = pygame.Surface((self.block.width, self.block.height), pygame.SRCALPHA)
         self.surface.fill((255, 0, 0))
 
         self.mask = pygame.mask.from_surface(self.surface)
-
-    def scroll(self):
-        # moves spike from left to right side of screen
-        self.x -= self.speed * dt
-        self.block = pygame.Rect(self.x, self.y, self.width, self.height)
-
-    def check_collision(self):
-        global in_game, player, on_block
-
-        # finds offset amount from the hitbox to the player
-        offset_x = int(self.block.x - player.rect.x)
-        offset_y = int(self.block.y - player.rect.y)
-
-        # if the player and mask overlap then reset the level
-        if player.mask.overlap(self.mask, (offset_x, offset_y)):
-            #print('overlap')
-            #print(self.block.x - player.w, player.x, self.block.x + self.block.width)
-            #print(self.block.y, player.rect.y + player.rect.h, self.block.y + SCREENHEIGHT / 50)
-            if self.block.x - player.rect.w <= player.rect.x <= self.block.x + self.block.width and self.block.y - SCREENHEIGHT / 50 <= player.rect.y + player.rect.h <= self.block.y + SCREENHEIGHT / 50:
-                self.colliding = True
-                player.rect.y = self.block.y - player.rect.h
-                player.y_vel = 0
-                player.angle = round(player.angle / 90) * 90 % 360
-                player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
-        else:
-            self.colliding = False
-
-def check_block_colliding(all_blocks):
-    for b in all_blocks:
-        if b.colliding:
-            return True, b
-    return False, None
-
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
@@ -203,47 +141,221 @@ class Button:
                         in_casino = False
                         in_game = False
 
-def draw_player(to_draw):
-    global screen
-    screen.blit(to_draw.rotated_surface, to_draw.rect)
-    #pygame.draw.rect(screen, to_draw.color, (to_draw.x, to_draw.y, to_draw.w, to_draw.h))l
+class GameScreenManager:
+    def __init__(self, screen_to_draw, current_player):
+        self.surface = screen_to_draw
+        self.player = current_player
+        self.spikes = []
+        self.blocks = []
+        self.buttons = []
+        self.scroll_speed = 550
+        self.clock = pygame.time.Clock()
+        self.tick_counter = 0
+        self.frame_counter = 0
+        self.dt = 0
 
-def draw_spike(to_draw):
-    #creates a list of the spikes (so that it can be iterated through)
-    #empty so that it can be filled with the vertices of each spike
-    #spike_to_draw= [None] * amount
-    global screen
-    #giving myself the ability to separate the vertices
-    v_a, v_b, v_c = to_draw.find_vertices()
-    pygame.draw.polygon(screen, (0, 0, 0), (v_a, v_b, v_c))
-    #shrinking the vertices inwards so that the outline doesn't go outside the block allotted
-    v_a[0] += 5
-    v_a[1] -= 3
-    v_b[1] += 3
-    v_c[0] -= 5
-    v_c[1] -= 3
-    pygame.draw.polygon(screen, (255, 255, 255), (v_a, v_b, v_c), width=3)
-    if SHOW_SPIKE_HITBOXES:
-        pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
-    #loops once for each spike
-    ''''
-    for i in amount:
-        #matches each spike to its vertices by passing in the spike number to the function, which returns its vertices
-        spike_to_draw[i] = to_draw.find_vertices(i)
-        pygame.draw.polygon(screen, (0, 0, 0), spike_to_draw[i])
-        pygame.draw.polygon(screen, (255, 255, 255), spike_to_draw[i], width=3)
-    '''
+        # Structures are basically a list of levels but can be combined at some point for semi-random levels
+        # Kinda like what slope.io does
+        self.structures = {
+    1: (
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                            0                              ',
+    '                                       0    0                              ',
+    '        111        1       1      01111011110111            11       1     '
+    ),
 
-def draw_block(to_draw):
-    global screen
-    pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
+    2: (
+    '                                                                           ',
+    '                                                           1               ',
+    '                                                           0               ',
+    '                                                      0                    ',
+    '                                                 0    0                    ',
+    '                                             0   0    0                    ',
+    '       1          11         0000000000000   0   0    0         11         '
+    ),
 
-def draw_platformer_screen(floor):
-    screen.blit(bg)
-    #calculates so that the floor always draws 2/3 of the way down
-    pygame.draw.rect(screen, floor, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
-    back_button.draw_button(screen)
-    back_button.render_text()
+    3: (
+    '                        ',
+    '                        ',
+    '                        ',
+    '                        ',
+    '                        ',
+    '                        ',
+    '    11    11    11      '
+    ),
+
+    4:(
+    '                                                                                ',
+    '                                                                                ',
+    '                                                                                ',
+    '                                                                                ',
+    '                                                                                ',
+    '                                                                                ',
+    '                                                                                '
+    )
+}
+        self.current_structure = random.randint(1,len(self.structures))
+        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
+
+    # Scrolls everything
+    def scroll(self):
+        for spike in self.spikes:
+            spike.x -= self.scroll_speed * self.dt
+            spike.hitbox.x = spike.x + spike.width / 2.5
+        for block in self.blocks:
+            block.x -= self.scroll_speed * self.dt
+            block.block.x = block.x
+
+    # Actually makes the level
+    def print_level(self, level, tick):
+        for row_number in range(len(level)):
+            if level[row_number][tick] == '1':
+                self.spikes.append(Spike(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
+            elif level[row_number][tick] == '0':
+                self.blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
+
+    # Ticks everything
+    def tick(self, current_player):
+        #converts the tuple into two variables to work with throughout the code
+        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
+
+        #scrolls the whole level
+        self.scroll()
+
+        # counts frames and converts into ticks
+        if self.frame_counter % math.floor(SCREENWIDTH / 200) == 0:
+            if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
+                self.tick_counter += 1
+            else:
+                self.tick_counter = 0
+            self.print_level(self.structures[self.current_structure], self.tick_counter)
+        self.frame_counter += 1
+
+        # calculates delta time from framerate
+        self.dt = self.clock.tick(FRAMERATE) / 1000
+
+        #draws the game screen and the objects contained
+        GameScreenManager.draw_screen(floor_color)
+        self.draw_objects()
+
+        # checks the collisions - rn the spike collision check is outside the class and the block is within
+        # fix it if you have time
+        for k in self.spikes:
+            k.check_collision()
+        for k in self.blocks:
+            self.check_block_player_collision(k)
+
+        # checks for jumping every tick and applies gravity
+        self.check_jump(current_player)
+        GameScreenManager.apply_physics(current_player)
+
+        # keeps the player above the floor and the blocks
+        self.check_ground_collisions(current_player)
+
+        # rotates the player if they're in the air
+        if current_player.y < GROUND_Y - current_player.h and not self.player_block_colliding:
+            current_player.rotate_player()
+
+        # draws the player to the screen
+        self.surface.blit(current_player.rotated_surface, current_player.rect)
+
+    def check_jump(self, current_player):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] or keys[pygame.K_w]:
+            # touching a block
+            if self.player_block_colliding:
+                current_player.y = self.colliding_with.y - current_player.h
+                current_player.y_vel = current_player.jump_strength
+
+            # touching the ground
+            if current_player.y >= GROUND_Y - current_player.h:
+                current_player.y = GROUND_Y - current_player.h
+                current_player.y_vel = current_player.jump_strength
+
+    # these can be static methods since they do not edit any objects within this class, but should still be here for organization
+    @staticmethod
+    def draw_screen(floor_c):
+        screen.blit(bg)
+        # calculates so that the floor always draws 2/3 of the way down
+        pygame.draw.rect(screen, floor_c, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
+        back_button.draw_button(screen)
+        back_button.render_text()
+
+    @staticmethod
+    def apply_physics(current_player):
+        # applies gravity and ground collision detection
+        current_player.y_vel += current_player.gravity * game_screen.dt
+        current_player.y += current_player.y_vel * game_screen.dt
+
+    @staticmethod
+    def is_block_colliding(all_blocks):
+        for b in all_blocks:
+            if b.colliding:
+                return True, b
+        return False, None
+
+    def check_ground_collisions(self, current_player):
+        if current_player.y >= GROUND_Y - current_player.h:
+            current_player.y = GROUND_Y - current_player.h
+            current_player.y_vel = 0
+            # snaps the cube back to flat on the ground
+            current_player.angle = round(current_player.angle / 90) * 90 % 360
+            current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
+        current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
+        # updates mask again
+        current_player.mask = pygame.mask.from_surface(current_player.rotated_surface)
+        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
+        if self.player_block_colliding:
+            current_player.y = self.colliding_with.y - current_player.h
+            current_player.y_vel = 0
+            # snaps the cube back to flat on the ground
+            current_player.angle = round(current_player.angle / 90) * 90 % 360
+            current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
+
+    def check_block_player_collision(self, block):
+        # finds offset amount from the hitbox to the player
+        offset_x = int(block.block.x - player.rect.x)
+        offset_y = int(block.block.y - player.rect.y)
+
+        if player.mask.overlap(player.mask, (offset_x, offset_y)) and player.y > block.block.y + SCREENHEIGHT/ 100 - player.h:
+            screen.fill((255, 0, 0))
+            self.reset_game(player)
+        # if the player and mask overlap then reset the level
+        if block.block.x - player.rect.w <= player.rect.x <= block.block.x + block.width and block.block.y - SCREENHEIGHT / 200 <= player.rect.y + player.rect.h <= block.block.y + SCREENHEIGHT / 100:
+            block.colliding = True
+            player.rect.y = block.block.y - player.rect.h
+            player.y_vel = 0
+            player.angle = round(player.angle / 90) * 90 % 360
+            player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
+        else:
+            block.colliding = False
+
+    def draw_objects(self):
+        for to_draw in self.spikes:
+            # giving myself the ability to separate the vertices
+            v_a, v_b, v_c = to_draw.find_vertices()
+            pygame.draw.polygon(screen, (0, 0, 0), (v_a, v_b, v_c))
+            # shrinking the vertices inwards so that the outline doesn't go outside the block allotted
+            v_a[0] += 5
+            v_a[1] -= 3
+            v_b[1] += 3
+            v_c[0] -= 5
+            v_c[1] -= 3
+            pygame.draw.polygon(screen, (255, 255, 255), (v_a, v_b, v_c), width=3)
+            if SHOW_SPIKE_HITBOXES:
+                pygame.draw.rect(screen, (255, 0, 0), to_draw.hitbox, width=1)
+        for to_draw in self.blocks:
+            pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
+
+    def reset_game(self, current_player):
+        current_player.__init__(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
+        self.spikes = []
+        self.blocks = []
+        self.tick_counter = 0
+        self.frame_counter = 0
 
 def draw_menu_screen():
     screen.fill((17, 56, 171))
@@ -261,27 +373,12 @@ def draw_casino_screen():
     back_button.draw_button(screen)
     back_button.render_text()
 
-def parse_level(level,tick):
-    for row_number in range(len(level)):
-         if level[row_number][tick] == '1':
-             spikes.append(Spike(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
-         elif level[row_number][tick] == '0':
-             blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
-
-def reset_game():
-    global player, spikes, blocks, tick_counter, frame_counter
-    player.__init__(SCREENWIDTH,SCREENHEIGHT,GROUND_Y)
-    spikes = []
-    blocks = []
-    tick_counter = 0
-    frame_counter = 0
-
 
 #screen setup
 FRAMERATE = 120
 SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
-SHOW_SPIKE_HITBOXES = True
+SHOW_SPIKE_HITBOXES = False
 
 #Text Stuff
 pygame.freetype.init()
@@ -320,24 +417,9 @@ GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
 floor_color = [9, 30, 92]
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 pygame.init()
-clock =  pygame.time.Clock()
 
 # New level data list
 # 1 is a spike, 0 is a block, ' ' is nothing
-levels = {
-    1: (
-    '                                                                       ',
-    '                                                                       ',
-    '                                                                       ',
-    '                                                                       ',
-    '                                                                       ',
-    '                                                                       ',
-    '0000000000000000000000000000000000                                     '
-    )
-}
-
-tick_counter = 0
-frame_counter = 0
 
 bg = pygame.image.load("assets/background.jpg").convert()
 #initializes first instances of class
@@ -348,10 +430,7 @@ play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREE
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 
-# lists of generated instances of the classes to allow for multiple to be on screen
-spikes = []
-blocks = []
-
+game_screen = GameScreenManager(screen, player)
 pygame.display.set_caption("GambleDash")
 chips= 100
 dt = 0
@@ -359,11 +438,8 @@ running = True
 in_menu = True
 in_game = False
 in_casino = False
-on_block = False
 current_level = 1
 while running:
-    on_block, block_collided_with = check_block_colliding(blocks)
-    print(on_block)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -376,46 +452,11 @@ while running:
         back_button.check_button_click(event, "Back")
 
     if in_game:
-        # jumping if space bar is pressed, otherwise not
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] or keys[pygame.K_w]:
-            if player.y >= GROUND_Y - player.h or on_block:
-                player.y = GROUND_Y - player.h
-                player.jump()
-        player.apply_physics()
-        #rotate player if they're in the air
-        if player.y < GROUND_Y - player.h and not on_block:
-            player.rotate_player()
-        for spike in spikes:
-            spike.scroll()
-        for block in blocks:
-            block.scroll()
-        if frame_counter % math.floor(SCREENWIDTH / 200) == 0:
-            if tick_counter < len(levels[current_level][0]) - 1:
-                tick_counter += 1
-            else:
-                tick_counter = 0
-            parse_level(levels[current_level], tick_counter)
-        frame_counter += 1
-    elif in_casino:
-        pass
-    else:
-        pass
-
-    if in_game:
-        draw_platformer_screen(floor_color)
-        draw_player(player)
-        for k in spikes:
-            draw_spike(k)
-            k.check_collision()
-        for k in blocks:
-            draw_block(k)
-            k.check_collision()
+        game_screen.tick(player)
     elif in_casino:
         draw_casino_screen()
     elif in_menu:
         draw_menu_screen()
 
     #4. Update and Wait
-    dt = clock.tick(FRAMERATE) / 1000
     pygame.display.flip()
