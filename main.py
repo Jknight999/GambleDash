@@ -71,6 +71,7 @@ class Block:
         self.height = SCREENHEIGHT / 10
         self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.colliding = False
 
         #makes the block a sprite
         self.image = pygame.image.load("Assets/gambledashblock.png").convert_alpha()
@@ -226,7 +227,7 @@ class GameScreenManager:
 
         # checks for jumping every tick and applies gravity
         self.check_jump(current_player)
-        GameScreenManager.apply_physics(current_player)
+        self.apply_physics(current_player)
 
         # keeps the player above the floor and the blocks
         self.check_ground_collisions(current_player)
@@ -260,11 +261,10 @@ class GameScreenManager:
         back_button.draw_button(screen)
         back_button.render_text()
 
-    @staticmethod
-    def apply_physics(current_player):
+    def apply_physics(self, current_player):
         # applies gravity and ground collision detection
-        current_player.y_vel += current_player.gravity * game_screen.dt
-        current_player.y += current_player.y_vel * game_screen.dt
+        current_player.y_vel += current_player.gravity * self.dt
+        current_player.y += current_player.y_vel * self.dt
 
     @staticmethod
     def is_block_colliding(all_blocks):
@@ -302,7 +302,7 @@ class GameScreenManager:
         offset_y = int(blk.block.y - current_player.rect.y)
 
         #if the player hits the side of the block then reset the game
-        if current_player.mask.overlap(blk.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + self.screen_height/ 100 - current_player.h:
+        if current_player.mask.overlap(blk.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + self.screen_height / 100 - current_player.h:
             screen.fill((0, 0, 0))
             self.reset_game(current_player)
 
@@ -322,7 +322,7 @@ class GameScreenManager:
         offset_y = int(spk.hitbox.y - current_player.rect.y)
 
         # if the player and mask overlap then reset the level
-        if player.mask.overlap(spk.mask, (offset_x, offset_y)):
+        if current_player.mask.overlap(spk.mask, (offset_x, offset_y)):
             screen.fill((0, 0, 0))
             self.reset_game(current_player)
 
