@@ -27,7 +27,7 @@ class Player:
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
 
         # creates mask for collision handling
-        self.mask = pygame.mask.from_surface(self.rotated_surface)
+        self.mask = pygame.mask.from_surface(self.image)
 
     def rotate_player(self):
         #calculates and sets rotation angle
@@ -35,9 +35,6 @@ class Player:
         # rotates the surface
         self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
-
-        # updates collision mask
-        self.mask = pygame.mask.from_surface(self.rotated_surface)
 
 class Spike:
     #spike characteristics
@@ -165,8 +162,8 @@ class GameScreenManager:
     '                                                                           ',
     '                                   11                                      ',
     '                   000000    000000000000                                  ',
-    '            00000000000001111000000000000                                  ',
-    '     000000000000000000000000000000000000                                  '
+    '            000000000000011110000000000000000000                           ',
+    '     0000000000000000000000000000000000000000000000                        '
     )
 }
         self.current_structure = 2
@@ -284,7 +281,7 @@ class GameScreenManager:
         current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
 
         # updates mask again
-        current_player.mask = pygame.mask.from_surface(current_player.rotated_surface)
+        current_player.mask = pygame.mask.from_surface(current_player.image)
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
         if self.player_block_colliding:
             current_player.y = self.colliding_with.y - current_player.h
