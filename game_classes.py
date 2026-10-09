@@ -1,5 +1,6 @@
 import pygame
 import random
+import pygame.freetype
 
 class Player:
     #player characteristics
@@ -76,3 +77,38 @@ class Block:
         self.mask = pygame.mask.from_surface(self.image)
 
         self.colliding = False
+
+class Button:
+    #takes in characteristics as arguments and makes a rect with them
+    def __init__(self, x, y, w, h, color, text):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.rect = pygame.Rect(x, y, w, h)
+        self.color = color
+
+        #if the text argument is filled it will parse the tuple and change the font size to the specified num
+        if text != 0:
+            self.text, self.font_name, self.text_size, self.text_color = text
+            self.font = pygame.freetype.Font(self.font_name, self.text_size)
+
+    def render_text(self, surface):
+        #gets the rectangle that bounds the text
+        text_rect = self.font.get_rect(self.text)
+        #sets the center to the center of the button
+        text_rect.center = (self.x + self.w / 2, self.y + self.h / 2)
+        #prints (renders) the text to the screen
+        self.font.render_to(surface, text_rect, self.text, self.text_color)
+
+    #draws the button
+    def draw_button(self, surface):
+        pygame.draw.rect(surface, self.color, self.rect)
+
+    #checks if the button is clicked
+    def check_button_click(self, click_event):
+        mouse_pos = pygame.mouse.get_pos()
+        if self.rect.collidepoint(mouse_pos) and click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1:
+            return True
+        else:
+            return False

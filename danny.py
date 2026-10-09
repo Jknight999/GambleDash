@@ -1,8 +1,8 @@
 import pygame
 import pygame.freetype
 import math
-from game_classes import Player, Spike, Block
-
+from game_classes import Player, Spike, Block, Button
+'''
 class Button:
     #takes in characteristics as arguments and makes a rect with them
     def __init__(self, x, y, w, h, color, text):
@@ -18,13 +18,13 @@ class Button:
             self.text, self.font_name, self.text_size, self.text_color = text
             self.font = pygame.freetype.Font(self.font_name, self.text_size)
 
-    def render_text(self):
+    def render_text(self, surface):
         #gets the rectangle that bounds the text
         text_rect = self.font.get_rect(self.text)
         #sets the center to the center of the button
         text_rect.center = (self.x + self.w / 2, self.y + self.h / 2)
         #prints (renders) the text to the screen
-        self.font.render_to(screen, text_rect, self.text, self.text_color)
+        self.font.render_to(surface, text_rect, self.text, self.text_color)
 
     #draws the button
     def draw_button(self, surface):
@@ -53,6 +53,7 @@ class Button:
                         in_menu = True
                         in_casino = False
                         in_game = False
+'''
 
 class GameScreenManager:
     #basic characteristics
@@ -189,7 +190,7 @@ class GameScreenManager:
         pygame.draw.rect(screen, floor_c, (0, GROUND_Y, self.screen_width, SCREENHEIGHT - GROUND_Y))
         #draws the back button to the screen
         back_button.draw_button(screen)
-        back_button.render_text()
+        back_button.render_text(self.surface)
 
     @staticmethod
     def apply_physics(current_player):
@@ -288,9 +289,9 @@ class GameScreenManager:
 def draw_menu_screen():
     screen.fill((17, 56, 171))
     play_button.draw_button(screen)
-    play_button.render_text()
+    play_button.render_text(screen)
     casino_button.draw_button(screen)
-    casino_button.render_text()
+    casino_button.render_text(screen)
 
 def draw_casino_screen():
     global casino_font
@@ -299,9 +300,9 @@ def draw_casino_screen():
     CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 4), f'Your Chips: {chips}', (255, 255, 255))
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
     back_button.draw_button(screen)
-    back_button.render_text()
+    back_button.render_text(screen)
     higher_or_lower_button.draw_button(screen)
-    higher_or_lower_button.render_text()
+    higher_or_lower_button.render_text(screen)
 
 #screen setup
 FRAMERATE = 120
@@ -380,11 +381,25 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+        if play_button.check_button_click(event):
+            if in_menu:
+                in_game = True
+                in_menu = False
+        if casino_button.check_button_click(event):
+            if in_menu:
+                in_casino = True
+                in_menu = False
+        if back_button.check_button_click(event):
+            if not in_menu:
+                in_menu = True
+                in_casino = False
+                in_game = False
+
         # sends event to button to see if it's been clicked
-        play_button.check_button_click(event, "Play")
-        casino_button.check_button_click(event, "Gamble")
-        back_button.check_button_click(event, "Back")
-        higher_or_lower_button.check_button_click(event, "Higher or Lower")
+        play_button.check_button_click(event)
+        casino_button.check_button_click(event)
+        back_button.check_button_click(event)
+        higher_or_lower_button.check_button_click(event)
 
     if in_game:
         game_screen.tick(player)
