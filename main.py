@@ -9,7 +9,7 @@ class Player:
         self.SCREENHEIGHT = sh
         self.w = SCREENWIDTH / 20
         self.h = SCREENHEIGHT / 10
-        self.x = (self.SCREENWIDTH - self.w) / 5
+        self.x = (self.SCREENWIDTH - self.w) / 4
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
@@ -163,7 +163,7 @@ class GameScreenManager:
     '                                   11                                      ',
     '                   000000    000000000000                                  ',
     '            000000000000011110000000000000000000                           ',
-    '     0000000000000000000000000000000000000000000000                        '
+    '     0000000000000000000000000000000000000000000000000                     '
     )
 }
         self.current_structure = 2
