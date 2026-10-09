@@ -10,7 +10,7 @@ class Player:
         self.SCREENHEIGHT = sh
         self.w = SCREENWIDTH / 20
         self.h = SCREENHEIGHT / 10
-        self.x = (self.SCREENWIDTH - self.w) / 5
+        self.x = (self.SCREENWIDTH - self.w) / 4
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
@@ -164,7 +164,7 @@ class GameScreenManager:
     '                                   11                                      ',
     '                   000000    000000000000                                  ',
     '            000000000000011110000000000000000000                           ',
-    '     0000000000000000000000000000000000000000000000                        '
+    '     0000000000000000000000000000000000000000000000000                     '
     )
 }
         self.current_structure = 2
@@ -180,6 +180,15 @@ class GameScreenManager:
         for block in self.blocks:
             block.x -= self.scroll_speed * self.dt
             block.block.x = block.x
+        self.discard_objects()
+
+    def discard_objects(self):
+        for spike in self.spikes:
+            if spike.x + spike.width < 0:
+                self.spikes.remove(spike)
+        for block in self.blocks:
+            if block.x + block.width < 0:
+                self.blocks.remove(block)
 
     def print_level(self, level, tick):
         #goes through each item in the structures list
