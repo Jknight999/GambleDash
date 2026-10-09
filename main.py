@@ -38,7 +38,6 @@ class Player:
         # updates collision mask
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
-
 class Spike:
     #spike characteristics
     def __init__(self, x, y):
@@ -153,6 +152,9 @@ class GameScreenManager:
         self.tick_counter = 0
         self.frame_counter = 0
         self.dt = 0
+
+        # Structures are basically a list of levels but can be combined at some point for semi-random levels
+        # Kinda like what slope.io does
         self.structures = {
     1: (
     '                                                                           ',
@@ -177,6 +179,7 @@ class GameScreenManager:
         self.current_structure = 1
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
 
+    # Scrolls everything
     def scroll(self):
         for spike in self.spikes:
             spike.x -= self.scroll_speed * self.dt
@@ -185,6 +188,7 @@ class GameScreenManager:
             block.x -= self.scroll_speed * self.dt
             block.block.x = block.x
 
+    # Actually makes the level
     def print_level(self, level, tick):
         for row_number in range(len(level)):
             if level[row_number][tick] == '1':
@@ -192,6 +196,7 @@ class GameScreenManager:
             elif level[row_number][tick] == '0':
                 self.blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
 
+    # Ticks everything
     def tick(self, current_player):
         #converts the tuple into two variables to work with throughout the code
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
@@ -289,7 +294,6 @@ class GameScreenManager:
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
 
-
     def check_block_player_collision(self, block):
         # finds offset amount from the hitbox to the player
         offset_x = int(block.block.x - player.rect.x)
@@ -325,14 +329,12 @@ class GameScreenManager:
         for to_draw in self.blocks:
             pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
 
-
     def reset_game(self, current_player):
         current_player.__init__(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
         self.spikes = []
         self.blocks = []
         self.tick_counter = 0
         self.frame_counter = 0
-
 
 def draw_menu_screen():
     screen.fill((17, 56, 171))
@@ -406,8 +408,6 @@ player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
-
-# lists of generated instances of the classes to allow for multiple to be on screen
 
 game_screen = GameScreenManager(screen, player)
 pygame.display.set_caption("GambleDash")
