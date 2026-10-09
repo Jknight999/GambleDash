@@ -176,7 +176,7 @@ class GameScreenManager:
         offset_y = int(blk.block.y - current_player.rect.y)
 
         # If the player hits the side of the block then reset the game
-        if current_player.mask.overlap(current_player.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + SCREENHEIGHT/ 100 - current_player.h:
+        if current_player.mask.overlap(blk.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + SCREENHEIGHT/ 100 - current_player.h:
             screen.fill((0, 0, 0))
             self.reset_game(current_player)
 
