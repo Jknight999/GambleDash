@@ -1,6 +1,7 @@
 import pygame
 import pygame.freetype
 import math
+import random
 
 class Player:
     #player characteristics
@@ -168,15 +169,25 @@ class GameScreenManager:
 
     2: (
     '                                                                           ',
-    '                                                                           ',
-    '                                                                           ',
-    '                                                                           ',
-    '                                                                           ',
-    '                                                                           ',
-    '                                                                           '
+    '                                                           1               ',
+    '                                                           0               ',
+    '                                                      0                    ',
+    '                                                 0                         ',
+    '                                             0                             ',
+    '       1          11         0000000000000                      11         '
+    ),
+
+    3: (
+    '                      ',
+    '                      ',
+    '                      ',
+    '                      ',
+    '                      ',
+    '                      ',
+    '    11   11   11      '
     )
 }
-        self.current_structure = 1
+        self.current_structure = random.randint(1,len(self.structures))
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
 
     # Scrolls everything
