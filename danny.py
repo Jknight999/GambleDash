@@ -260,20 +260,10 @@ def draw_casino_screen():
     higher_or_lower_button.draw_button(screen)
     higher_or_lower_button.render_text(screen)
 
-# Screen setup
-FRAMERATE = 120
-SCREENWIDTH = 1000
-SCREENHEIGHT = SCREENWIDTH * 0.5
-SHOW_SPIKE_HITBOXES = False
-
-# Text Stuff
+# Text initialization and font storing
 pygame.freetype.init()
-
-# Default size
 gd_font_size = 80
 gd_font = pygame.freetype.Font("Assets/pusab.otf", gd_font_size)
-
-# Cache of common fonts in a dict - so to use the cached font its GD_FONTS[font_size]
 GD_FONTS = {
     14: pygame.freetype.Font('Assets/pusab.otf', 14),
     18: pygame.freetype.Font('Assets/pusab.otf', 18),
@@ -282,8 +272,6 @@ GD_FONTS = {
     50: pygame.freetype.Font('Assets/pusab.otf', 50),
     100: pygame.freetype.Font('Assets/pusab.otf', 100)
 }
-
-# Initializes the font with default size
 casino_font_size = 100
 casino_font = pygame.freetype.Font("Assets/casino.ttf", casino_font_size)
 CASINO_FONTS = {
@@ -295,10 +283,12 @@ CASINO_FONTS = {
     100: pygame.freetype.Font('Assets/casino.ttf', 100)
 }
 
-# Where the top of the floor is (for collision physics principles)
+# Screen setup
+FRAMERATE = 120
+SCREENWIDTH = 1000
+SCREENHEIGHT = SCREENWIDTH * 0.5
+SHOW_SPIKE_HITBOXES = False
 GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
-
-#More basic variable initialization
 floor_color = [9, 30, 92]
 pygame.init()
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
@@ -317,7 +307,6 @@ higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE)
 pygame.display.set_caption("GambleDash")
 chips= 100
-dt = 0
 
 # Boolean initialization
 running = True
