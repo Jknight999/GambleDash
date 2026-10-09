@@ -130,11 +130,12 @@ class Button:
                         in_game = False
 
 class GameScreenManager:
-    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color):
+    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_r):
         self.surface = screen_to_draw
         self.screen_width = s_w
         self.screen_height = s_h
         self.f_c = fl_color
+        self.framerate = f_r
         self.player = current_player
         self.spikes = []
         self.blocks = []
@@ -184,6 +185,9 @@ class GameScreenManager:
                 self.blocks.append(Block(screen.get_width(), (self.screen_height / 10) * row_number))
 
     def tick(self, current_player):
+        # calculates delta time from framerate
+        self.dt = self.clock.tick(self.framerate) / 1000
+
         #converts the tuple into two variables to work with throughout the code
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
 
@@ -199,9 +203,6 @@ class GameScreenManager:
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
 
-        # calculates delta time from framerate
-        self.dt = self.clock.tick(FRAMERATE) / 1000
-
         #draws the game screen and the objects contained
         self.draw_screen(self.f_c)
         self.draw_objects()
@@ -211,7 +212,7 @@ class GameScreenManager:
         for k in self.spikes:
             self.check_spike_player_collision(k, current_player)
         for k in self.blocks:
-            self.check_block_player_collision(k)
+            self.check_block_player_collision(k, current_player)
 
         # checks for jumping every tick and applies gravity
         self.check_jump(current_player)
@@ -279,32 +280,32 @@ class GameScreenManager:
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
 
-    def check_block_player_collision(self, block):
+    def check_block_player_collision(self, blk, current_player):
         # finds offset amount from the hitbox to the player
-        offset_x = int(block.block.x - player.rect.x)
-        offset_y = int(block.block.y - player.rect.y)
+        offset_x = int(blk.block.x - current_player.rect.x)
+        offset_y = int(blk.block.y - current_player.rect.y)
 
-        if player.mask.overlap(player.mask, (offset_x, offset_y)) and player.y > block.block.y + SCREENHEIGHT/ 100 - player.h:
+        if current_player.mask.overlap(current_player.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + SCREENHEIGHT/ 100 - current_player.h:
             screen.fill((255, 0, 0))
-            self.reset_game(player)
+            self.reset_game(current_player)
         # if the player and mask overlap then reset the level
-        if block.block.x - player.rect.w <= player.rect.x <= block.block.x + block.width and block.block.y - SCREENHEIGHT / 200 <= player.rect.y + player.rect.h <= block.block.y + SCREENHEIGHT / 100:
-            block.colliding = True
-            player.rect.y = block.block.y - player.rect.h
-            player.y_vel = 0
-            player.angle = round(player.angle / 90) * 90 % 360
-            player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
+        if blk.block.x - current_player.rect.w <= current_player.rect.x <= blk.block.x + blk.width and blk.block.y - SCREENHEIGHT / 200 <= current_player.rect.y + current_player.rect.h <= blk.block.y + SCREENHEIGHT / 100:
+            blk.colliding = True
+            current_player.rect.y = blk.block.y - player.rect.h
+            current_player.y_vel = 0
+            current_player.angle = round(player.angle / 90) * 90 % 360
+            current_player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
         else:
-            block.colliding = False
+            blk.colliding = False
 
-    def check_spike_player_collision(self, spike, current_player):
+    def check_spike_player_collision(self, spk, current_player):
 
         # finds offset amount from the hitbox to the player
-        offset_x = int(spike.hitbox.x - current_player.rect.x)
-        offset_y = int(spike.hitbox.y - current_player.rect.y)
+        offset_x = int(spk.hitbox.x - current_player.rect.x)
+        offset_y = int(spk.hitbox.y - current_player.rect.y)
 
         # if the player and mask overlap then reset the level
-        if player.mask.overlap(spike.mask, (offset_x, offset_y)):
+        if player.mask.overlap(spk.mask, (offset_x, offset_y)):
             screen.fill((255, 0, 0))
             self.reset_game(current_player)
 
@@ -409,7 +410,7 @@ back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCR
 
 # lists of generated instances of the classes to allow for multiple to be on screen
 
-game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color)
+game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE)
 pygame.display.set_caption("GambleDash")
 chips= 100
 dt = 0
