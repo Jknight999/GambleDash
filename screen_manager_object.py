@@ -9,7 +9,7 @@ class Player:
         self.SCREENHEIGHT = sh
         self.w = SCREENWIDTH / 20
         self.h = SCREENHEIGHT / 10
-        self.x = (self.SCREENWIDTH - self.w) / 5
+        self.x = (self.SCREENWIDTH - self.w) / 4
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
@@ -181,6 +181,9 @@ class GameScreenManager:
                 self.blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
 
     def tick(self, current_player):
+        # calculates delta time from framerate
+        self.dt = self.clock.tick(FRAMERATE) / 1000
+
         #converts the tuple into two variables to work with throughout the code
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
 
@@ -195,9 +198,6 @@ class GameScreenManager:
                 self.tick_counter = 0
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
-
-        # calculates delta time from framerate
-        self.dt = self.clock.tick(FRAMERATE) / 1000
 
         #draws the game screen and the objects contained
         GameScreenManager.draw_screen(floor_color)

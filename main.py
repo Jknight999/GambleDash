@@ -130,8 +130,11 @@ class Button:
                         in_game = False
 
 class GameScreenManager:
-    def __init__(self, screen_to_draw, current_player):
+    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color):
         self.surface = screen_to_draw
+        self.screen_width = s_w
+        self.screen_height = s_h
+        self.f_c = fl_color
         self.player = current_player
         self.spikes = []
         self.blocks = []
@@ -176,9 +179,9 @@ class GameScreenManager:
     def print_level(self, level, tick):
         for row_number in range(len(level)):
             if level[row_number][tick] == '1':
-                self.spikes.append(Spike(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
+                self.spikes.append(Spike(screen.get_width(), (self.screen_height / 10) * row_number))
             elif level[row_number][tick] == '0':
-                self.blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
+                self.blocks.append(Block(screen.get_width(), (self.screen_height / 10) * row_number))
 
     def tick(self, current_player):
         #converts the tuple into two variables to work with throughout the code
@@ -188,7 +191,7 @@ class GameScreenManager:
         self.scroll()
 
         # counts frames and converts into ticks
-        if self.frame_counter % math.floor(SCREENWIDTH / 200) == 0:
+        if self.frame_counter % math.floor(self.screen_width / 200) == 0:
             if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
                 self.tick_counter += 1
             else:
@@ -200,13 +203,13 @@ class GameScreenManager:
         self.dt = self.clock.tick(FRAMERATE) / 1000
 
         #draws the game screen and the objects contained
-        GameScreenManager.draw_screen(floor_color)
+        self.draw_screen(self.f_c)
         self.draw_objects()
 
         # checks the collisions - rn the spike collision check is outside the class and the block is within
         # fix it if you have time
         for k in self.spikes:
-            self.check_spike_player_collision(k)
+            self.check_spike_player_collision(k, current_player)
         for k in self.blocks:
             self.check_block_player_collision(k)
 
@@ -238,11 +241,10 @@ class GameScreenManager:
                 current_player.y_vel = current_player.jump_strength
 
     # these can be static methods since they do not edit any objects within this class, but should still be here for organization
-    @staticmethod
-    def draw_screen(floor_c):
+    def draw_screen(self, floor_c):
         screen.blit(bg)
         # calculates so that the floor always draws 2/3 of the way down
-        pygame.draw.rect(screen, floor_c, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
+        pygame.draw.rect(screen, floor_c, (0, GROUND_Y, self.screen_width, SCREENHEIGHT - GROUND_Y))
         back_button.draw_button(screen)
         back_button.render_text()
 
@@ -295,16 +297,16 @@ class GameScreenManager:
         else:
             block.colliding = False
 
-    def check_spike_player_collision(self, spike):
+    def check_spike_player_collision(self, spike, current_player):
 
         # finds offset amount from the hitbox to the player
-        offset_x = int(spike.hitbox.x - player.rect.x)
-        offset_y = int(spike.hitbox.y - player.rect.y)
+        offset_x = int(spike.hitbox.x - current_player.rect.x)
+        offset_y = int(spike.hitbox.y - current_player.rect.y)
 
         # if the player and mask overlap then reset the level
         if player.mask.overlap(spike.mask, (offset_x, offset_y)):
             screen.fill((255, 0, 0))
-            self.reset_game(player)
+            self.reset_game(current_player)
 
     def draw_objects(self):
         for to_draw in self.spikes:
@@ -325,7 +327,7 @@ class GameScreenManager:
 
 
     def reset_game(self, current_player):
-        current_player.__init__(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
+        current_player.__init__(self.screen_width, SCREENHEIGHT, GROUND_Y)
         self.spikes = []
         self.blocks = []
         self.tick_counter = 0
@@ -407,7 +409,7 @@ back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCR
 
 # lists of generated instances of the classes to allow for multiple to be on screen
 
-game_screen = GameScreenManager(screen, player)
+game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color)
 pygame.display.set_caption("GambleDash")
 chips= 100
 dt = 0
