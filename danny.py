@@ -2,9 +2,6 @@ import pygame
 import pygame.freetype
 import math
 
-from jonah import reset_game
-
-
 class Player:
     #player characteristics
     def __init__(self, sw, sh, floor_y):
