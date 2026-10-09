@@ -1,7 +1,6 @@
 import pygame
 import pygame.freetype
 import math
-import random
 
 class Player:
     #player characteristics
@@ -39,6 +38,7 @@ class Player:
         # updates collision mask
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
+
 class Spike:
     #spike characteristics
     def __init__(self, x, y):
@@ -61,18 +61,6 @@ class Spike:
         #needed because triangles drawn through draw.polygon()
         # These vertices should not be used for hitboxes, spike hitboxes are rectangular
         return [[self.x, self.y + self.height], [self.x + self.width / 2, self.y], [self.x + self.width, self.y + self.height]]
-
-    def check_collision(self):
-        global in_game, player
-
-        # finds offset amount from the hitbox to the player
-        offset_x = int(self.hitbox.x - player.rect.x)
-        offset_y = int(self.hitbox.y - player.rect.y)
-
-        # if the player and mask overlap then reset the level
-        if player.mask.overlap(self.mask, (offset_x, offset_y)):
-            screen.fill((255, 0, 0))
-            game_screen.reset_game(player)
 
 class Block:
     # spike characteristics
@@ -153,9 +141,6 @@ class GameScreenManager:
         self.tick_counter = 0
         self.frame_counter = 0
         self.dt = 0
-
-        # Structures are basically a list of levels but can be combined at some point for semi-random levels
-        # Kinda like what slope.io does
         self.structures = {
     1: (
     '                                                                           ',
@@ -169,28 +154,17 @@ class GameScreenManager:
 
     2: (
     '                                                                           ',
-    '                                                           1               ',
-    '                                                           0               ',
-    '                                                      0                    ',
-    '                                                 0                         ',
-    '                                             0                             ',
-    '       1          11         0000000000000                      11         '
-    ),
-
-    3: (
-    '                      ',
-    '                      ',
-    '                      ',
-    '                      ',
-    '                      ',
-    '                      ',
-    '    11   11   11      '
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           ',
+    '                                                                           '
     )
 }
-        self.current_structure = random.randint(1,len(self.structures))
+        self.current_structure = 1
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
 
-    # Scrolls everything
     def scroll(self):
         for spike in self.spikes:
             spike.x -= self.scroll_speed * self.dt
@@ -199,7 +173,6 @@ class GameScreenManager:
             block.x -= self.scroll_speed * self.dt
             block.block.x = block.x
 
-    # Actually makes the level
     def print_level(self, level, tick):
         for row_number in range(len(level)):
             if level[row_number][tick] == '1':
@@ -207,7 +180,6 @@ class GameScreenManager:
             elif level[row_number][tick] == '0':
                 self.blocks.append(Block(screen.get_width(), (SCREENHEIGHT / 10) * row_number))
 
-    # Ticks everything
     def tick(self, current_player):
         #converts the tuple into two variables to work with throughout the code
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
@@ -234,7 +206,7 @@ class GameScreenManager:
         # checks the collisions - rn the spike collision check is outside the class and the block is within
         # fix it if you have time
         for k in self.spikes:
-            k.check_collision()
+            self.check_spike_player_collision(k)
         for k in self.blocks:
             self.check_block_player_collision(k)
 
@@ -323,6 +295,17 @@ class GameScreenManager:
         else:
             block.colliding = False
 
+    def check_spike_player_collision(self, spike):
+
+        # finds offset amount from the hitbox to the player
+        offset_x = int(spike.hitbox.x - player.rect.x)
+        offset_y = int(spike.hitbox.y - player.rect.y)
+
+        # if the player and mask overlap then reset the level
+        if player.mask.overlap(spike.mask, (offset_x, offset_y)):
+            screen.fill((255, 0, 0))
+            self.reset_game(player)
+
     def draw_objects(self):
         for to_draw in self.spikes:
             # giving myself the ability to separate the vertices
@@ -340,12 +323,14 @@ class GameScreenManager:
         for to_draw in self.blocks:
             pygame.draw.rect(screen, (9, 30, 92), to_draw.block)
 
+
     def reset_game(self, current_player):
         current_player.__init__(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
         self.spikes = []
         self.blocks = []
         self.tick_counter = 0
         self.frame_counter = 0
+
 
 def draw_menu_screen():
     screen.fill((17, 56, 171))
@@ -419,6 +404,8 @@ player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
+
+# lists of generated instances of the classes to allow for multiple to be on screen
 
 game_screen = GameScreenManager(screen, player)
 pygame.display.set_caption("GambleDash")
