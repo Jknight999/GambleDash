@@ -180,7 +180,7 @@ class GameScreenManager:
 
 
     def check_block_player_collision(self, blk, current_player, current_player_yv):
-        #if the player hits the side of the block then reset the game
+        # if the player hits the side of the block then reset the game
         # checks if the y velocity is less than or equal to 0 or its way below the block
         if (current_player_yv <= 0 or current_player.y >= blk.y) and current_player.rect.x + current_player.w > blk.block.x:
             screen.fill((0, 0, 0))
