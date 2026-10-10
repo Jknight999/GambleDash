@@ -24,6 +24,7 @@ class GameScreenManager:
         self.tick_counter = 0
         self.frame_counter = 0
         self.dt = 0
+        self.previous_player_bottom = current_player.y + current_player.h
 
         # A list of tuples of all possible structures for the level printer to use
         self.structures = {
@@ -101,6 +102,7 @@ class GameScreenManager:
 
         # Checks for jumping every tick and applies gravity
         self.check_jump(current_player)
+        self.previous_player_bottom = current_player.y + current_player.h
         GameScreenManager.apply_physics(current_player)
 
         # Counts frames and converts them into ticks
@@ -122,7 +124,9 @@ class GameScreenManager:
         for k in self.spikes:
             self.check_spike_player_collision(k, current_player)
         for k in self.blocks:
-            self.check_block_player_collision(k, current_player)
+            player_died = self.check_block_player_collision(k, current_player)
+            if player_died:
+                break
 
         # Keeps the player above the floor and the blocks
         self.check_ground_collisions(current_player)
@@ -167,7 +171,7 @@ class GameScreenManager:
         current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
 
         # Updates player collision mask
-        current_player.mask = pygame.mask.from_surface(current_player.image)
+        current_player.mask = pygame.mask.from_surface(current_player.rotated_surface)
 
         # Converts the block collision tuple into two variables
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
@@ -181,14 +185,14 @@ class GameScreenManager:
 
     def check_block_player_collision(self, blk, current_player):
         # Find the player's horizontal overlap with the block
-        horizontal_overlap = current_player.x + current_player.w > blk.block.x and current_player.x < blk.block.x + blk.width
+        horizontal_overlap = current_player.rect.right > blk.block.left and current_player.rect.left < blk.block.right
 
         # Find the player's feet and the top of the block
         player_bottom = current_player.y + current_player.h
         block_top = blk.block.y
 
         # Check whether the player's feet crossed the block's top during this frame while falling
-        previous_bottom = player_bottom - current_player.y_vel * self.dt
+        previous_bottom = self.previous_player_bottom
 
         landing = horizontal_overlap and current_player.y_vel > 0 and previous_bottom <= block_top <= player_bottom
 
@@ -202,8 +206,9 @@ class GameScreenManager:
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
 
             current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
-            blk.colliding = True
+            current_player.mask = pygame.mask.from_surface(current_player.rotated_surface)
 
+            blk.colliding = True
         else:
             blk.colliding = False
 
@@ -213,7 +218,10 @@ class GameScreenManager:
             offset_y = int(blk.block.y - current_player.rect.y)
 
             if current_player.mask.overlap(blk.mask, (offset_x, offset_y)):
-                self.reset_game(current_player)
+                self.reset_game(current_player, "Block Collision")
+                return True
+        return False
+
 
     def check_spike_player_collision(self, spk, current_player):
         # Finds offset amount from the spike hitbox to the player
@@ -223,7 +231,7 @@ class GameScreenManager:
         # If the player and mask overlap then reset the level
         if player.mask.overlap(spk.mask, (offset_x, offset_y)):
             screen.fill((0, 0, 0))
-            self.reset_game(current_player)
+            self.reset_game(current_player, "Spike Collision")
 
     def draw_objects(self):
         for to_draw in self.spikes:
@@ -246,7 +254,8 @@ class GameScreenManager:
             screen.blit(to_draw.image, to_draw.block)
 
     #resets the game
-    def reset_game(self, current_player):
+    def reset_game(self, current_player, reason="Unknown"):
+        print("PLAYER RESET:", reason)
         current_player.__init__(self.screen_width, SCREENHEIGHT, GROUND_Y)
         self.spikes = []
         self.blocks = []
@@ -351,7 +360,7 @@ while running:
             if in_menu:
                 in_game = True
                 in_menu = False
-                GameScreenManager.reset_game(game_screen, player)
+                GameScreenManager.reset_game(game_screen, player, "Play Button")
         if casino_button.check_button_click(event):
             if in_menu:
                 in_casino = True
