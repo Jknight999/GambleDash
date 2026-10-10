@@ -99,6 +99,7 @@ class GameScreenManager:
                 self.tick_counter += 1
             else:
                 self.tick_counter = 0
+                # Randomizes next structure
                 self.current_structure = random.randint(1, len(self.structures))
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
