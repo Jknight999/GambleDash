@@ -108,7 +108,11 @@ class GameScreenManager:
         self.draw_screen(self.f_c)
         self.draw_objects()
 
-        GameScreenManager.apply_physics(current_player)
+        self.apply_physics(current_player)
+
+        # rotates the player if they're in the air
+        if current_player.y_vel != 0 and not self.colliding_with_block:
+            current_player.rotate_player(self.dt)
 
         # checks spike and block collisions
         for k in self.spikes:
@@ -126,10 +130,6 @@ class GameScreenManager:
 
         # keeps the player above the floor
         self.check_ground_collisions(current_player)
-
-        # rotates the player if they're in the air
-        if current_player.y_vel != 0 and not self.colliding_with_block:
-            current_player.rotate_player(self.dt)
 
         # checks for jumping every tick and applies gravity
         self.check_jump(current_player)
@@ -165,7 +165,8 @@ class GameScreenManager:
         current_player.y_vel += current_player.gravity * game_screen.dt
         current_player.y += current_player.y_vel * game_screen.dt
 
-    def check_ground_collisions(self, current_player):
+    @staticmethod
+    def check_ground_collisions(current_player):
         #checks if the player is on the ground
         if current_player.y >= GROUND_Y - current_player.h:
             current_player.y = GROUND_Y - current_player.h
@@ -175,9 +176,6 @@ class GameScreenManager:
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
         current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
-
-        # updates mask again
-
 
     def check_block_player_collision(self, blk, current_player, current_player_yv):
         # if the player hits the side of the block then reset the game
@@ -308,13 +306,16 @@ bg = pygame.image.load("assets/background.jpg").convert()
 #initializes first instances of class
 player = gc.Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 
+# I have absolutely no idea why but this is necessary to make the cube start the right way up
+player.angle = 91
+player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
+player.rect = player.rotated_surface.get_rect(center=(player.x + player.w // 2, player.y + player.h // 2))
+
 #now takes a text argument - ('text', 'font file name', size, color(R,G,B))
 play_button = gc.Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
 casino_button = gc.Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = gc.Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 higher_or_lower_button = gc.Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
-
-# lists of generated instances of the classes to allow for multiple to be on screen
 
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE)
 pygame.display.set_caption("GambleDash")
