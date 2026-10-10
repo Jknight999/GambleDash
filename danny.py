@@ -14,10 +14,8 @@ class GameScreenManager:
         self.screen_height = s_h
         self.f_c = fl_color
         self.framerate = f_r
-        self.player = current_player
         self.spikes = []
         self.blocks = []
-        self.buttons = []
         self.scroll_speed = 550
         self.clock = pygame.time.Clock()
         self.tick_counter = 0
@@ -165,12 +163,7 @@ class GameScreenManager:
             current_player.y_vel = 0
 
             #snaps the cube back to flat on the ground
-            current_player.angle = round(current_player.angle / 90) * 90 % 360
-            current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
-        current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
-
-        #updates player collision mask
-        current_player.mask = pygame.mask.from_surface(current_player.rotated_surface)
+            current_player.snap_rotation()
 
         #converts the block collision tuple into two variables
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
@@ -179,8 +172,7 @@ class GameScreenManager:
             current_player.y_vel = 0
 
             #snaps the cube back to flat on the ground
-            current_player.angle = round(current_player.angle / 90) * 90 % 360
-            current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
+            current_player.snap_rotation()
 
     def check_block_player_collision(self, blk, current_player):
         #find the players horizontal overlap with the block
@@ -201,12 +193,7 @@ class GameScreenManager:
             current_player.y_vel = 0
 
             #reset rotation when landing
-            current_player.angle = round(current_player.angle / 90) * 90 % 360
-            current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
-
-            #updates the player rect and mask for collisions
-            current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
-            current_player.mask = pygame.mask.from_surface(current_player.rotated_surface)
+            current_player.snap_rotation()
 
             blk.colliding = True
         else:
@@ -219,7 +206,6 @@ class GameScreenManager:
                 self.reset_game(current_player)
                 return True
         return False
-
 
     def check_spike_player_collision(self, spk, current_player):
         #finds offset amount from the spike hitbox to the player
@@ -268,9 +254,9 @@ class GameScreenManager:
     @staticmethod
     def is_block_colliding(all_blocks):
         #if the player is colliding with a block then return true and the block
-        for b in all_blocks:
-            if b.colliding:
-                return True, b
+        for block in all_blocks:
+            if block.colliding:
+                return True, block
         return False, None
 
 def draw_menu_screen():
@@ -281,7 +267,6 @@ def draw_menu_screen():
     casino_button.render_text(screen)
 
 def draw_casino_screen():
-    global casino_font
     screen.fill((94, 6, 6))
     CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
     CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 4), f'Your Chips: {chips}', (255, 255, 255))

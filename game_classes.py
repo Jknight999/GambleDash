@@ -36,6 +36,12 @@ class Player:
         self.rect = self.rotated_surface.get_rect(center=(self.x + self.w // 2, self.y + self.h // 2))
         self.mask = pygame.mask.from_surface(self.rotated_surface)
 
+    def snap_rotation(self):
+        self.angle = round(self.angle / 90) * 90 % 360
+        self.rotated_surface = pygame.transform.rotate(self.image, self.angle)
+        self.rect = self.rotated_surface.get_rect(center=(self.x+self.w // 2, self.y + self.h // 2))
+        self.mask = pygame.mask.from_surface(self.rotated_surface)
+
 class Spike:
     #basic spike characteristics
     def __init__(self, x, y, sw, sh):
@@ -43,7 +49,6 @@ class Spike:
         self.y = y
         self.width = sw / 20
         self.height = sh / 10
-        self.speed = 550
         self.hitbox = pygame.Rect(x + self.width / 2.5, self.y + self.height / 3, self.width / 5, self.height / 2.3)
 
         #makes the spike hitbox into a surface
@@ -66,7 +71,6 @@ class Block:
         self.y = y
         self.width = sw / 20
         self.height = sh / 10
-        self.speed = 550
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
 
         #makes the block into a sprite
