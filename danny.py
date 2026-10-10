@@ -86,11 +86,16 @@ class GameScreenManager:
         # Calculates delta time from framerate
         self.dt = self.clock.tick(self.framerate) / 1000
 
-        # Converts the block collision tuple into two variables
-        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
-
         # Scrolls the whole level
         self.scroll()
+
+        # Rotates the player if they're in the air
+        if current_player.y < GROUND_Y - current_player.h and not self.player_block_colliding:
+            current_player.rotate_player(self.dt)
+
+        # Checks for jumping every tick and applies gravity
+        self.check_jump(current_player)
+        GameScreenManager.apply_physics(current_player)
 
         # Counts frames and converts them into ticks
         if self.frame_counter % math.floor(self.screen_width / 200) == 0:
@@ -104,9 +109,8 @@ class GameScreenManager:
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
 
-        # Draws the game screen and the objects contained in it at the moment
-        self.draw_screen(self.f_c)
-        self.draw_objects()
+        # Converts the block collision tuple into two variables
+        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
 
         # Checks spike and block collisions with the player
         for k in self.spikes:
@@ -114,16 +118,12 @@ class GameScreenManager:
         for k in self.blocks:
             self.check_block_player_collision(k, current_player)
 
-        # Checks for jumping every tick and applies gravity
-        self.check_jump(current_player)
-        GameScreenManager.apply_physics(current_player)
-
         # Keeps the player above the floor and the blocks
         self.check_ground_collisions(current_player)
 
-        # Rotates the player if they're in the air
-        if current_player.y < GROUND_Y - current_player.h and not self.player_block_colliding:
-            current_player.rotate_player(self.dt)
+        # Draws the game screen and the objects contained in it at the moment
+        self.draw_screen(self.f_c)
+        self.draw_objects()
 
         # Draws the player to the screen
         self.surface.blit(current_player.rotated_surface, current_player.rect)
