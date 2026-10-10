@@ -218,7 +218,7 @@ class GameScreenManager:
             offset_y = int(blk.block.y - current_player.rect.y)
 
             if current_player.mask.overlap(blk.mask, (offset_x, offset_y)):
-                self.reset_game(current_player, "Block Collision")
+                self.reset_game(current_player)
                 return True
         return False
 
@@ -231,7 +231,7 @@ class GameScreenManager:
         # If the player and mask overlap then reset the level
         if player.mask.overlap(spk.mask, (offset_x, offset_y)):
             screen.fill((0, 0, 0))
-            self.reset_game(current_player, "Spike Collision")
+            self.reset_game(current_player)
 
     def draw_objects(self):
         for to_draw in self.spikes:
@@ -254,8 +254,7 @@ class GameScreenManager:
             screen.blit(to_draw.image, to_draw.block)
 
     #resets the game
-    def reset_game(self, current_player, reason="Unknown"):
-        print("PLAYER RESET:", reason)
+    def reset_game(self, current_player):
         current_player.__init__(self.screen_width, SCREENHEIGHT, GROUND_Y)
         self.spikes = []
         self.blocks = []
@@ -360,7 +359,7 @@ while running:
             if in_menu:
                 in_game = True
                 in_menu = False
-                GameScreenManager.reset_game(game_screen, player, "Play Button")
+                GameScreenManager.reset_game(game_screen, player)
         if casino_button.check_button_click(event):
             if in_menu:
                 in_casino = True
