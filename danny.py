@@ -2,6 +2,7 @@ import pygame
 import pygame.freetype
 import math
 import random
+import time
 
 # Pulls the Player, Spike, Block, and Button classes from the game_classes.py folder
 from game_classes import Player, Spike, Block, Button
@@ -65,12 +66,17 @@ class GameScreenManager:
 
     def discard_objects(self):
         # If an object is off of the screen, the function removes it from the game list
+        remaining_spikes = []
         for spike in self.spikes:
-            if spike.x + spike.width < 0:
-                self.spikes.remove(spike)
+            if spike.x + spike.width >= 0:
+                remaining_spikes.append(spike)
+        self.spikes = remaining_spikes
+
+        remaining_blocks = []
         for block in self.blocks:
-            if block.x + block.width < 0:
-                self.blocks.remove(block)
+            if block.x + block.width >= 0:
+                remaining_blocks.append(block)
+        self.blocks = remaining_blocks
 
     def print_level(self, level, tick):
         # Goes through each item in the structures list
