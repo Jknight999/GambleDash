@@ -1,6 +1,7 @@
 import pygame
 import pygame.freetype
 import math
+import random
 
 # Pulls the Player, Spike, Block, and Button classes from the game_classes.py folder
 from game_classes import Player, Spike, Block, Button
@@ -98,6 +99,7 @@ class GameScreenManager:
                 self.tick_counter += 1
             else:
                 self.tick_counter = 0
+                self.current_structure = random.randint(1, len(self.structures))
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
 
