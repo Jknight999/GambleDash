@@ -36,8 +36,8 @@ class GameScreenManager:
     2: (
     '                                                                           ',
     '                                                                           ',
-    '                                                                           ',
-    '                             00000000000                                   ',
+    '                                     0000                                  ',
+    '                             000000000000                                  ',
     '                   000000    000000000000                                  ',
     '            00000000000001111000000000000                                  ',
     '     0000000000000000000000000000000000000000000000000                     '
@@ -182,9 +182,10 @@ class GameScreenManager:
     def check_block_player_collision(self, blk, current_player, current_player_yv):
         #if the player hits the side of the block then reset the game
         # checks if the y velocity is less than or equal to 0 or its way below the block
-        if current_player_yv <= 0 or current_player.y >= blk.y:
+        if (current_player_yv <= 0 or current_player.y >= blk.y) and current_player.rect.x + current_player.w > blk.block.x:
             screen.fill((0, 0, 0))
             self.reset_game(current_player)
+            return
         if current_player_yv > 0:
             # sets the tracking bool to true and resets the rect
             self.colliding_with_block = True
