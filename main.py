@@ -124,7 +124,6 @@ while running:
             if back_button.check_button_click(event):
                 in_game = False
                 in_menu = True
-        higher_or_lower_button.check_button_click(event)
 
     if in_game:
         draw_game_screen()
