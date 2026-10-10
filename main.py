@@ -39,7 +39,7 @@ class GameScreenManager:
     '                                                                           ',
     '                             00000000000                                   ',
     '                   000000    000000000000                                  ',
-    '            000000000000011110000000000000000000                           ',
+    '            00000000000001111000000000000                                  ',
     '     0000000000000000000000000000000000000000000000000                     '
     ),
 
@@ -53,7 +53,7 @@ class GameScreenManager:
         '     0000000000000000000000000000000000000000000000000                     '
     )
 }
-        self.current_structure = 3
+        self.current_structure = 2
         #returns tuple of if the player is colliding with a block
         self.colliding_with_block = False
         self.colliding_with = None
@@ -113,14 +113,12 @@ class GameScreenManager:
         # checks spike and block collisions
         for k in self.spikes:
             self.check_spike_player_collision(k, current_player)
+        self.colliding_with_block = False
         for k in self.blocks:
             if current_player.rect.colliderect(k.block) and current_player.x < k.x + k.width:
                 self.colliding_with = k
                 self.check_block_player_collision(k, current_player, current_player.y_vel)
                 break
-            if k == self.blocks[-1]:
-                print(current_player.rect.bottom)
-                self.colliding_with_block = False
 
         # keeps the player above the floor
         self.check_ground_collisions(current_player)
@@ -186,8 +184,9 @@ class GameScreenManager:
             self.colliding_with_block = True
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
-            current_player.y = blk.y - current_player.h
+            current_player.y = blk.block.y - current_player.h
             current_player.y_vel = 0
+            current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
 
     def check_spike_player_collision(self, spk, current_player):
         # finds offset amount from the hitbox to the player
