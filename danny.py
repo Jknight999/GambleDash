@@ -37,14 +37,14 @@ class GameScreenManager:
     ),
 
     2: (
-    '                                                                           ',
-    '                                                                           ',
-    '                                                                           ',
-    '                                   11     0000                             ',
-    '                   000000    000000000000                                  ',
-    '            000000000000011110000000000000                                 ',
-    '     0000000000000000000000000000000000000000000000000                     '
-    )
+        '                                                                           ',
+        '                                                                           ',
+        '                                     0000                                  ',
+        '                             000000000000                                  ',
+        '                   000000    000000000000                                  ',
+        '            00000000000001111000000000000                                  ',
+        '     0000000000000000000000000000000000000000000000000                     '
+            )
 }
         self.current_structure = 2
 
@@ -174,25 +174,24 @@ class GameScreenManager:
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
 
     def check_block_player_collision(self, blk, current_player):
-        #finds the offset amount from the block hitbox to the player
-        offset_x = int(blk.block.x - current_player.rect.x)
-        offset_y = int(blk.block.y - current_player.rect.y)
+        # Find the player's horizontal overlap with the block
+        horizontal_overlap = current_player.x + current_player.w > blk.block.x and current_player.x < blk.block.x + blk.width
 
-        #finds the bottom of the player
+        # Find the player's feet and the top of the block
         player_bottom = current_player.y + current_player.h
         block_top = blk.block.y
 
-        #only returns true if the player x is within the block
-        horizontal_overlap = (current_player.x + current_player.w > blk.block.x and current_player.x < blk.block.x + blk.width)
-        #returns true if the player overlaps horizontally with the block, it is moving down, and the player is very close to landing on the block
-        landing = (horizontal_overlap and current_player.y_vel > 0 and block_top + SCREENHEIGHT / 100 >= player_bottom >= block_top - 5)
+        # Check whether the player's feet crossed the block's top during this frame while falling
+        previous_bottom = player_bottom - current_player.y_vel * self.dt
+
+        landing = horizontal_overlap and current_player.y_vel > 0 and previous_bottom <= block_top <= player_bottom
 
         if landing:
-            #snaps the player to the block and resets the player's y velocity
+            # Place the player exactly on top of the block
             current_player.y = block_top - current_player.h
             current_player.y_vel = 0
 
-            #snaps the player to the nearest 90 degrees
+            # Reset rotation when landing
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
 
@@ -200,11 +199,14 @@ class GameScreenManager:
             blk.colliding = True
 
         else:
-            #only check for a deadly collision if the player is not landing
             blk.colliding = False
 
+            # Only kill the player if they overlap the block
+            # without landing on its top
+            offset_x = int(blk.block.x - current_player.rect.x)
+            offset_y = int(blk.block.y - current_player.rect.y)
+
             if current_player.mask.overlap(blk.mask, (offset_x, offset_y)):
-                screen.fill((0, 0, 0))
                 self.reset_game(current_player)
 
     def check_spike_player_collision(self, spk, current_player):
