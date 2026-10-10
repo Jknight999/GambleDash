@@ -174,24 +174,38 @@ class GameScreenManager:
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
 
     def check_block_player_collision(self, blk, current_player):
-        # Finds the offset amount from the block hitbox to the player
+        #finds the offset amount from the block hitbox to the player
         offset_x = int(blk.block.x - current_player.rect.x)
         offset_y = int(blk.block.y - current_player.rect.y)
 
-        # If the player hits the side of the block then reset the game
-        if current_player.mask.overlap(blk.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + SCREENHEIGHT/ 100 - current_player.h:
-            screen.fill((0, 0, 0))
-            self.reset_game(current_player)
+        #finds the bottom of the player
+        player_bottom = current_player.y + current_player.h
+        block_top = blk.block.y
 
-        # When touching a block snap the player on top of the block
-        if blk.block.x - current_player.rect.w <= current_player.rect.x <= blk.block.x + blk.width and blk.block.y - SCREENHEIGHT / 200 <= current_player.rect.y + current_player.rect.h <= blk.block.y + SCREENHEIGHT / 100:
-            blk.colliding = True
-            current_player.rect.y = blk.block.y - player.rect.h
+        #only returns true if the player x is within the block
+        horizontal_overlap = (current_player.x + current_player.w > blk.block.x and current_player.x < blk.block.x + blk.width)
+        #returns true if the player overlaps horizontally with the block, it is moving down, and the player is very close to landing on the block
+        landing = (horizontal_overlap and current_player.y_vel > 0 and block_top + SCREENHEIGHT / 100 >= player_bottom >= block_top - 5)
+
+        if landing:
+            #snaps the player to the block and resets the player's y velocity
+            current_player.y = block_top - current_player.h
             current_player.y_vel = 0
-            current_player.angle = round(player.angle / 90) * 90 % 360
-            current_player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
+
+            #snaps the player to the nearest 90 degrees
+            current_player.angle = round(current_player.angle / 90) * 90 % 360
+            current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
+
+            current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
+            blk.colliding = True
+
         else:
+            #only check for a deadly collision if the player is not landing
             blk.colliding = False
+
+            if current_player.mask.overlap(blk.mask, (offset_x, offset_y)):
+                screen.fill((0, 0, 0))
+                self.reset_game(current_player)
 
     def check_spike_player_collision(self, spk, current_player):
         # Finds offset amount from the spike hitbox to the player
@@ -223,7 +237,7 @@ class GameScreenManager:
         for to_draw in self.blocks:
             screen.blit(to_draw.image, to_draw.block)
 
-    # Resets the game
+    #resets the game
     def reset_game(self, current_player):
         current_player.__init__(self.screen_width, SCREENHEIGHT, GROUND_Y)
         self.spikes = []
