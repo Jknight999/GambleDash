@@ -1,6 +1,7 @@
 import pygame
 import pygame.freetype
 import math
+import random
 
 # Pulls the Player, Spike, Block, and Button classes from the game_classes.py folder
 from game_classes import Player, Spike, Block, Button
@@ -85,11 +86,16 @@ class GameScreenManager:
         # Calculates delta time from framerate
         self.dt = self.clock.tick(self.framerate) / 1000
 
-        # Converts the block collision tuple into two variables
-        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
-
         # Scrolls the whole level
         self.scroll()
+
+        # Rotates the player if they're in the air
+        if current_player.y < GROUND_Y - current_player.h and not self.player_block_colliding:
+            current_player.rotate_player(self.dt)
+
+        # Checks for jumping every tick and applies gravity
+        self.check_jump(current_player)
+        GameScreenManager.apply_physics(current_player)
 
         # Counts frames and converts them into ticks
         if self.frame_counter % math.floor(self.screen_width / 200) == 0:
@@ -98,12 +104,13 @@ class GameScreenManager:
                 self.tick_counter += 1
             else:
                 self.tick_counter = 0
+                # Randomizes next structure
+                self.current_structure = random.randint(1, len(self.structures))
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
 
-        # Draws the game screen and the objects contained in it at the moment
-        self.draw_screen(self.f_c)
-        self.draw_objects()
+        # Converts the block collision tuple into two variables
+        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
 
         # Checks spike and block collisions with the player
         for k in self.spikes:
@@ -111,16 +118,12 @@ class GameScreenManager:
         for k in self.blocks:
             self.check_block_player_collision(k, current_player)
 
-        # Checks for jumping every tick and applies gravity
-        self.check_jump(current_player)
-        GameScreenManager.apply_physics(current_player)
-
         # Keeps the player above the floor and the blocks
         self.check_ground_collisions(current_player)
 
-        # Rotates the player if they're in the air
-        if current_player.y < GROUND_Y - current_player.h and not self.player_block_colliding:
-            current_player.rotate_player(self.dt)
+        # Draws the game screen and the objects contained in it at the moment
+        self.draw_screen(self.f_c)
+        self.draw_objects()
 
         # Draws the player to the screen
         self.surface.blit(current_player.rotated_surface, current_player.rect)
@@ -176,7 +179,7 @@ class GameScreenManager:
         offset_y = int(blk.block.y - current_player.rect.y)
 
         # If the player hits the side of the block then reset the game
-        if current_player.mask.overlap(current_player.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + SCREENHEIGHT/ 100 - current_player.h:
+        if current_player.mask.overlap(blk.mask, (offset_x, offset_y)) and current_player.y > blk.block.y + SCREENHEIGHT/ 100 - current_player.h:
             screen.fill((0, 0, 0))
             self.reset_game(current_player)
 

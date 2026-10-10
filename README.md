@@ -1,13 +1,10 @@
 # GambleDash
 
 #TASK LIST:
-1. Manager object for the screen
-2. Block Collisions
-3. Randomly generated levels
-4. Coins
-5. Gambling
-6. Upgrades
-7. Enemies
+1. Coins
+2. Gambling
+3. Upgrades
+4. Enemies
 
 
 Optional Tasks:
