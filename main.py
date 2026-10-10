@@ -124,7 +124,7 @@ class GameScreenManager:
         self.check_ground_collisions(current_player)
 
         # rotates the player if they're in the air
-        if current_player.y_vel != 0:
+        if current_player.y_vel != 0 and not self.colliding_with_block:
             current_player.rotate_player(self.dt)
 
         # checks for jumping every tick and applies gravity
