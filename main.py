@@ -182,7 +182,10 @@ class GameScreenManager:
     def check_block_player_collision(self, blk, current_player, current_player_yv):
         # if the player hits the side of the block then reset the game
         # checks if the y velocity is less than or equal to 0 or its way below the block
-        if (current_player_yv <= 0 or current_player.y >= blk.y) and current_player.rect.x + current_player.w > blk.block.x:
+        offset_x = int(blk.block.x - current_player.rect.x)
+        offset_y = int(blk.block.y - current_player.rect.y)
+
+        if (current_player_yv <= 0 or current_player.y >= blk.y) and player.mask.overlap(blk.mask, (offset_x, offset_y)):
             screen.fill((0, 0, 0))
             self.reset_game(current_player)
             return
