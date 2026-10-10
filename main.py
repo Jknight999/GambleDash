@@ -107,7 +107,7 @@ class GameScreenManager:
         for k in self.blocks:
             offset_x = int(k.block.x - current_player.rect.x)
             offset_y = int(k.block.y - current_player.rect.y)
-            if current_player.mask.overlap(current_player.mask, (offset_x, offset_y)) and current_player.x < k.x + k.width:
+            if current_player.mask.overlap(k.mask, (offset_x, offset_y)) and current_player.x < k.x + k.width:
                 self.check_block_player_collision(k, current_player, current_player.y_vel)
                 break
 
