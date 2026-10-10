@@ -54,7 +54,7 @@ class GameScreenManager:
     '000000000000000000000000000000000000000000000000000000                     '
     )
 }
-        self.current_structure = 2
+        self.current_structure = random.randint(1, len(self.structures))
 
         #returns a tuple with if the player is colliding with a block and the block it is colliding with
         self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
@@ -119,7 +119,9 @@ class GameScreenManager:
             else:
                 self.tick_counter = 0
                 #randomizes next structure
-                self.current_structure = random.randint(1, len(self.structures))
+                temp = self.current_structure
+                while temp == self.current_structure:
+                    self.current_structure = random.randint(1, len(self.structures))
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
 
@@ -139,7 +141,6 @@ class GameScreenManager:
 
         #draws the game screen and the objects contained in it at the moment
         self.draw_screen(self.f_c)
-        self.draw_objects()
 
         #draws the player to the screen
         self.surface.blit(current_player.rotated_surface, current_player.rect)
@@ -162,6 +163,7 @@ class GameScreenManager:
         #calculates so that the floor always draws 2/3 of the way down
         pygame.draw.rect(screen, floor_c, (0, GROUND_Y, self.screen_width, SCREENHEIGHT - GROUND_Y))
         #draws the back button to the screen
+        self.draw_objects()
         back_button.draw_button(screen)
         back_button.render_text(self.surface)
 
