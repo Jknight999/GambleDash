@@ -115,9 +115,13 @@ class GameScreenManager:
             self.check_spike_player_collision(k, current_player)
         self.colliding_with_block = False
         for k in self.blocks:
+            # checks for each block if they are colliding with the player using colliderect
             if current_player.rect.colliderect(k.block) and current_player.x < k.x + k.width:
+                # if they are, add the block that is to the variable that tracks it
                 self.colliding_with = k
+                # check to see if it is from the top or from the left
                 self.check_block_player_collision(k, current_player, current_player.y_vel)
+                # only one will be colliding, so you can break after one
                 break
 
         # keeps the player above the floor
@@ -177,10 +181,12 @@ class GameScreenManager:
 
     def check_block_player_collision(self, blk, current_player, current_player_yv):
         #if the player hits the side of the block then reset the game
+        # checks if the y velocity is less than or equal to 0 or its way below the block
         if current_player_yv <= 0 or current_player.y >= blk.y:
             screen.fill((0, 0, 0))
             self.reset_game(current_player)
         if current_player_yv > 0:
+            # sets the tracking bool to true and resets the rect
             self.colliding_with_block = True
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
