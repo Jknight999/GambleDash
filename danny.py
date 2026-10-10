@@ -237,7 +237,7 @@ class GameScreenManager:
         for to_draw in self.blocks:
             screen.blit(to_draw.image, to_draw.block)
 
-    # Resets the game
+    #resets the game
     def reset_game(self, current_player):
         current_player.__init__(self.screen_width, SCREENHEIGHT, GROUND_Y)
         self.spikes = []
