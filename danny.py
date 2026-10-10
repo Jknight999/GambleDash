@@ -2,7 +2,6 @@ import pygame
 import pygame.freetype
 import math
 import random
-import time
 
 #pulls the player, spike, block, and button classes from the game_classes.py folder
 from game_classes import Player, Spike, Block, Button
