@@ -1,4 +1,4 @@
-from game_classes import Player, Spike, Block, Button
+from game_classes import Spike, Block
 import math
 import pygame
 
@@ -49,11 +49,11 @@ class GameScreenManager:
         '                                                                           ',
         '                                                                           ',
         '                                                                           ',
-        '             00000                                                         ',
+        '                                                                           ',
         '     0000000000000000000000000000000000000000000000000                     '
     )
 }
-        self.current_structure = 2
+        self.current_structure = 3
         #returns tuple of if the player is colliding with a block
         self.colliding_with_block = False
         self.colliding_with = None
@@ -70,12 +70,18 @@ class GameScreenManager:
         self.discard_objects()
 
     def discard_objects(self):
+        # makes a list of all spikes and blocks on the screen
+        remaining_spikes = []
         for spike in self.spikes:
-            if spike.x + spike.width < 0:
-                self.spikes.remove(spike)
+            if spike.x + spike.width >= 0:
+                remaining_spikes.append(spike)
+        self.spikes = remaining_spikes
+
+        remaining_blocks = []
         for block in self.blocks:
-            if block.x + block.width < 0:
-                self.blocks.remove(block)
+            if block.x + block.width >= 0:
+                remaining_blocks.append(block)
+        self.blocks = remaining_blocks
 
     def print_level(self, level, tick):
         #goes through each item in the structures list
@@ -118,7 +124,7 @@ class GameScreenManager:
             self.check_spike_player_collision(k, current_player)
         self.colliding_with_block = False
         for k in self.blocks:
-            # checks for each block if they are colliding with the player using colliderect
+            # checks for each block if they are colliding with the player using colliderect()
             if current_player.rect.colliderect(k.block) and current_player.x < k.x + k.width:
                 # if they are, add the block that is to the variable that tracks it
                 self.colliding_with = k
@@ -167,7 +173,7 @@ class GameScreenManager:
 
     def check_block_player_collision(self, blk, current_player, current_player_yv):
         # if the player hits the side of the block then reset the game
-        # checks if the y velocity is less than or equal to 0 or its way below the block
+        # checks if the y velocity is less than or equal to 0, or it's way below the block
         offset_x = int(blk.block.x - current_player.rect.x)
         offset_y = int(blk.block.y - current_player.rect.y)
 

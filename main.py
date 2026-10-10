@@ -1,8 +1,7 @@
 import pygame
 import pygame.freetype
 import math
-import random
-import game_classes as gc
+from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 
 def draw_menu_screen():
@@ -81,7 +80,7 @@ pygame.init()
 bg = pygame.image.load("assets/background.jpg").convert()
 
 #initializes first instances of class
-player = gc.Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
+player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 
 # I have absolutely no idea why but this is necessary to make the cube start the right way up
 player.angle = 91
@@ -89,10 +88,10 @@ player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
 player.rect = player.rotated_surface.get_rect(center=(player.x + player.w // 2, player.y + player.h // 2))
 
 #now takes a text argument - ('text', 'font file name', size, color(R,G,B))
-play_button = gc.Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
-casino_button = gc.Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
-back_button = gc.Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
-higher_or_lower_button = gc.Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
+play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
+casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
+back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
+higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
 
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE, pygame.time.Clock(), GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
