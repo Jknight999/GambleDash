@@ -37,15 +37,26 @@ class GameScreenManager:
     '                                                                           ',
     '                                                                           ',
     '                                                                           ',
-    '                            000000000                                      ',
-    '                   000000    000000000                                     ',
-    '            00000000000001111000000000                                     ',
+    '                             00000000000                                   ',
+    '                   000000    000000000000                                  ',
+    '            000000000000011110000000000000000000                           ',
     '     0000000000000000000000000000000000000000000000000                     '
+    ),
+
+    3: (
+        '                                                                           ',
+        '                                                                           ',
+        '                                                                           ',
+        '                                                                           ',
+        '                                                                           ',
+        '             00000                                                         ',
+        '     0000000000000000000000000000000000000000000000000                     '
     )
 }
-        self.current_structure = 2
+        self.current_structure = 3
         #returns tuple of if the player is colliding with a block
-        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
+        self.colliding_with_block = False
+        self.colliding_with = None
 
     def scroll(self):
         #scrolls spike and places hitbox
@@ -81,8 +92,6 @@ class GameScreenManager:
         self.dt = self.clock.tick(self.framerate) / 1000
 
         #converts the tuple into two variables to work with throughout the code
-        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
-
         #scrolls the whole level
         self.scroll()
 
@@ -105,21 +114,23 @@ class GameScreenManager:
         for k in self.spikes:
             self.check_spike_player_collision(k, current_player)
         for k in self.blocks:
-            offset_x = int(k.block.x - current_player.rect.x)
-            offset_y = int(k.block.y - current_player.rect.y)
-            if current_player.mask.overlap(k.mask, (offset_x, offset_y)) and current_player.x < k.x + k.width:
+            if current_player.rect.colliderect(k.block) and current_player.x < k.x + k.width:
+                self.colliding_with = k
                 self.check_block_player_collision(k, current_player, current_player.y_vel)
                 break
+            if k == self.blocks[-1]:
+                print(current_player.rect.bottom)
+                self.colliding_with_block = False
 
-        # keeps the player above the floor and the blocks
+        # keeps the player above the floor
         self.check_ground_collisions(current_player)
+
+        # rotates the player if they're in the air
+        if current_player.y_vel != 0:
+            current_player.rotate_player(self.dt)
 
         # checks for jumping every tick and applies gravity
         self.check_jump(current_player)
-
-        # rotates the player if they're in the air
-        if current_player.y < GROUND_Y - current_player.h and not self.player_block_colliding:
-            current_player.rotate_player(self.dt)
 
         # draws the player to the screen
         self.surface.blit(current_player.rotated_surface, current_player.rect)
@@ -128,7 +139,7 @@ class GameScreenManager:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] or keys[pygame.K_w]:
             # touching a block
-            if self.player_block_colliding:
+            if self.colliding_with_block:
                 current_player.y = self.colliding_with.y - current_player.h
                 current_player.y_vel = current_player.jump_strength
 
@@ -149,16 +160,8 @@ class GameScreenManager:
     @staticmethod
     def apply_physics(current_player):
         # applies gravity and ground collision detection
-        current_player.y += current_player.y_vel * game_screen.dt
         current_player.y_vel += current_player.gravity * game_screen.dt
-
-    @staticmethod
-    def is_block_colliding(all_blocks):
-        #if the player is colliding with a block then return true and the block
-        for b in all_blocks:
-            if b.colliding:
-                return True, b
-        return False, None
+        current_player.y += current_player.y_vel * game_screen.dt
 
     def check_ground_collisions(self, current_player):
         #checks if the player is on the ground
@@ -172,28 +175,19 @@ class GameScreenManager:
         current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
 
         # updates mask again
-        current_player.mask = pygame.mask.from_surface(current_player.image)
-        self.player_block_colliding, self.colliding_with = GameScreenManager.is_block_colliding(self.blocks)
-        if self.player_block_colliding:
-            current_player.y = self.colliding_with.y - current_player.h
-            current_player.y_vel = 0
 
 
     def check_block_player_collision(self, blk, current_player, current_player_yv):
-        print(current_player_yv)
-
         #if the player hits the side of the block then reset the game
         if current_player_yv <= 0 or current_player.y >= blk.y:
             screen.fill((0, 0, 0))
             self.reset_game(current_player)
         if current_player_yv > 0:
-            blk.colliding = True
+            self.colliding_with_block = True
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
             current_player.y = blk.y - current_player.h
             current_player.y_vel = 0
-        else:
-            blk.colliding = False
 
     def check_spike_player_collision(self, spk, current_player):
         # finds offset amount from the hitbox to the player
