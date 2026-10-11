@@ -64,26 +64,6 @@ class Spike:
         #calculates where the vertices should be based off x, y, w and h of the spike
         return [[self.x, self.y + self.height], [self.x + self.width / 2, self.y], [self.x + self.width, self.y + self.height]]
 
-'''class Block:
-    #basic block characteristics
-    def __init__(self, x, y, sw, sh):
-        self.x = x
-        self.y = y
-        self.width = sw / 20
-        self.height = sh / 10
-        self.block = pygame.Rect(self.x, self.y, self.width, self.height)
-
-        #makes the block into a sprite
-        self.image = pygame.image.load("Assets/gambledashblock.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (self.width, self.height))
-
-        #draws a mask around the image for collisions
-        self.mask = pygame.mask.from_surface(self.image)
-
-        #initializes collision as false
-        self.colliding = False
-'''
-
 class Block:
     # Shared resources: create these only once.
     shared_image = None
