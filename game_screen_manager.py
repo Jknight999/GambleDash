@@ -27,7 +27,8 @@ class GameScreenManager:
         #all possible structures
         self.structures = structure_dictionary
 
-        self.current_structure = random.randint(1, len(structure_dictionary))
+        #self.current_structure = random.randint(1, len(structure_dictionary))
+        self.current_structure = 1000
         #returns tuple of if the player is colliding with a block
         self.colliding_with_block = False
         self.colliding_with = None
@@ -44,17 +45,8 @@ class GameScreenManager:
         self.discard_objects()
 
     def discard_objects(self):
-        remaining_spikes = []
-        for spike in self.spikes:
-            if spike.x + spike.width >= 0:
-                remaining_spikes.append(spike)
-        self.spikes = remaining_spikes
-
-        remaining_blocks = []
-        for block in self.blocks:
-            if block.x + block.width >= 0:
-                remaining_blocks.append(block)
-        self.blocks = remaining_blocks
+        self.spikes = [spike for spike in self.spikes if spike.x + spike.width >= 0]
+        self.blocks = [block for block in self.blocks if block.x + block.width >= 0]
 
     def print_level(self, level, tick):
         #goes through each item in the structures list
@@ -81,10 +73,11 @@ class GameScreenManager:
                 self.tick_counter += 1
             else:
                 self.tick_counter = 0
+                '''
                 temp = self.current_structure
                 while temp == self.current_structure:
                     self.current_structure = random.randint(1, len(structure_dictionary))
-                print(self.current_structure)
+                '''
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
 
@@ -156,17 +149,23 @@ class GameScreenManager:
         offset_y = int(blk.block.y - current_player.rect.y)
 
         if ((current_player_yv <= 0 or current_player.y >= blk.y) and current_player.mask.overlap(blk.mask, (offset_x, offset_y))) and not current_player.rect.bottom == blk.y:
+            pass
+            '''
             self.surface.fill((0, 0, 0))
             self.reset_game(current_player)
             return
+            '''
         elif current_player_yv > 0:
+            pass
             # sets the tracking bool to true and resets the rect
+            '''
             self.colliding_with_block = True
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
             current_player.y = blk.block.y - current_player.h
             current_player.y_vel = 0
             current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
+            '''
 
     def check_spike_player_collision(self, spk, current_player):
         # finds offset amount from the hitbox to the player
