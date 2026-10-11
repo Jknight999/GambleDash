@@ -21,6 +21,7 @@ class GameScreenManager:
         self.frame_counter = 0
         self.dt = 0
         self.background = bg
+        self.previous_player_bottom = current_player.y + current_player.h
         #all possible structures
         self.structures = {
     1: (
@@ -119,7 +120,7 @@ class GameScreenManager:
         self.colliding_with_block = False
         for k in self.blocks:
             # checks for each block if they are colliding with the player using colliderect
-            if current_player.rect.colliderect(k.block) and current_player.x < k.x + k.width:
+            if (current_player.rect.colliderect(k.block) or k.y == current_player.rect.bottom) and k.x - k.width < current_player.x < k.x + k.width:
                 # if they are, add the block that is to the variable that tracks it
                 self.colliding_with = k
                 # check to see if it is from the top or from the left
@@ -171,11 +172,11 @@ class GameScreenManager:
         offset_x = int(blk.block.x - current_player.rect.x)
         offset_y = int(blk.block.y - current_player.rect.y)
 
-        if (current_player_yv <= 0 or current_player.y >= blk.y) and current_player.mask.overlap(blk.mask, (offset_x, offset_y)):
+        if ((current_player_yv <= 0 or current_player.y >= blk.y) and current_player.mask.overlap(blk.mask, (offset_x, offset_y))) and not current_player.rect.bottom == blk.y:
             self.surface.fill((0, 0, 0))
             self.reset_game(current_player)
             return
-        if current_player_yv > 0:
+        elif current_player_yv > 0:
             # sets the tracking bool to true and resets the rect
             self.colliding_with_block = True
             current_player.angle = round(current_player.angle / 90) * 90 % 360
