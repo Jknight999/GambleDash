@@ -1,6 +1,7 @@
-from game_classes import Player, Spike, Block, Button
+from game_classes import Spike, Block
 import math
 import pygame
+import time
 
 class GameScreenManager:
     #basic characteristics
@@ -71,26 +72,47 @@ class GameScreenManager:
         self.discard_objects()
 
     def discard_objects(self):
+        remaining_spikes = []
         for spike in self.spikes:
-            if spike.x + spike.width < 0:
-                self.spikes.remove(spike)
+            if spike.x + spike.width >= 0:
+                remaining_spikes.append(spike)
+        self.spikes = remaining_spikes
+
+        remaining_blocks = []
         for block in self.blocks:
-            if block.x + block.width < 0:
-                self.blocks.remove(block)
+            if block.x + block.width >= 0:
+                remaining_blocks.append(block)
+        self.blocks = remaining_blocks
 
     def print_level(self, level, tick):
+        start = time.perf_counter()
+        spikes_created = 0
+        blocks_created = 0
         #goes through each item in the structures list
         for row_number in range(len(level)):
             #if it is a 1 then makes a spike
             if level[row_number][tick] == '1':
                 self.spikes.append(Spike(self.screen_width, (self.screen_height / 10) * row_number, self.screen_width, self.screen_height))
+                spikes_created += 1
             #if it is a 0 then makes a block
             elif level[row_number][tick] == '0':
                 self.blocks.append(Block(self.screen_width, (self.screen_height / 10) * row_number, self.screen_width, self.screen_height))
+                blocks_created += 1
 
+            elapsed_ms = (time.perf_counter() - start) * 1000
+
+            if elapsed_ms > 2:
+                print(
+                    f"Level generation: {elapsed_ms:.2f} ms | "
+                    f"Column: {tick} | "
+                    f"New spikes: {spikes_created} | "
+                    f"New blocks: {blocks_created}"
+                )
     def tick(self, current_player):
         # calculates delta time from framerate
+
         self.dt = self.clock.tick(self.framerate) / 1000
+        process_start = time.perf_counter()
 
         #converts the tuple into two variables to work with throughout the code
         #scrolls the whole level
@@ -119,7 +141,7 @@ class GameScreenManager:
             self.check_spike_player_collision(k, current_player)
         self.colliding_with_block = False
         for k in self.blocks:
-            # checks for each block if they are colliding with the player using colliderect
+            # checks for each block if they are colliding with the player using colliderect()
             if (current_player.rect.colliderect(k.block) or k.y == current_player.rect.bottom) and k.x - k.width < current_player.x < k.x + k.width:
                 # if they are, add the block that is to the variable that tracks it
                 self.colliding_with = k
@@ -136,6 +158,16 @@ class GameScreenManager:
 
         # draws the player to the screen
         self.surface.blit(current_player.rotated_surface, current_player.rect)
+
+        process_ms = (time.perf_counter() - process_start) * 1000
+
+        if process_ms > 8:
+            print(
+                f"Processing: {process_ms:.2f} ms | "
+                f"dt: {self.dt * 1000:.2f} ms | "
+                f"Spikes: {len(self.spikes)} | "
+                f"Blocks: {len(self.blocks)}"
+            )
 
     def check_jump(self, current_player):
         keys = pygame.key.get_pressed()
@@ -168,7 +200,7 @@ class GameScreenManager:
 
     def check_block_player_collision(self, blk, current_player, current_player_yv):
         # if the player hits the side of the block then reset the game
-        # checks if the y velocity is less than or equal to 0 or it's way below the block
+        # checks if the y velocity is less than or equal to 0, or it's way below the block
         offset_x = int(blk.block.x - current_player.rect.x)
         offset_y = int(blk.block.y - current_player.rect.y)
 

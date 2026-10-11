@@ -64,7 +64,7 @@ class Spike:
         #calculates where the vertices should be based off x, y, w and h of the spike
         return [[self.x, self.y + self.height], [self.x + self.width / 2, self.y], [self.x + self.width, self.y + self.height]]
 
-class Block:
+'''class Block:
     #basic block characteristics
     def __init__(self, x, y, sw, sh):
         self.x = x
@@ -81,6 +81,38 @@ class Block:
         self.mask = pygame.mask.from_surface(self.image)
 
         #initializes collision as false
+        self.colliding = False
+'''
+
+class Block:
+    # Shared resources: create these only once.
+    shared_image = None
+    shared_mask = None
+    shared_size = None
+
+    def __init__(self, x, y, sw, sh):
+        self.x = x
+        self.y = y
+        self.width = sw / 20
+        self.height = sh / 10
+
+        size = (round(self.width), round(self.height))
+
+        # Load, scale, and mask the image only once per size.
+        if Block.shared_image is None or Block.shared_size != size:
+            Block.shared_image = pygame.image.load("Assets/gambledashblock.png").convert_alpha()
+
+            Block.shared_image = pygame.transform.scale(Block.shared_image, size)
+
+            Block.shared_mask = pygame.mask.from_surface(Block.shared_image)
+            Block.shared_size = size
+
+        # Reuse the shared image and mask.
+        self.image = Block.shared_image
+        self.mask = Block.shared_mask
+
+        self.block = pygame.Rect(self.x, self.y, self.width, self.height)
+
         self.colliding = False
 
 class Button:
