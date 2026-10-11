@@ -85,29 +85,15 @@ class GameScreenManager:
         self.blocks = remaining_blocks
 
     def print_level(self, level, tick):
-        start = time.perf_counter()
-        spikes_created = 0
-        blocks_created = 0
         #goes through each item in the structures list
         for row_number in range(len(level)):
             #if it is a 1 then makes a spike
             if level[row_number][tick] == '1':
                 self.spikes.append(Spike(self.screen_width, (self.screen_height / 10) * row_number, self.screen_width, self.screen_height))
-                spikes_created += 1
             #if it is a 0 then makes a block
             elif level[row_number][tick] == '0':
                 self.blocks.append(Block(self.screen_width, (self.screen_height / 10) * row_number, self.screen_width, self.screen_height))
-                blocks_created += 1
 
-            elapsed_ms = (time.perf_counter() - start) * 1000
-
-            if elapsed_ms > 2:
-                print(
-                    f"Level generation: {elapsed_ms:.2f} ms | "
-                    f"Column: {tick} | "
-                    f"New spikes: {spikes_created} | "
-                    f"New blocks: {blocks_created}"
-                )
     def tick(self, current_player):
         # calculates delta time from framerate
 
