@@ -1,7 +1,8 @@
+import random
 from game_classes import Spike, Block
 import math
 import pygame
-import time
+from structures import structure_dictionary
 
 class GameScreenManager:
     #basic characteristics
@@ -24,38 +25,9 @@ class GameScreenManager:
         self.background = bg
         self.previous_player_bottom = current_player.y + current_player.h
         #all possible structures
-        self.structures = {
-    1: (
-    '                                                                           ',
-    '                                                                           ',
-    '                                                                           ',
-    '                                                                           ',
-    '                                            0                              ',
-    '                                       0    0                              ',
-    '        111        1       1      01111011110111            11       1     '
-    ),
+        self.structures = structure_dictionary
 
-    2: (
-    '                                                                           ',
-    '                                                                           ',
-    '                                     0000                                  ',
-    '                             000000000000                                  ',
-    '                   000000    000000000000                                  ',
-    '            00000000000001111000000000000                                  ',
-    '     0000000000000000000000000000000000000000000000000                     '
-    ),
-
-    3: (
-        '                                                                           ',
-        '                                                                           ',
-        '                                                                           ',
-        '                                                                           ',
-        '                                                                           ',
-        '             00000                                                         ',
-        '     0000000000000000000000000000000000000000000000000                     '
-    )
-}
-        self.current_structure = 2
+        self.current_structure = random.randint(1, len(structure_dictionary))
         #returns tuple of if the player is colliding with a block
         self.colliding_with_block = False
         self.colliding_with = None
@@ -98,7 +70,6 @@ class GameScreenManager:
         # calculates delta time from framerate
 
         self.dt = self.clock.tick(self.framerate) / 1000
-        process_start = time.perf_counter()
 
         #converts the tuple into two variables to work with throughout the code
         #scrolls the whole level
@@ -110,6 +81,10 @@ class GameScreenManager:
                 self.tick_counter += 1
             else:
                 self.tick_counter = 0
+                temp = self.current_structure
+                while temp == self.current_structure:
+                    self.current_structure = random.randint(1, len(structure_dictionary))
+                print(self.current_structure)
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
 
@@ -144,16 +119,6 @@ class GameScreenManager:
 
         # draws the player to the screen
         self.surface.blit(current_player.rotated_surface, current_player.rect)
-
-        process_ms = (time.perf_counter() - process_start) * 1000
-
-        if process_ms > 8:
-            print(
-                f"Processing: {process_ms:.2f} ms | "
-                f"dt: {self.dt * 1000:.2f} ms | "
-                f"Spikes: {len(self.spikes)} | "
-                f"Blocks: {len(self.blocks)}"
-            )
 
     def check_jump(self, current_player):
         keys = pygame.key.get_pressed()
