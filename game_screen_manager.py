@@ -195,6 +195,7 @@ class GameScreenManager:
             self.surface.fill((0, 0, 0))
             self.reset_game(current_player)
 
+
     def draw_objects(self):
         for to_draw in self.spikes:
             # giving myself the ability to separate the vertices
