@@ -4,6 +4,7 @@ import math
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 
+
 def draw_menu_screen():
     screen.fill((17, 56, 171))
     play_button.draw_button(screen)
@@ -93,7 +94,7 @@ casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCR
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
 
-game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE, GROUND_Y, SHOW_SPIKE_HITBOXES, bg, back_button)
+game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE, pygame.time.Clock(), GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
 chips= 100
 dt = 0
