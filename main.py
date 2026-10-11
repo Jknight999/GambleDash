@@ -4,7 +4,6 @@ import math
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 
-
 def draw_menu_screen():
     screen.fill((17, 56, 171))
     play_button.draw_button(screen)
