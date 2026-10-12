@@ -23,6 +23,7 @@ class GameScreenManager:
         self.clock = clock
         self.tick_counter = 0
         self.frame_counter = 0
+        # dt is the milliseconds since the last frame, capped at a maximum of the framerate
         self.dt = clock.tick(self.framerate) / 1000
         self.background = bg
         #all possible structures
@@ -45,6 +46,7 @@ class GameScreenManager:
         self.discard_objects()
 
     def discard_objects(self):
+        # Deletes objects off the screen (or more accurately it keeps objects on the screen)
         self.spikes = [spike for spike in self.spikes if spike.x + spike.width >= 0]
         self.blocks = [block for block in self.blocks if block.x + block.width >= 0]
 
@@ -59,9 +61,6 @@ class GameScreenManager:
                 self.blocks.append(Block(self.screen_width, (self.screen_height / 10) * row_number, self.screen_width, self.screen_height))
 
     def tick(self, current_player):
-        # calculates delta time from framerate
-
-        #converts the tuple into two variables to work with throughout the code
         #scrolls the whole level
         self.scroll()
 

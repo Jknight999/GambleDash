@@ -40,8 +40,6 @@ SCREENHEIGHT = SCREENWIDTH * 0.5
 GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
 SHOW_SPIKE_HITBOXES = False
 
-#Text Stuff
-
 #default size
 gd_font_size = 80
 gd_font = pygame.freetype.Font("Assets/pusab.otf", gd_font_size)
@@ -70,7 +68,6 @@ CASINO_FONTS = {
     50: pygame.freetype.Font('Assets/casino.ttf', 50),
     100: pygame.freetype.Font('Assets/casino.ttf', 100)
 }
-
 
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
 
@@ -126,6 +123,7 @@ while running:
 
     if in_game:
         draw_game_screen()
+        # Clamps dt to never be slower than 30 fps, prevents tick freezing and stuttering
         game_screen.dt = min(dt, 1/30)
         game_screen.tick(player)
     elif in_casino:
