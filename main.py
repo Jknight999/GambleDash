@@ -124,7 +124,7 @@ while running:
     if in_game:
         draw_game_screen()
         # Clamps dt to never be slower than 30 fps, prevents tick freezing and stuttering
-        game_screen.dt = min(dt, 1/30)
+        game_screen.dt = min(game_screen.dt, 1/30)
         game_screen.tick(player)
     elif in_casino:
         draw_casino_screen()

@@ -76,7 +76,6 @@ class GameScreenManager:
                     self.current_structure = random.randint(1, len(structure_dictionary))
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         end_time = time.perf_counter()
-        print(f'{(end_time-start_time) *1000}')
         self.frame_counter += 1
 
         #draws the game screen and the objects contained
