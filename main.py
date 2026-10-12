@@ -32,7 +32,7 @@ def draw_game_screen():
 
 
 #screen setup
-FRAMERATE = 120
+FRAMERATE = 60
 SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
 SHOW_SPIKE_HITBOXES = False
@@ -102,7 +102,10 @@ in_menu = True
 in_game = False
 in_casino = False
 current_level = 1
+clock = pygame.time.Clock()
 while running:
+    dt = clock.tick(FRAMERATE) / 1000
+
     #event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

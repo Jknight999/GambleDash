@@ -1,4 +1,6 @@
 import random
+import time
+
 from game_classes import Spike, Block
 import math
 import pygame
@@ -21,7 +23,7 @@ class GameScreenManager:
         self.clock = clock
         self.tick_counter = 0
         self.frame_counter = 0
-        self.dt = 0
+        self.dt = 1/self.framerate
         self.background = bg
         self.previous_player_bottom = current_player.y + current_player.h
         #all possible structures
@@ -60,8 +62,6 @@ class GameScreenManager:
 
     def tick(self, current_player):
         # calculates delta time from framerate
-
-        self.dt = self.clock.tick(self.framerate) / 1000
 
         #converts the tuple into two variables to work with throughout the code
         #scrolls the whole level
@@ -156,7 +156,6 @@ class GameScreenManager:
             return
             '''
         elif current_player_yv > 0:
-            pass
             # sets the tracking bool to true and resets the rect
             '''
             self.colliding_with_block = True
