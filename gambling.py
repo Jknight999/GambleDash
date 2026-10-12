@@ -1,18 +1,36 @@
 import random
+import pygame
+import pygame.freetype
+
+pygame.init()
+pygame.freetype.init()
+
+CASINO_FONTS = {
+    14: pygame.freetype.Font('Assets/casino.ttf', 14),
+    18: pygame.freetype.Font('Assets/casino.ttf', 18),
+    24: pygame.freetype.Font('Assets/casino.ttf', 24),
+    32: pygame.freetype.Font('Assets/casino.ttf', 32),
+    50: pygame.freetype.Font('Assets/casino.ttf', 50),
+    100: pygame.freetype.Font('Assets/casino.ttf', 100)
+}
+
+screen = pygame.display.set_mode((1000, 500), vsync= 1)
 
 #this is the file to create the gambling
 class Card:
     def __init__(self, suit, rank):
         self.suit = suit
         self.rank = rank
+        self.image = pygame.image.load(f"Assets/Cards/{self.rank}of{self.suit}.png")
+        self.image = pygame.transform.scale(self.image, (70.4, 108.8))
 
     #basically just represents it as a string (for printing purposes)
     def __repr__(self):
         return f'{self.rank} of {self.suit}'
 class Deck:
     def __init__(self):
-        suits = ("hearts", "diamonds", "spades", "crosses")
-        ranks = ('A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K')
+        suits = ("Hearts", "Diamonds", "Spades", "Crosses")
+        ranks = ('Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King')
         # list comprehension stuff -- but basically just initializes a card for each suit and rank by looping through their iterables
         self.cards = [Card(suit, rank) for suit in suits for rank in ranks]
 
@@ -33,7 +51,7 @@ supported_games = {'blackjack'}
 #dictionary mapping card ranks to card values
 card_values = {
     '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
-    'J': 10, 'Q': 10, 'K': 10, 'A': 11
+    'Jack': 10, 'Queen': 10, 'King': 10, 'Ace': 11
 }
 
 #calculates the value of a hand
@@ -61,14 +79,12 @@ my_deck.shuffle()
 
 #starting amount of chips - we need to set this to whatever they got from geo dash whenever we insert it
 chips = 100
+card = my_deck.deal()
 
 #prints
 def print_player_hand():
-    global player_hand
-    print(f"\nYour hand: ", end='')
-    for i in range(len(player_hand)):
-        print(player_hand[i], end=' ')
-    print(f"\nHand value: {calculate_hand(player_hand)}\n")
+    global screen
+    screen.blit(card.image, (300, 300))
 
 def print_dealer_hand():
     global dealer_hand
@@ -81,14 +97,26 @@ def blackjack_start_hand():
     return hand
 
 #checks for which of the games they would like to play - obviously the only option rn is blackjack
+'''
 print('What casino game would you like to play?\nCurrently supported games: ', end='')
 for game in supported_games:
     print(game, end=' ')
 current_game = input('').lower()
 while current_game.lower() not in supported_games:
     current_game = input('That game is currently not supported. Please enter the name of a supported game: ').lower()
+'''
+
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    print_player_hand()
+    pygame.display.flip()
 
 #actual 'game loop'
+'''
 while chips > 0:
     #blackjack game
     if current_game == 'blackjack':
@@ -170,6 +198,8 @@ while chips > 0:
             chips += bet
 
     #checks if they want to keep going or change to a different game
+    if chips == 0:
+        break
     try_again = input(f'Would you like to keep playing {current_game} or try another of our supported games?\nType "keep going" to remain playing and "try another" if you would like to try your luck at a different game. ').lower()
 
     #input validation
@@ -186,3 +216,4 @@ while chips > 0:
         current_game = input('').lower()
         while current_game.lower() not in supported_games:
             current_game = input('That game is currently not supported. Please enter the name of a supported game: ').lower()
+    '''
