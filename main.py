@@ -33,7 +33,6 @@ def draw_game_screen():
     back_button.render_text(screen)
 
 #screen setup
-FRAMERATE = 60
 SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
@@ -69,8 +68,7 @@ CASINO_FONTS = {
     100: pygame.freetype.Font('Assets/casino.ttf', 100)
 }
 
-screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
-
+screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync= 1)
 bg = pygame.image.load("assets/background.jpg").convert()
 
 #initializes first instances of class
@@ -89,15 +87,13 @@ higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
-game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE, pygame.time.Clock(), GROUND_Y, bg)
+game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
 chips= 100
-dt = 1/60
 running = True
 in_menu = True
 in_game = False
 in_casino = False
-clock = pygame.time.Clock()
 while running:
     #event handling
     for event in pygame.event.get():
@@ -124,7 +120,6 @@ while running:
     if in_game:
         draw_game_screen()
         # Clamps dt to never be slower than 30 fps, prevents tick freezing and stuttering
-        game_screen.dt = min(game_screen.dt, 1/30)
         game_screen.tick(player)
     elif in_casino:
         draw_casino_screen()

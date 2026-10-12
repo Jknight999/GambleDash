@@ -1,6 +1,4 @@
 import random
-import time
-
 from game_classes import Spike, Block
 import math
 import pygame
@@ -8,23 +6,21 @@ from structures import structure_dictionary
 
 class GameScreenManager:
     #basic characteristics
-    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_r, clock, f_y, bg):
+    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_y, bg):
         self.surface = screen_to_draw
         self.screen_width = s_w
         self.screen_height = s_h
         self.f_c = fl_color
         self.floor_y = f_y
-        self.framerate = f_r
         self.player = current_player
         self.spikes = []
         self.blocks = []
         self.buttons = []
         self.scroll_speed = 550
-        self.clock = clock
         self.tick_counter = 0
         self.frame_counter = 0
         # dt is the milliseconds since the last frame, capped at a maximum of the framerate
-        self.dt = clock.tick(self.framerate) / 1000
+        self.dt = 1 / pygame.display.get_current_refresh_rate()
         self.background = bg
         #all possible structures
         self.structures = structure_dictionary
@@ -65,7 +61,6 @@ class GameScreenManager:
         self.scroll()
 
         # counts frames and converts into ticks
-        start_time = time.perf_counter()
         if self.frame_counter % math.floor(self.screen_width / 200) == 0:
             if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
                 self.tick_counter += 1
@@ -75,7 +70,6 @@ class GameScreenManager:
                 while temp == self.current_structure:
                     self.current_structure = random.randint(1, len(structure_dictionary))
             self.print_level(self.structures[self.current_structure], self.tick_counter)
-        end_time = time.perf_counter()
         self.frame_counter += 1
 
         #draws the game screen and the objects contained
