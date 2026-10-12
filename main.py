@@ -30,7 +30,6 @@ def draw_game_screen():
     back_button.draw_button(screen)
     back_button.render_text(screen)
 
-
 #screen setup
 FRAMERATE = 60
 SCREENWIDTH = 1000
@@ -96,7 +95,7 @@ higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE, pygame.time.Clock(), GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
 chips= 100
-dt = 0
+dt = 1/60
 running = True
 in_menu = True
 in_game = False
@@ -104,8 +103,6 @@ in_casino = False
 current_level = 1
 clock = pygame.time.Clock()
 while running:
-    dt = clock.tick(FRAMERATE) / 1000
-
     #event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -130,6 +127,7 @@ while running:
 
     if in_game:
         draw_game_screen()
+        game_screen.dt = min(dt, 1/30)
         game_screen.tick(player)
     elif in_casino:
         draw_casino_screen()

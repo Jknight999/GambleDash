@@ -23,7 +23,7 @@ class GameScreenManager:
         self.clock = clock
         self.tick_counter = 0
         self.frame_counter = 0
-        self.dt = 1/self.framerate
+        self.dt = clock.tick(self.framerate) / 1000
         self.background = bg
         self.previous_player_bottom = current_player.y + current_player.h
         #all possible structures
