@@ -25,7 +25,6 @@ class GameScreenManager:
         self.frame_counter = 0
         self.dt = clock.tick(self.framerate) / 1000
         self.background = bg
-        self.previous_player_bottom = current_player.y + current_player.h
         #all possible structures
         self.structures = structure_dictionary
 
@@ -67,6 +66,7 @@ class GameScreenManager:
         self.scroll()
 
         # counts frames and converts into ticks
+        start_time = time.perf_counter()
         if self.frame_counter % math.floor(self.screen_width / 200) == 0:
             if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
                 self.tick_counter += 1
@@ -76,6 +76,8 @@ class GameScreenManager:
                 while temp == self.current_structure:
                     self.current_structure = random.randint(1, len(structure_dictionary))
             self.print_level(self.structures[self.current_structure], self.tick_counter)
+        end_time = time.perf_counter()
+        print(f'{(end_time-start_time) *1000}')
         self.frame_counter += 1
 
         #draws the game screen and the objects contained
@@ -93,7 +95,7 @@ class GameScreenManager:
         self.colliding_with_block = False
         for k in self.blocks:
             # checks for each block if they are colliding with the player using colliderect()
-            if (current_player.rect.colliderect(k.block) or k.y == current_player.rect.bottom) and k.x - k.width < current_player.x < k.x + k.width:
+            if k.x - k.width < current_player.x < k.x + k.width and (current_player.rect.colliderect(k.block) or k.y == current_player.rect.bottom):
                 # if they are, add the block that is to the variable that tracks it
                 self.colliding_with = k
                 # check to see if it is from the top or from the left
@@ -195,3 +197,4 @@ class GameScreenManager:
         self.blocks = []
         self.tick_counter = 0
         self.frame_counter = 0
+        self.current_structure = random.randint(1, len(structure_dictionary))

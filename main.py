@@ -4,6 +4,9 @@ import math
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 
+pygame.init()
+pygame.freetype.init()
+
 def draw_menu_screen():
     screen.fill((17, 56, 171))
     play_button.draw_button(screen)
@@ -12,7 +15,6 @@ def draw_menu_screen():
     casino_button.render_text(screen)
 
 def draw_casino_screen():
-    global casino_font
     screen.fill((94, 6, 6))
     CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
     CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 4), f'Your Chips: {chips}', (255, 255, 255))
@@ -34,10 +36,11 @@ def draw_game_screen():
 FRAMERATE = 60
 SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
+#where the top of the floor is (for collision physics principles)
+GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
 SHOW_SPIKE_HITBOXES = False
 
 #Text Stuff
-pygame.freetype.init()
 
 #default size
 gd_font_size = 80
@@ -68,13 +71,8 @@ CASINO_FONTS = {
     100: pygame.freetype.Font('Assets/casino.ttf', 100)
 }
 
-#where the top of the floor is (for collision physics principles)
-GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
 
-#in a list, so IT CAN CHANGE
-floor_color = [9, 30, 92]
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync = 1)
-pygame.init()
 
 bg = pygame.image.load("assets/background.jpg").convert()
 
@@ -92,6 +90,8 @@ casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCR
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
 
+#in a list, so IT CAN CHANGE
+floor_color = [9, 30, 92]
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, FRAMERATE, pygame.time.Clock(), GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
 chips= 100
@@ -100,7 +100,6 @@ running = True
 in_menu = True
 in_game = False
 in_casino = False
-current_level = 1
 clock = pygame.time.Clock()
 while running:
     #event handling

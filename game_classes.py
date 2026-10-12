@@ -93,7 +93,6 @@ class Block:
 
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
 
-        self.colliding = False
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
