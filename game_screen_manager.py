@@ -142,7 +142,7 @@ class GameScreenManager:
         offset_x = int(blk.block.x - current_player.rect.x)
         offset_y = int(blk.block.y - current_player.rect.y)
 
-        if ((current_player_yv <= 0 or current_player.y >= blk.y) and current_player.mask.overlap(blk.mask, (offset_x, offset_y))) and not current_player.rect.bottom == blk.y:
+        if ((current_player_yv <= 0 or current_player.y >= blk.y-blk.height//2) and current_player.mask.overlap(blk.mask, (offset_x, offset_y))) and not current_player.rect.bottom == blk.y:
             self.surface.fill((0, 0, 0))
             self.player_alive = False
             return
