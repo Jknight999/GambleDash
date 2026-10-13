@@ -87,9 +87,9 @@ higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
+chips = 100
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
-chips= 100
 running = True
 in_menu = True
 in_game = False
@@ -105,9 +105,11 @@ while running:
             if play_button.check_button_click(event):
                 in_menu = False
                 in_game = True
+                game_screen.reset_game(game_screen.player)
             if casino_button.check_button_click(event):
                 in_menu = False
                 in_casino = True
+                chips += game_screen.chips_earned
         elif in_casino:
             if back_button.check_button_click(event):
                 in_casino = False
@@ -119,7 +121,6 @@ while running:
 
     if in_game:
         draw_game_screen()
-        # Clamps dt to never be slower than 30 fps, prevents tick freezing and stuttering
         game_screen.tick(player)
     elif in_casino:
         draw_casino_screen()

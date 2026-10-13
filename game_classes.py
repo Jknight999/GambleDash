@@ -93,7 +93,6 @@ class Block:
 
         self.block = pygame.Rect(self.x, self.y, self.width, self.height)
 
-
 class Button:
     #takes in characteristics as arguments and makes a rect with them
     def __init__(self, x, y, w, h, color, text):
@@ -128,3 +127,10 @@ class Button:
             return True
         else:
             return False
+
+class Particle:
+    def __init__(self, x, y, size):
+        self.x = x
+        self.y = y
+        self.size = size
+        self.shrink_speed = 0.5
