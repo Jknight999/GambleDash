@@ -26,11 +26,11 @@ class GameScreenManager:
         self.background = bg
         #all possible structures
         self.structures = structure_dictionary
-
-        self.current_structure = 11
+        self.current_structure = random.randint(1, len(self.structures))
         #returns tuple of if the player is colliding with a block
         self.colliding_with_block = False
         self.colliding_with = None
+        self.player_alive = True
 
     def scroll(self):
         #scrolls spike and places hitbox
@@ -144,7 +144,7 @@ class GameScreenManager:
 
         if ((current_player_yv <= 0 or current_player.y >= blk.y-blk.height//2) and current_player.mask.overlap(blk.mask, (offset_x, offset_y))) and not current_player.rect.bottom == blk.y:
             self.surface.fill((0, 0, 0))
-            self.reset_game(current_player)
+            self.player_alive = False
             return
 
         elif current_player_yv > 0:
@@ -164,8 +164,7 @@ class GameScreenManager:
         # if the player and mask overlap then reset the level
         if current_player.mask.overlap(spk.mask, (offset_x, offset_y)):
             self.surface.fill((0, 0, 0))
-            self.reset_game(current_player)
-
+            self.player_alive = False
 
     def draw_objects(self):
         for to_draw in self.spikes:
