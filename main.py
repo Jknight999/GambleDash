@@ -32,6 +32,11 @@ def draw_game_screen():
     back_button.draw_button(screen)
     back_button.render_text(screen)
 
+def draw_death_screen():
+    screen.fill((0, 0, 0))
+    continue_button.draw_button(screen)
+    continue_button.render_text(screen)
+
 #screen setup
 SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
@@ -84,6 +89,7 @@ play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREE
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
+continue_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Continue for 5 Coins?', 'Assets/pusab.otf', 40, (0, 0, 0)))
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
@@ -94,6 +100,7 @@ running = True
 in_menu = True
 in_game = False
 in_casino = False
+in_death_screen = False
 while running:
     #event handling
     for event in pygame.event.get():
@@ -105,19 +112,28 @@ while running:
             if play_button.check_button_click(event):
                 in_menu = False
                 in_game = True
+                in_death_screen = False
                 game_screen.reset_game(game_screen.player)
             if casino_button.check_button_click(event):
                 in_menu = False
                 in_casino = True
+                in_death_screen = False
                 chips += game_screen.chips_earned
         elif in_casino:
             if back_button.check_button_click(event):
                 in_casino = False
                 in_menu = True
+                in_death_screen = False
         elif in_game:
             if back_button.check_button_click(event):
                 in_game = False
                 in_menu = True
+                in_death_screen = False
+            if not game_screen.player_alive:
+                in_game = False
+                in_menu = False
+                in_casino = False
+                in_death_screen = True
 
     if in_game:
         draw_game_screen()
@@ -126,5 +142,8 @@ while running:
         draw_casino_screen()
     elif in_menu:
         draw_menu_screen()
+    elif in_death_screen:
+        draw_death_screen()
+
 
     pygame.display.flip()
