@@ -1,5 +1,6 @@
 import random
 import pygame
+from time import sleep
 import pygame.freetype
 from game_classes import Button
 
@@ -131,11 +132,18 @@ while running:
             running = False
         if hit_button.check_button_click(event):
             player_hand.append(my_deck.deal())
-    hit_button.draw_button(screen)
-    hit_button.render_text(screen)
+    player_hand_value = calculate_hand(player_hand)
+    CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 5), f'Your Chips: {chips}', (255, 255, 255))
+    CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 4), f'Hand Value: {player_hand_value}', (255, 255, 255))
+    if player_hand_value > 21:
+        screen.fill((0,0,0))
+        CASINO_FONTS[100].render_to(screen, (SCREENWIDTH / 4, SCREENHEIGHT / 2.3), f'You Busted',(255, 255, 255))
+    else:
+        hit_button.draw_button(screen)
+        hit_button.render_text(screen)
 
-    print_player_hand(player_hand, 500, 300, 5)
-    print_dealer_start_hand(dealer_hand, 500, 50, 5)
+        print_player_hand(player_hand, 500, 300, 5)
+        print_dealer_start_hand(dealer_hand, 500, 50, 5)
     pygame.display.flip()
 
 #actual 'game loop'
