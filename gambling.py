@@ -1,6 +1,7 @@
 import random
 import pygame
 import pygame.freetype
+from game_classes import Button
 
 pygame.init()
 pygame.freetype.init()
@@ -14,7 +15,9 @@ CASINO_FONTS = {
     100: pygame.freetype.Font('Assets/casino.ttf', 100)
 }
 
-screen = pygame.display.set_mode((1000, 500), vsync= 1)
+SCREENHEIGHT = 500
+SCREENWIDTH = 1000
+screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync= 1)
 
 #this is the file to create the gambling
 class Card:
@@ -79,22 +82,36 @@ my_deck.shuffle()
 
 #starting amount of chips - we need to set this to whatever they got from geo dash whenever we insert it
 chips = 100
-card = my_deck.deal()
+card_back = pygame.image.load('Assets/Cards/0_card_back.png')
+card_back = pygame.transform.scale(card_back, (70.4, 108.8))
 
 #prints
-def print_player_hand():
+def print_player_hand(p_hand, x, y, spacer):
     global screen
-    screen.blit(card.image, (300, 300))
+    i = x - (len(p_hand) * p_hand[0].image.get_width() / 2) - (spacer * len(p_hand) // 2)
+    for card in p_hand:
+        screen.blit(card.image, (i, y))
+        i += card.image.get_width() + spacer
 
-def print_dealer_hand():
-    global dealer_hand
-    print(f"Dealer Hand: {dealer_hand[0]}, unknown\n")
+def print_dealer_start_hand(d_hand, x, y, spacer):
+    global screen
+    i = x - (len(d_hand) * d_hand[0].image.get_width() / 2) - (spacer * len(d_hand) // 2)
+    for card in d_hand:
+        if card != d_hand[-1]:
+            screen.blit(card.image, (i, y))
+        else:
+            screen.blit(card_back, (i, y))
+        i += card.image.get_width() + spacer
 
 def blackjack_start_hand():
     hand = []
     for _ in range(2):
         hand.append(my_deck.deal())
     return hand
+
+player_hand = blackjack_start_hand()
+dealer_hand = blackjack_start_hand()
+hit_button = Button(SCREENWIDTH * 0.8, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 8, SCREENHEIGHT / 5, (255, 0, 0), ('Hit', 'Assets/casino.ttf', 40, (0, 0, 0)))
 
 #checks for which of the games they would like to play - obviously the only option rn is blackjack
 '''
@@ -108,11 +125,17 @@ while current_game.lower() not in supported_games:
 
 running = True
 while running:
+    screen.fill((16, 82, 9))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if hit_button.check_button_click(event):
+            player_hand.append(my_deck.deal())
+    hit_button.draw_button(screen)
+    hit_button.render_text(screen)
 
-    print_player_hand()
+    print_player_hand(player_hand, 500, 300, 5)
+    print_dealer_start_hand(dealer_hand, 500, 50, 5)
     pygame.display.flip()
 
 #actual 'game loop'
