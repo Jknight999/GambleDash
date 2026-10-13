@@ -26,7 +26,7 @@ class GameScreenManager:
         #all possible structures
         self.structures = structure_dictionary
 
-        self.current_structure = 8
+        self.current_structure = 11
         #returns tuple of if the player is colliding with a block
         self.colliding_with_block = False
         self.colliding_with = None
