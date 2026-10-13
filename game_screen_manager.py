@@ -3,7 +3,6 @@ from game_classes import Spike, Block
 import math
 import pygame
 from structures import structure_dictionary
-
 class GameScreenManager:
     #basic characteristics
     def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_y, bg):
@@ -19,6 +18,8 @@ class GameScreenManager:
         self.scroll_speed = 550
         self.tick_counter = 0
         self.frame_counter = 0
+        self.score = 0
+        self.chips_earned = 0
         # dt is the milliseconds since the last frame, capped at a maximum of the framerate
         self.refresh_rate = pygame.display.get_current_refresh_rate()
         self.dt = 1 / self.refresh_rate
@@ -70,6 +71,7 @@ class GameScreenManager:
                 temp = self.current_structure
                 while temp == self.current_structure:
                     self.current_structure = random.randint(1, len(structure_dictionary))
+                    self.score += 1
             self.print_level(self.structures[self.current_structure], self.tick_counter)
         self.frame_counter += 1
 
@@ -191,3 +193,6 @@ class GameScreenManager:
         self.tick_counter = 0
         self.frame_counter = 0
         self.current_structure = random.randint(1, len(structure_dictionary))
+        self.chips_earned -= 5
+        self.chips_earned += self.score
+        self.score = 0
