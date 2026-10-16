@@ -89,7 +89,7 @@ play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREE
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
-continue_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Continue for 5 Coins?', 'Assets/pusab.otf', 40, (0, 0, 0)))
+continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), ('Continue for 5 Coins?', 'Assets/pusab.otf', 40, (0, 0, 0)))
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
@@ -129,7 +129,6 @@ while running:
                 in_game = False
                 in_menu = True
                 in_death_screen = False
-
         elif in_death_screen:
             if continue_button.check_button_click(event):
                 in_death_screen = False
