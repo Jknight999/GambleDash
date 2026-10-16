@@ -102,6 +102,7 @@ class Button:
         self.h = h
         self.rect = pygame.Rect(x, y, w, h)
         self.color = color
+        self.press = True
 
         #if the text argument is filled it will parse the tuple and change the font size to the specified num
         if text != 0:
@@ -123,7 +124,7 @@ class Button:
     #checks if the button is clicked
     def check_button_click(self, click_event):
         mouse_pos = pygame.mouse.get_pos()
-        if self.rect.collidepoint(mouse_pos) and click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1:
+        if self.rect.collidepoint(mouse_pos) and click_event.type == pygame.MOUSEBUTTONDOWN and click_event.button == 1 and self.press:
             return True
         else:
             return False
