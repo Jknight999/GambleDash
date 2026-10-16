@@ -31,17 +31,19 @@ class Card:
     #basically just represents it as a string (for printing purposes)
     def __repr__(self):
         return f'{self.rank} of {self.suit}'
+
 class Deck:
     def __init__(self):
-        suits = ("Hearts", "Diamonds", "Spades", "Crosses")
-        ranks = ('Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King')
+        self.suits = ("Hearts", "Diamonds", "Spades", "Crosses")
+        self.ranks = ('Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King')
         # list comprehension stuff -- but basically just initializes a card for each suit and rank by looping through their iterables
-        self.cards = [Card(suit, rank) for suit in suits for rank in ranks]
+        self.cards = [Card(suit, rank) for suit in self.suits for rank in self.ranks]
 
     #takes a card off the top
     def deal(self):
         if len(self.cards) == 0:
-            return None
+            print('new deck')
+            self.cards = [Card(suit, rank) for suit in self.suits for rank in self.ranks]
         return self.cards.pop()
 
     #shuffles the cards randomly - just used it to improve readability
@@ -87,21 +89,39 @@ card_back = pygame.image.load('Assets/Cards/0_card_back.png')
 card_back = pygame.transform.scale(card_back, (70.4, 108.8))
 
 #prints
-def print_player_hand(p_hand, x, y, spacer):
+def calculate_final_result():
+    global player_hand
+    global dealer_hand
+    p_hand_val = calculate_hand(player_hand)
+    d_hand_val = calculate_hand(dealer_hand)
+    if p_hand_val > d_hand_val:
+        print('player wins')
+    elif p_hand_val == d_hand_val:
+        print('push')
+    else:
+        print('dealer wins')
+
+
+
+def print_player_hand(hand, x, y, spacer):
     global screen
-    i = x - (len(p_hand) * p_hand[0].image.get_width() / 2) - (spacer * len(p_hand) // 2)
-    for card in p_hand:
+    i = x - (len(hand) * hand[0].image.get_width() / 2) - (spacer * len(hand) // 2)
+    for card in hand:
         screen.blit(card.image, (i, y))
         i += card.image.get_width() + spacer
 
-def print_dealer_start_hand(d_hand, x, y, spacer):
+def print_dealer_hand(d_hand, x, y, spacer, hidden):
     global screen
     i = x - (len(d_hand) * d_hand[0].image.get_width() / 2) - (spacer * len(d_hand) // 2)
     for card in d_hand:
-        if card != d_hand[-1]:
-            screen.blit(card.image, (i, y))
+        if hidden:
+            if card == d_hand[-1]:
+                screen.blit(card_back, (i, y))
+                break
+            else:
+                screen.blit(card.image, (i, y))
         else:
-            screen.blit(card_back, (i, y))
+            screen.blit(card.image, (i, y))
         i += card.image.get_width() + spacer
 
 def blackjack_start_hand():
@@ -110,9 +130,35 @@ def blackjack_start_hand():
         hand.append(my_deck.deal())
     return hand
 
+def dealer_play(d_hand):
+    print(d_hand)
+    global hide_card
+    while calculate_hand(d_hand) < 17:
+        hide_card = False
+        sleep(1)
+        d_hand.append(my_deck.deal())
+        print_dealer_hand(d_hand, 500, 50, 5, hide_card)
+    else:
+        hide_card = False
+        sleep(1)
+        if calculate_hand(d_hand) > 21:
+            print('player wins')
+        calculate_final_result()
+
+
+
+
+def reset_game():
+    global player_hand, dealer_hand
+    player_hand = blackjack_start_hand()
+    dealer_hand = blackjack_start_hand()
+
 player_hand = blackjack_start_hand()
 dealer_hand = blackjack_start_hand()
 hit_button = Button(SCREENWIDTH * 0.8, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 8, SCREENHEIGHT / 5, (255, 0, 0), ('Hit', 'Assets/casino.ttf', 40, (0, 0, 0)))
+play_again_button = Button(SCREENWIDTH * 0.7, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 5, SCREENHEIGHT / 5, (255, 0, 0), ('Play Again', 'Assets/casino.ttf', 40, (0, 0, 0)))
+stand_button = Button(SCREENWIDTH * 0.2, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 8, SCREENHEIGHT / 5, (255, 0, 0), ('Stand', 'Assets/casino.ttf', 40, (0, 0, 0)))
+
 
 #checks for which of the games they would like to play - obviously the only option rn is blackjack
 '''
@@ -125,6 +171,7 @@ while current_game.lower() not in supported_games:
 '''
 
 running = True
+hide_card = True
 while running:
     screen.fill((16, 82, 9))
     for event in pygame.event.get():
@@ -132,18 +179,26 @@ while running:
             running = False
         if hit_button.check_button_click(event):
             player_hand.append(my_deck.deal())
+        if stand_button.check_button_click(event):
+            dealer_play(dealer_hand)
+        if play_again_button.check_button_click(event) and player_hand_value > 21:
+            reset_game()
     player_hand_value = calculate_hand(player_hand)
     CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 5), f'Your Chips: {chips}', (255, 255, 255))
     CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 4), f'Hand Value: {player_hand_value}', (255, 255, 255))
     if player_hand_value > 21:
         screen.fill((0,0,0))
         CASINO_FONTS[100].render_to(screen, (SCREENWIDTH / 4, SCREENHEIGHT / 2.3), f'You Busted',(255, 255, 255))
+        play_again_button.draw_button(screen)
+        play_again_button.render_text(screen)
     else:
         hit_button.draw_button(screen)
         hit_button.render_text(screen)
+        stand_button.draw_button(screen)
+        stand_button.render_text(screen)
 
         print_player_hand(player_hand, 500, 300, 5)
-        print_dealer_start_hand(dealer_hand, 500, 50, 5)
+        print_dealer_hand(dealer_hand, 500, 50, 5, hide_card)
     pygame.display.flip()
 
 #actual 'game loop'
