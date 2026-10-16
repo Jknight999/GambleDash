@@ -252,7 +252,7 @@ while chips > 0:
             else:
                 dealer_playing = False
 
-        #checks all the possible outcomes for the player hand in relation to the dealer's hand
+        #checks all the possible outcomes for the player hand compared to the dealer's hand
         #I really don't know how it could possibly be undefined, see if you can figure it out
         if player_hand_value <= 21:
             print("Dealer Hand: ", end='')

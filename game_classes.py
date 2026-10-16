@@ -65,7 +65,7 @@ class Spike:
         return [[self.x, self.y + self.height], [self.x + self.width / 2, self.y], [self.x + self.width, self.y + self.height]]
 
 class Block:
-    # Shared resources: create these only once.
+    # Shared resources: create these only ONCE.
     shared_image = None
     shared_mask = None
     shared_size = None
