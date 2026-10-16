@@ -34,8 +34,16 @@ def draw_game_screen():
 
 def draw_death_screen():
     screen.fill((0, 0, 0))
+
+    font = GD_FONTS[50]
+    text = "Your Chips: " + str(chips)
+    text_rect = font.get_rect(text)
+    text_rect.right = SCREENWIDTH + 300
+    font.render_to(screen, text_rect, str(chips), (255, 255, 255))
     continue_button.draw_button(screen)
     continue_button.render_text(screen)
+    casino_button.draw_button(screen)
+    casino_button.render_text(screen)
 
 #screen setup
 SCREENWIDTH = 1000
@@ -89,11 +97,11 @@ play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREE
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
-continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), ('Continue for 5 Coins?', 'Assets/pusab.otf', 40, (0, 0, 0)))
+continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), ('Continue for 5 Chips?', 'Assets/pusab.otf', 40, (0, 0, 0)))
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
-chips = 100
+chips = 10
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
 running = True
@@ -131,12 +139,14 @@ while running:
                 in_death_screen = False
         elif in_death_screen:
             if continue_button.check_button_click(event):
-                in_death_screen = False
-                in_menu = False
-                in_casino = False
-                in_game = True
-                GameScreenManager.reset_game(game_screen, player)
-                game_screen.player_alive = True
+                if chips >= 5:
+                    chips -= 5
+                    in_death_screen = False
+                    in_menu = False
+                    in_casino = False
+                    in_game = True
+                    GameScreenManager.reset_game(game_screen, player)
+                    game_screen.player_alive = True
 
     if in_game:
         draw_game_screen()
@@ -152,6 +162,5 @@ while running:
         draw_menu_screen()
     elif in_death_screen:
         draw_death_screen()
-
 
     pygame.display.flip()
