@@ -129,15 +129,24 @@ while running:
                 in_game = False
                 in_menu = True
                 in_death_screen = False
-            if not game_screen.player_alive:
-                in_game = False
+
+        elif in_death_screen:
+            if continue_button.check_button_click(event):
+                in_death_screen = False
                 in_menu = False
                 in_casino = False
-                in_death_screen = True
+                in_game = True
+                GameScreenManager.reset_game(game_screen, player)
+                game_screen.player_alive = True
 
     if in_game:
         draw_game_screen()
         game_screen.tick(player)
+        if not game_screen.player_alive:
+            in_game = False
+            in_menu = False
+            in_casino = False
+            in_death_screen = True
     elif in_casino:
         draw_casino_screen()
     elif in_menu:

@@ -33,15 +33,16 @@ class GameScreenManager:
         self.player_alive = True
 
     def scroll(self):
-        #scrolls spike and places hitbox
-        for spike in self.spikes:
-            spike.x -= self.scroll_speed * self.dt
-            spike.hitbox.x = spike.x + spike.width / 2.5
-        #scrolls block and block mask
-        for block in self.blocks:
-            block.x -= self.scroll_speed * self.dt
-            block.block.x = block.x
-        self.discard_objects()
+        if self.player_alive:
+            #scrolls spike and places hitbox
+            for spike in self.spikes:
+                spike.x -= self.scroll_speed * self.dt
+                spike.hitbox.x = spike.x + spike.width / 2.5
+            #scrolls block and block mask
+            for block in self.blocks:
+                block.x -= self.scroll_speed * self.dt
+                block.block.x = block.x
+            self.discard_objects()
 
     def discard_objects(self):
         # Deletes objects off the screen (or more accurately it keeps objects on the screen)
@@ -49,63 +50,65 @@ class GameScreenManager:
         self.blocks = [block for block in self.blocks if block.x + block.width >= 0]
 
     def print_level(self, level, tick):
-        #goes through each item in the structures list
-        for row_number in range(len(level)):
-            #if it is a 1 then makes a spike
-            if level[row_number][tick] == '1':
-                self.spikes.append(Spike(self.screen_width, (self.screen_height / 10) * row_number, self.screen_width, self.screen_height))
-            #if it is a 0 then makes a block
-            elif level[row_number][tick] == '0':
-                self.blocks.append(Block(self.screen_width, (self.screen_height / 10) * row_number, self.screen_width, self.screen_height))
+        if self.player_alive:
+            #goes through each item in the structures list
+            for row_number in range(len(level)):
+                #if it is a 1 then makes a spike
+                if level[row_number][tick] == '1':
+                    self.spikes.append(Spike(self.screen_width, (self.screen_height / 10) * row_number, self.screen_width, self.screen_height))
+                #if it is a 0 then makes a block
+                elif level[row_number][tick] == '0':
+                    self.blocks.append(Block(self.screen_width, (self.screen_height / 10) * row_number, self.screen_width, self.screen_height))
 
     def tick(self, current_player):
-        #scrolls the whole level
-        self.scroll()
+        if self.player_alive:
+            #scrolls the whole level
+            self.scroll()
 
-        # counts frames and converts into ticks
-        if self.frame_counter % (math.floor(self.screen_width / 200) * (self.refresh_rate / 60)) == 0:
-            if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
-                self.tick_counter += 1
-            else:
-                self.tick_counter = 0
-                temp = self.current_structure
-                while temp == self.current_structure:
-                    self.current_structure = random.randint(1, len(structure_dictionary))
-                    self.score += 1
-            self.print_level(self.structures[self.current_structure], self.tick_counter)
-        self.frame_counter += 1
+            # counts frames and converts into ticks
+            if self.frame_counter % (math.floor(self.screen_width / 200) * (self.refresh_rate / 60)) == 0:
+                if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
+                    self.tick_counter += 1
+                else:
+                    self.tick_counter = 0
+                    temp = self.current_structure
+                    while temp == self.current_structure:
+                        self.current_structure = random.randint(1, len(structure_dictionary))
+                        self.score += 1
+                self.print_level(self.structures[self.current_structure], self.tick_counter)
+            self.frame_counter += 1
 
-        #draws the game screen and the objects contained
-        self.draw_objects()
+            #draws the game screen and the objects contained
+            self.draw_objects()
 
-        self.apply_physics(current_player)
+            self.apply_physics(current_player)
 
-        # rotates the player if they're in the air
-        if current_player.y_vel != 0 and not self.colliding_with_block:
-            current_player.rotate_player(self.dt)
+            # rotates the player if they're in the air
+            if current_player.y_vel != 0 and not self.colliding_with_block:
+                current_player.rotate_player(self.dt)
 
-        # checks spike and block collisions
-        for k in self.spikes:
-            self.check_spike_player_collision(k, current_player)
-        self.colliding_with_block = False
-        for k in self.blocks:
-            # checks for each block if they are colliding with the player using colliderect()
-            if k.x - k.width < current_player.x < k.x + k.width and (current_player.rect.colliderect(k.block) or k.y == current_player.rect.bottom):
-                # if they are, add the block that is to the variable that tracks it
-                self.colliding_with = k
-                # check to see if it is from the top or from the left
-                self.check_block_player_collision(k, current_player, current_player.y_vel)
-                # only one will be colliding, so you can break after one
-                break
+            # checks spike and block collisions
+            for k in self.spikes:
+                self.check_spike_player_collision(k, current_player)
+            self.colliding_with_block = False
+            for k in self.blocks:
+                # checks for each block if they are colliding with the player using colliderect()
+                if k.x - k.width < current_player.x < k.x + k.width and (current_player.rect.colliderect(k.block) or k.y == current_player.rect.bottom):
+                    # if they are, add the block that is to the variable that tracks it
+                    self.colliding_with = k
+                    # check to see if it is from the top or from the left
+                    self.check_block_player_collision(k, current_player, current_player.y_vel)
+                    # only one will be colliding, so you can break after one
+                    break
 
-        # keeps the player above the floor
-        self.check_ground_collisions(current_player)
+            # keeps the player above the floor
+            self.check_ground_collisions(current_player)
 
-        # checks for jumping every tick and applies gravity
-        self.check_jump(current_player)
+            # checks for jumping every tick and applies gravity
+            self.check_jump(current_player)
 
-        # draws the player to the screen
-        self.surface.blit(current_player.rotated_surface, current_player.rect)
+            # draws the player to the screen
+            self.surface.blit(current_player.rotated_surface, current_player.rect)
 
     def check_jump(self, current_player):
         keys = pygame.key.get_pressed()
