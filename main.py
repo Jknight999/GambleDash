@@ -184,7 +184,6 @@ while running:
                     in_game = True
                     game_screen.reset_game(game_screen.player)
 
-
     if in_game:
         draw_game_screen()
         game_screen.tick(player)

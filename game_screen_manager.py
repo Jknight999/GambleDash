@@ -112,7 +112,6 @@ class GameScreenManager:
 
             # draws the player to the screen
             self.surface.blit(current_player.rotated_surface, current_player.rect)
-            print(current_player.y_vel)
 
     def check_jump(self, current_player):
         keys = pygame.key.get_pressed()
@@ -222,4 +221,3 @@ class GameScreenManager:
         self.frame_counter = 0
         self.current_structure = random.randint(1, len(structure_dictionary))
         self.player_alive = True
-        print(self.run_chips)
