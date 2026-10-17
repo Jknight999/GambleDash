@@ -61,7 +61,7 @@ SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
-SHOW_SPIKE_HITBOXES = False
+SHOW_SPIKE_HITBOXES = True
 
 #default size
 gd_font_size = 80
