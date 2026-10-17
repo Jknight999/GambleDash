@@ -1,8 +1,9 @@
 import random
-from game_classes import Spike, Block
+from game_classes import Spike, Block, Particle
 import math
 import pygame
 from structures import structure_dictionary
+
 class GameScreenManager:
     #basic characteristics
     def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_y, bg):
@@ -30,6 +31,7 @@ class GameScreenManager:
         self.colliding_with = None
         self.player_alive = True
         self.run_chips = 0
+        self.particles_list = []
 
     def scroll(self):
         if self.player_alive:
@@ -168,6 +170,11 @@ class GameScreenManager:
             self.surface.fill((0, 0, 0))
             self.player_alive = False
 
+    def count_particles(self, screen, player):
+        size = 10
+        for k in range(10):
+            self.particles_list.append(Particle(player.x - size // 2, player.y + player.h - size // 2, size, screen))
+
     def draw_objects(self):
         for to_draw in self.spikes:
             # giving myself the ability to separate the vertices
@@ -185,6 +192,11 @@ class GameScreenManager:
         #draws blocks to the screen
         for to_draw in self.blocks:
             self.surface.blit(to_draw.image, to_draw.block)
+
+        #draws the particles to the screen
+        self.count_particles(self.surface, self.player)
+        for particle in self.particles_list:
+            pygame.draw.rect(particle.screen, (17, 51, 171), (particle.x, particle.y, particle.size, particle.size))
 
     #resets the game
     def reset_game(self, current_player):

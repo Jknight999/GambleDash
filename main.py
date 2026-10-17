@@ -120,6 +120,7 @@ in_menu = True
 in_game = False
 in_casino = False
 in_death_screen = False
+
 while running:
     #event handling
     for event in pygame.event.get():
@@ -159,6 +160,7 @@ while running:
                     in_death_screen = False
                     in_game = True
                     game_screen.reset_game(game_screen.player)
+
     if in_game:
         draw_game_screen()
         game_screen.tick(player)

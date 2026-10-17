@@ -129,8 +129,9 @@ class Button:
             return False
 
 class Particle:
-    def __init__(self, x, y, size):
+    def __init__(self, x, y, size, screen):
         self.x = x
         self.y = y
         self.size = size
         self.shrink_speed = 0.5
+        self.screen = screen
