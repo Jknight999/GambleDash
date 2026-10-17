@@ -39,16 +39,16 @@ def draw_game_screen():
     # calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor_color, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
     #draws the back button to the screen
-    back_button.draw_button(screen)
-    back_button.render_text(screen)
-    font = GD_FONTS[50]
-    text = "+" + str(game_screen.run_chips)
-    text_rect = font.get_rect(text)
-    text_rect.right = SCREENWIDTH - 30
-    font.render_to(screen, text_rect, text, (255, 255, 255))
+    if game_screen.player_alive:
+        back_button.draw_button(screen)
+        back_button.render_text(screen)
+        font = GD_FONTS[50]
+        text = "+" + str(game_screen.run_chips)
+        text_rect = font.get_rect(text)
+        text_rect.right = SCREENWIDTH - 30
+        font.render_to(screen, text_rect, text, (255, 255, 255))
 
 def draw_death_screen():
-    screen.fill((0, 0, 0))
     font = GD_FONTS[50]
     chip_text = str(chips)
     text_rect = font.get_rect(chip_text)
@@ -67,6 +67,15 @@ def draw_death_screen():
     continue_button.render_text(screen)
     casino_button.draw_button(screen)
     casino_button.render_text(screen)
+
+def blur_screen():
+    screen_copy = screen.copy()
+    #apparently making the screen smaller is more efficient for blurring
+    small_screen = (SCREENWIDTH // 4, SCREENHEIGHT // 4)
+    small_surface = pygame.transform.scale(screen_copy, small_screen)
+    pygame.transform.box_blur(small_surface, radius=15)
+    blurred_screen = pygame.transform.smoothscale(small_surface, (SCREENWIDTH, SCREENHEIGHT))
+    screen.blit(blurred_screen)
 
 #screen setup
 SCREENWIDTH = 1000
@@ -124,7 +133,7 @@ continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCR
 
 #in a list, so IT CAN CHANGE
 floor_color = [9, 30, 92]
-chips = 100
+chips = 10000
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
 running = True
@@ -179,6 +188,8 @@ while running:
         draw_game_screen()
         game_screen.tick(player)
         if not game_screen.player_alive:
+            draw_game_screen()
+            blur_screen()
             in_game = False
             in_death_screen = True
     elif in_casino:
