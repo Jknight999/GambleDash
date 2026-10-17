@@ -79,9 +79,6 @@ class GameScreenManager:
                 self.print_level(self.structures[self.current_structure], self.tick_counter)
             self.frame_counter += 1
 
-            #draws the game screen and the objects contained
-            self.draw_objects()
-
             self.apply_physics(current_player)
 
             # rotates the player if they're in the air
@@ -108,8 +105,12 @@ class GameScreenManager:
             # checks for jumping every tick and applies gravity
             self.check_jump(current_player)
 
+            # draws the game screen and the objects contained
+            self.draw_objects(current_player)
+
             # draws the player to the screen
             self.surface.blit(current_player.rotated_surface, current_player.rect)
+            print(current_player.y_vel)
 
     def check_jump(self, current_player):
         keys = pygame.key.get_pressed()
@@ -172,10 +173,29 @@ class GameScreenManager:
 
     def count_particles(self, screen, player):
         size = 10
-        for k in range(10):
-            self.particles_list.append(Particle(player.x - size // 2, player.y + player.h - size // 2, size, screen))
 
-    def draw_objects(self):
+        spawn_x = player.rect.left - size // 2
+        spawn_y = player.rect.bottom - size
+        for k in range(5):
+            self.particles_list.append(Particle(spawn_x, spawn_y, size, screen))
+
+    def handle_particle_physics(self):
+        for particle in self.particles_list:
+            particle.update_particle(self.dt)
+            if particle.size <= 0:
+                self.particles_list.remove(particle)
+
+    def draw_objects(self, player):
+        # draws the particles to the screen
+        if player.y_vel == 0 and (self.colliding_with_block or player.y >= self.floor_y - player.h):
+            self.count_particles(self.surface, self.player)
+
+        self.handle_particle_physics()
+
+        for particle in self.particles_list:
+            if particle.size > 0:
+                pygame.draw.rect(particle.screen, (255, 255, 255), (particle.x, particle.y, particle.size, particle.size))
+
         for to_draw in self.spikes:
             # giving myself the ability to separate the vertices
             v_a, v_b, v_c = to_draw.find_vertices()
@@ -192,11 +212,6 @@ class GameScreenManager:
         #draws blocks to the screen
         for to_draw in self.blocks:
             self.surface.blit(to_draw.image, to_draw.block)
-
-        #draws the particles to the screen
-        self.count_particles(self.surface, self.player)
-        for particle in self.particles_list:
-            pygame.draw.rect(particle.screen, (17, 51, 171), (particle.x, particle.y, particle.size, particle.size))
 
     #resets the game
     def reset_game(self, current_player):

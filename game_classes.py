@@ -1,3 +1,5 @@
+import random
+
 import pygame
 import pygame.freetype
 
@@ -135,3 +137,11 @@ class Particle:
         self.size = size
         self.shrink_speed = 0.5
         self.screen = screen
+        self.x_vel = random.uniform(-200, -50)
+        self.y_vel = random.uniform(-100, 0)
+
+    def update_particle(self, dt):
+        self.x += self.x_vel * dt
+        self.y += self.y_vel * dt
+        self.size -= self.shrink_speed
+
