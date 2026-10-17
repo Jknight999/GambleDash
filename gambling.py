@@ -31,17 +31,19 @@ class Card:
     #basically just represents it as a string (for printing purposes)
     def __repr__(self):
         return f'{self.rank} of {self.suit}'
+
 class Deck:
     def __init__(self):
         suits = ("Hearts", "Diamonds", "Spades", "Crosses")
         ranks = ('Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King')
         # list comprehension stuff -- but basically just initializes a card for each suit and rank by looping through their iterables
         self.cards = [Card(suit, rank) for suit in suits for rank in ranks]
+        self.shuffle()
 
     #takes a card off the top
     def deal(self):
         if len(self.cards) == 0:
-            return None
+            self.__init__()
         return self.cards.pop()
 
     #shuffles the cards randomly - just used it to improve readability
@@ -114,9 +116,12 @@ player_hand = blackjack_start_hand()
 dealer_hand = blackjack_start_hand()
 hit_button = Button(SCREENWIDTH * 0.8, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 8, SCREENHEIGHT / 5, (255, 0, 0), ('Hit', 'Assets/casino.ttf', 40, (0, 0, 0)))
 stand_button = Button(SCREENWIDTH * 0.1, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 8, SCREENHEIGHT / 5, (255,0,0), ('Stand', 'Assets/casino.ttf', 40, (0,0,0)))
+play_again_button = Button(SCREENWIDTH * 0.7, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 5, SCREENHEIGHT / 5, (255, 0, 0), ('Play Again', 'Assets/casino.ttf', 40, (0, 0, 0)))
+play_again_button.press = False
 
 player_playing = True
 running = True
+in_main_menu = True
 while running:
     screen.fill((16, 82, 9))
     for event in pygame.event.get():
@@ -126,6 +131,13 @@ while running:
             player_hand.append(my_deck.deal())
         if stand_button.check_button_click(event):
             player_playing = False
+        if play_again_button.check_button_click(event):
+            player_hand = blackjack_start_hand()
+            dealer_hand = blackjack_start_hand()
+            player_playing = True
+            play_again_button.press = False
+            hit_button.press = True
+            stand_button.press = True
     player_hand_value = calculate_hand(player_hand)
     dealer_hand_value = calculate_hand(dealer_hand)
     CASINO_FONTS[18].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 5), f'Your Chips: {chips}', (255, 255, 255))
@@ -134,6 +146,21 @@ while running:
         if player_hand_value > 21:
             screen.fill((0,0,0))
             CASINO_FONTS[100].render_to(screen, (SCREENWIDTH / 4, SCREENHEIGHT / 2.3), f'You Busted',(255, 255, 255))
+            chips -= 50
+            play_again_button.press = True
+            hit_button.press = False
+            stand_button.press = False
+            play_again_button.draw_button(screen)
+            play_again_button.render_text(screen)
+        elif player_hand_value == 21:
+            screen.fill((0, 0, 0))
+            CASINO_FONTS[100].render_to(screen, (SCREENWIDTH / 4, SCREENHEIGHT / 2.3), f'Blackjack!', (255, 255, 255))
+            chips += 50
+            play_again_button.press = True
+            hit_button.press = False
+            stand_button.press = False
+            play_again_button.draw_button(screen)
+            play_again_button.render_text(screen)
         else:
             hit_button.draw_button(screen)
             hit_button.render_text(screen)
@@ -142,17 +169,23 @@ while running:
 
             print_player_hand(player_hand, 500, 300, 5)
             print_dealer_start_hand(dealer_hand, 500, 50, 5)
-    elif not player_playing:
+    else:
+        play_again_button.press = True
+        hit_button.press = False
+        stand_button.press = False
+        play_again_button.draw_button(screen)
+        play_again_button.render_text(screen)
         print_player_hand(player_hand, 500, 300, 5)
         print_player_hand(dealer_hand, 500, 50, 5)
-        if dealer_hand_value <= 16:
+        while dealer_hand_value < 17:
             dealer_hand.append(my_deck.deal())
+            dealer_hand_value = calculate_hand(dealer_hand)
+        if player_hand_value > dealer_hand_value or dealer_hand_value > 21:
+            chips += 50
+            CASINO_FONTS[100].render_to(screen, (SCREENWIDTH / 4, SCREENHEIGHT / 2.3), 'You Win!', (255, 255, 255))
         else:
-            if player_hand_value > dealer_hand_value or dealer_hand_value > 21:
-                CASINO_FONTS[100].render_to(screen, (SCREENWIDTH / 4, SCREENHEIGHT / 2.3), 'You Win!', (255, 255, 255))
-            else:
-                CASINO_FONTS[100].render_to(screen, (SCREENWIDTH / 4, SCREENHEIGHT / 2.3), 'You Lose!', (255, 255, 255))
-
+            chips -= 50
+            CASINO_FONTS[100].render_to(screen, (SCREENWIDTH / 4, SCREENHEIGHT / 2.3), 'You Lose!', (255, 255, 255))
     pygame.display.flip()
 
 #actual 'game loop'
@@ -219,7 +252,7 @@ while chips > 0:
             else:
                 dealer_playing = False
 
-        #checks all the possible outcomes for the player hand in relation to the dealer's hand
+        #checks all the possible outcomes for the player hand compared to the dealer's hand
         #I really don't know how it could possibly be undefined, see if you can figure it out
         if player_hand_value <= 21:
             print("Dealer Hand: ", end='')
