@@ -2,7 +2,6 @@
 
 #JONAH DO THESE ON YOUR DRIVE:
 if you finish those 3:
-  -make more stuctures
   -develop a coin system
   -try to figure out gambling (probably not recommended)
 
@@ -10,8 +9,7 @@ if you finish those 3:
 1. Coins
 2. Gambling
 3. Upgrades
-4. Enemies
-
+4. make everything our pixel art (bg, blocks)
 
 Optional Tasks:
 - Premade levels
