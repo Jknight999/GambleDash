@@ -178,8 +178,7 @@ class GameScreenManager:
         size = 10
         spawn_x = player.rect.left - size // 2
         spawn_y = player.rect.bottom - size
-        for k in range(5):
-            self.particles_list.append(Particle(spawn_x, spawn_y, size, screen))
+        self.particles_list.append(Particle(spawn_x, spawn_y, size, screen))
 
     def handle_particle_physics(self):
         #moves and shrinks the particle and deletes it if it gets too small
@@ -195,7 +194,7 @@ class GameScreenManager:
         self.handle_particle_physics()
         for particle in self.particles_list:
             if particle.size > 0:
-                pygame.draw.rect(particle.screen, (255, 255, 255), (particle.x, particle.y, particle.size, particle.size))
+                pygame.draw.rect(particle.screen, (206, 224, 244), (particle.x, particle.y, particle.size, particle.size))
 
         for to_draw in self.spikes:
             # giving myself the ability to separate the vertices
