@@ -3,7 +3,6 @@ from game_classes import Spike, Block, Particle
 import math
 import pygame
 from structures import structure_dictionary
-from time import sleep
 
 class GameScreenManager:
     #basic characteristics
@@ -171,7 +170,6 @@ class GameScreenManager:
 
         # if the player and mask overlap then reset the level
         if current_player.mask.overlap(spk.mask, (offset_x, offset_y)):
-            sleep(5)
             self.surface.fill((0, 0, 0))
             self.player_alive = False
 
