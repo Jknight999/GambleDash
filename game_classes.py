@@ -144,4 +144,3 @@ class Particle:
         self.x += self.x_vel * dt
         self.y += self.y_vel * dt
         self.size -= self.shrink_speed
-

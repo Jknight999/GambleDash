@@ -71,6 +71,7 @@ class GameScreenManager:
                 if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
                     self.tick_counter += 1
                 else:
+                    #adds a chip each new structure
                     self.run_chips += 1
                     self.tick_counter = 0
                     temp = self.current_structure
@@ -171,15 +172,16 @@ class GameScreenManager:
             self.surface.fill((0, 0, 0))
             self.player_alive = False
 
+    #makes particles and sets position to bottom-left of the player and adds to particle list
     def count_particles(self, screen, player):
         size = 10
-
         spawn_x = player.rect.left - size // 2
         spawn_y = player.rect.bottom - size
         for k in range(5):
             self.particles_list.append(Particle(spawn_x, spawn_y, size, screen))
 
     def handle_particle_physics(self):
+        #moves and shrinks the particle and deletes it if it gets too small
         for particle in self.particles_list:
             particle.update_particle(self.dt)
             if particle.size <= 0:
@@ -189,9 +191,7 @@ class GameScreenManager:
         # draws the particles to the screen
         if player.y_vel == 0 and (self.colliding_with_block or player.y >= self.floor_y - player.h):
             self.count_particles(self.surface, self.player)
-
         self.handle_particle_physics()
-
         for particle in self.particles_list:
             if particle.size > 0:
                 pygame.draw.rect(particle.screen, (255, 255, 255), (particle.x, particle.y, particle.size, particle.size))
