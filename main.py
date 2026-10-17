@@ -49,24 +49,25 @@ def draw_game_screen():
         font.render_to(screen, text_rect, text, (255, 255, 255))
 
 def draw_death_screen():
-    font = GD_FONTS[50]
-    chip_text = str(chips)
-    text_rect = font.get_rect(chip_text)
-    text_rect.right = SCREENWIDTH - 70
-    font.render_to(screen, text_rect, chip_text, (255, 255, 255))
-    run_text = "+" + str(game_screen.run_chips)
-    run_text_rect = font.get_rect(run_text)
-    run_text_rect.right = SCREENWIDTH - 70
-    run_text_rect.top = 80
-    font.render_to(screen, run_text_rect, run_text, (255, 255, 255))
-    chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
-    screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
-    back_button.draw_button(screen)
-    back_button.render_text(screen)
-    continue_button.draw_button(screen)
-    continue_button.render_text(screen)
-    casino_button.draw_button(screen)
-    casino_button.render_text(screen)
+    if not game_screen.player_alive:
+        font = GD_FONTS[50]
+        chip_text = str(chips)
+        text_rect = font.get_rect(chip_text)
+        text_rect.right = SCREENWIDTH - 70
+        font.render_to(screen, text_rect, chip_text, (255, 255, 255))
+        run_text = "+" + str(game_screen.run_chips)
+        run_text_rect = font.get_rect(run_text)
+        run_text_rect.right = SCREENWIDTH - 70
+        run_text_rect.top = 80
+        font.render_to(screen, run_text_rect, run_text, (255, 255, 255))
+        chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
+        screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
+        back_button.draw_button(screen)
+        back_button.render_text(screen)
+        continue_button.draw_button(screen)
+        continue_button.render_text(screen)
+        casino_button.draw_button(screen)
+        casino_button.render_text(screen)
 
 def blur_screen():
     screen_copy = screen.copy()
