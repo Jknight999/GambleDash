@@ -9,6 +9,16 @@ pygame.freetype.init()
 
 def draw_menu_screen():
     screen.fill((17, 56, 171))
+
+    font = GD_FONTS[50]
+    chip_text = str(chips)
+    text_rect = font.get_rect(chip_text)
+    text_rect.right = SCREENWIDTH - 70
+    font.render_to(screen, text_rect, chip_text, (255, 255, 255))
+
+    chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
+    screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
+
     play_button.draw_button(screen)
     play_button.render_text(screen)
     casino_button.draw_button(screen)
@@ -40,17 +50,19 @@ def draw_game_screen():
 def draw_death_screen():
     screen.fill((0, 0, 0))
     font = GD_FONTS[50]
-    chip_text = "Your Chips: " + str(chips)
+    chip_text = str(chips)
     text_rect = font.get_rect(chip_text)
-    text_rect.right = SCREENWIDTH - 30
+    text_rect.right = SCREENWIDTH - 70
     font.render_to(screen, text_rect, chip_text, (255, 255, 255))
-
     run_text = "+" + str(game_screen.run_chips)
     run_text_rect = font.get_rect(run_text)
-    run_text_rect.right = SCREENWIDTH - 30
+    run_text_rect.right = SCREENWIDTH - 70
     run_text_rect.top = 80
     font.render_to(screen, run_text_rect, run_text, (255, 255, 255))
-
+    chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
+    screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
+    back_button.draw_button(screen)
+    back_button.render_text(screen)
     continue_button.draw_button(screen)
     continue_button.render_text(screen)
     casino_button.draw_button(screen)
@@ -149,6 +161,7 @@ while running:
             if back_button.check_button_click(event):
                 in_death_screen = False
                 in_menu = True
+                chips += game_screen.run_chips
         if in_game:
             if back_button.check_button_click(event):
                 in_game = False
@@ -160,6 +173,7 @@ while running:
                     in_death_screen = False
                     in_game = True
                     game_screen.reset_game(game_screen.player)
+
 
     if in_game:
         draw_game_screen()
