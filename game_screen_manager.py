@@ -18,8 +18,6 @@ class GameScreenManager:
         self.scroll_speed = 550
         self.tick_counter = 0
         self.frame_counter = 0
-        self.score = 0
-        self.chips_earned = 0
         # dt is the milliseconds since the last frame, capped at a maximum of the framerate
         self.refresh_rate = pygame.display.get_current_refresh_rate()
         self.dt = 1 / self.refresh_rate
@@ -31,7 +29,6 @@ class GameScreenManager:
         self.colliding_with_block = False
         self.colliding_with = None
         self.player_alive = True
-        self.player_score = 0
         self.run_chips = 0
 
     def scroll(self):
@@ -72,14 +69,12 @@ class GameScreenManager:
                 if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
                     self.tick_counter += 1
                 else:
+                    self.run_chips += 1
                     self.tick_counter = 0
                     temp = self.current_structure
                     while temp == self.current_structure:
                         self.current_structure = random.randint(1, len(structure_dictionary))
-                        self.score += 1
                 self.print_level(self.structures[self.current_structure], self.tick_counter)
-                self.player_score += 1
-                self.run_chips = self.player_score // 20
             self.frame_counter += 1
 
             #draws the game screen and the objects contained
@@ -199,6 +194,5 @@ class GameScreenManager:
         self.tick_counter = 0
         self.frame_counter = 0
         self.current_structure = random.randint(1, len(structure_dictionary))
-        self.score = 0
-        self.run_chips = 0
         self.player_alive = True
+        print(self.run_chips)

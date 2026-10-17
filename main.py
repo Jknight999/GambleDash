@@ -31,7 +31,6 @@ def draw_game_screen():
     #draws the back button to the screen
     back_button.draw_button(screen)
     back_button.render_text(screen)
-
     font = GD_FONTS[50]
     text = "+" + str(game_screen.run_chips)
     text_rect = font.get_rect(text)
@@ -40,12 +39,18 @@ def draw_game_screen():
 
 def draw_death_screen():
     screen.fill((0, 0, 0))
-
     font = GD_FONTS[50]
-    text = "Your Chips: " + str(chips)
-    text_rect = font.get_rect(text)
+    chip_text = "Your Chips: " + str(chips)
+    text_rect = font.get_rect(chip_text)
     text_rect.right = SCREENWIDTH - 30
-    font.render_to(screen, text_rect, text, (255, 255, 255))
+    font.render_to(screen, text_rect, chip_text, (255, 255, 255))
+
+    run_text = "+" + str(game_screen.run_chips)
+    run_text_rect = font.get_rect(run_text)
+    run_text_rect.right = SCREENWIDTH - 30
+    run_text_rect.top = 80
+    font.render_to(screen, run_text_rect, run_text, (255, 255, 255))
+
     continue_button.draw_button(screen)
     continue_button.render_text(screen)
     casino_button.draw_button(screen)
@@ -125,15 +130,13 @@ while running:
             if play_button.check_button_click(event):
                 in_menu = False
                 in_game = True
-                in_death_screen = False
+                game_screen.run_chips = 0
                 game_screen.reset_game(game_screen.player)
             if casino_button.check_button_click(event):
                 in_menu = False
                 in_casino = True
-                in_death_screen = False
         if in_death_screen:
             if casino_button.check_button_click(event):
-                in_menu = False
                 in_casino = True
                 in_death_screen = False
                 chips += game_screen.run_chips
@@ -141,19 +144,19 @@ while running:
             if back_button.check_button_click(event):
                 in_casino = False
                 in_menu = True
+        if in_death_screen:
+            if back_button.check_button_click(event):
                 in_death_screen = False
+                in_menu = True
         if in_game:
             if back_button.check_button_click(event):
                 in_game = False
                 in_menu = True
-                in_death_screen = False
         if in_death_screen:
             if continue_button.check_button_click(event):
                 if chips >= 5:
                     chips -= 5
                     in_death_screen = False
-                    in_menu = False
-                    in_casino = False
                     in_game = True
                     game_screen.reset_game(game_screen.player)
     if in_game:
@@ -161,8 +164,6 @@ while running:
         game_screen.tick(player)
         if not game_screen.player_alive:
             in_game = False
-            in_menu = False
-            in_casino = False
             in_death_screen = True
     elif in_casino:
         draw_casino_screen()
@@ -170,5 +171,5 @@ while running:
         draw_menu_screen()
     elif in_death_screen:
         draw_death_screen()
-    print(in_death_screen)
+
     pygame.display.flip()
