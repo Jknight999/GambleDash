@@ -69,12 +69,16 @@ def draw_death_screen():
         casino_button.draw_button(screen)
         casino_button.render_text(screen)
 
+def draw_shop_screen():
+    screen.fill((17, 56, 171))
+
+
 def blur_screen():
     screen_copy = screen.copy()
     #apparently making the screen smaller is more efficient for blurring
     small_screen = (SCREENWIDTH // 4, SCREENHEIGHT // 4)
     small_surface = pygame.transform.scale(screen_copy, small_screen)
-    pygame.transform.box_blur(small_surface, radius=15)
+    pygame.transform.box_blur(small_surface, radius=3)
     blurred_screen = pygame.transform.smoothscale(small_surface, (SCREENWIDTH, SCREENHEIGHT))
     screen.blit(blurred_screen)
 
