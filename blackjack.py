@@ -33,7 +33,7 @@ class CasinoScreenManager:
         self.dealer_hand = []
         self.game = 'blackjack'
 
-    #prints
+    #prints i
     def print_player_hand(self, p_hand, x, y, spacer):
         i = x - (len(p_hand) * p_hand[0].image.get_width() / 2) - (spacer * len(p_hand) // 2)
         for card in p_hand:
