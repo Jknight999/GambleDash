@@ -8,8 +8,7 @@ pygame.init()
 pygame.freetype.init()
 
 def draw_menu_screen():
-    screen.fill((17, 56, 171))
-
+    draw_game_screen()
     font = GD_FONTS[50]
     chip_text = str(chips)
     text_rect = font.get_rect(chip_text)
@@ -39,7 +38,7 @@ def draw_game_screen():
     # calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor_color, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
     #draws the back button to the screen
-    if game_screen.player_alive:
+    if game_screen.player_alive and not in_menu:
         back_button.draw_button(screen)
         back_button.render_text(screen)
         font = GD_FONTS[50]
@@ -134,7 +133,7 @@ player.rect = player.rotated_surface.get_rect(center=(player.x + player.w // 2, 
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
-higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Higher or Lower', 'Assets/casino.ttf', 40, (0, 0, 0)))
+higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Blackjack', 'Assets/casino.ttf', 40, (0, 0, 0)))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), ('Continue for 5 Chips?', 'Assets/pusab.otf', 40, (0, 0, 0)))
 
 #in a list, so IT CAN CHANGE
@@ -158,6 +157,7 @@ while running:
             if play_button.check_button_click(event):
                 in_menu = False
                 in_game = True
+                chips -= 5
                 game_screen.run_chips = 0
                 game_screen.reset_game(game_screen.player)
             if casino_button.check_button_click(event):
