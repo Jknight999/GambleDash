@@ -8,8 +8,7 @@ pygame.init()
 pygame.freetype.init()
 
 def draw_menu_screen():
-    screen.fill((17, 56, 171))
-
+    draw_game_screen()
     font = GD_FONTS[50]
     chip_text = str(chips)
     text_rect = font.get_rect(chip_text)
@@ -39,7 +38,7 @@ def draw_game_screen():
     # calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor_color, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
     #draws the back button to the screen
-    if game_screen.player_alive:
+    if game_screen.player_alive and not in_menu:
         back_button.draw_button(screen)
         back_button.render_text(screen)
         font = GD_FONTS[50]
@@ -157,6 +156,7 @@ while running:
             if play_button.check_button_click(event):
                 in_menu = False
                 in_game = True
+                chips -= 5
                 game_screen.run_chips = 0
                 game_screen.reset_game(game_screen.player)
             if casino_button.check_button_click(event):
