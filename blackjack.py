@@ -104,16 +104,18 @@ class CasinoScreenManager:
                     self.chips_added = False
                 if bet_less_button.check_button_click(event) and not self.is_bet_set:
                     self.bet_amount -= 10
+                    if self.bet_amount < 0: self.bet_amount = 0
                 if bet_more_button.check_button_click(event) and not self.is_bet_set:
                     self.bet_amount += 10
+                    if self.bet_amount > self.chips: self.bet_amount = self.chips
                 if set_bet_button.check_button_click(event) and not self.is_bet_set:
                     self.chips -= self.bet_amount
                     self.is_bet_set = True
                     blackjack_in_game = True
             self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 5), f'Your Chips: {self.chips}', (255, 255, 255))
-            self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 4), f'Hand Value: {self.player_hand.get_hand_value()}', (255, 255, 255))
             if self.is_bet_set:
                 if player_playing:
+                    self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 4), f'Hand Value: {self.player_hand.get_hand_value()}', (255, 255, 255))
                     player_hand_value = self.player_hand.get_hand_value()
                     if self.player_hand.get_hand_value() > 21:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), f'You Busted',(255, 255, 255))
