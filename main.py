@@ -72,7 +72,6 @@ def draw_death_screen():
 def draw_shop_screen():
     screen.fill((17, 56, 171))
 
-
 def blur_screen():
     screen_copy = screen.copy()
     #apparently making the screen smaller is more efficient for blurring
@@ -141,7 +140,7 @@ casino_screen = CasinoScreenManager(screen, 50, SCREENWIDTH, SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
-chips = 10000
+chips = 100
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
 running = True
