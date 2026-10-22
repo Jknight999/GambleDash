@@ -3,6 +3,7 @@ import pygame.freetype
 import math
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
+from blackjack import CasinoScreenManager
 
 pygame.init()
 pygame.freetype.init()
@@ -122,7 +123,7 @@ bg = pygame.image.load("assets/background.png").convert()
 bg = pygame.transform.scale(bg, (SCREENWIDTH, SCREENHEIGHT))
 
 #initializes first instances of class
-player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
+player= Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 
 # I have absolutely no idea why but this is necessary to make the cube start the right way up
 player.angle = 91
@@ -135,6 +136,8 @@ casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCR
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Blackjack', 'Assets/casino.ttf', 40, (0, 0, 0)))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), ('Continue for 5 Chips?', 'Assets/pusab.otf', 40, (0, 0, 0)))
+
+casino_screen = CasinoScreenManager(screen, 50, SCREENWIDTH, SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
@@ -169,6 +172,7 @@ while running:
                 in_death_screen = False
                 chips += game_screen.run_chips
         if in_casino:
+            casino_screen.play_blackjack()
             if back_button.check_button_click(event):
                 in_casino = False
                 in_menu = True

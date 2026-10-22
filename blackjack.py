@@ -24,7 +24,8 @@ class CasinoScreenManager:
 
 
         #dictionary mapping card ranks to card values
-        self.deck = Deck().shuffle()
+        self.deck = Deck()
+        self.deck.shuffle()
         self.chips = chips
 
         self.card_back = pygame.image.load('Assets/Cards/0_card_back.png')
@@ -77,8 +78,8 @@ class CasinoScreenManager:
                 if stand_button.check_button_click(event):
                     player_playing = False
                 if play_again_button.check_button_click(event):
-                    player_hand = BlackjackHand(self.deck)
-                    dealer_hand = BlackjackHand(self.deck)
+                    self.player_hand = BlackjackHand(self.deck)
+                    self.dealer_hand = BlackjackHand(self.deck)
                     player_playing = True
                     play_again_button.press = False
                     hit_button.press = True
@@ -124,7 +125,7 @@ class CasinoScreenManager:
                 dealer_hand_value = self.dealer_hand.get_hand_value()
                 player_hand_value = self.player_hand.get_hand_value()
                 while self.dealer_hand.get_hand_value() < 17:
-                    self.dealer_hand.append(self.deck.deal())
+                    self.dealer_hand.deal_card(self.deck)
                 if player_hand_value > dealer_hand_value or dealer_hand_value > 21:
                     self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'You Win!', (255, 255, 255))
                 elif player_hand_value == dealer_hand_value:
