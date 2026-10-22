@@ -118,7 +118,8 @@ CASINO_FONTS = {
 }
 
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync= 1)
-bg = pygame.image.load("assets/background.jpg").convert()
+bg = pygame.image.load("assets/background.png").convert()
+bg = pygame.transform.scale(bg, (SCREENWIDTH, SCREENHEIGHT))
 
 #initializes first instances of class
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
@@ -136,7 +137,7 @@ higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), ('Continue for 5 Chips?', 'Assets/pusab.otf', 40, (0, 0, 0)))
 
 #in a list, so IT CAN CHANGE
-floor_color = [9, 30, 92]
+floor_color = [0,42,124]
 chips = 10000
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
