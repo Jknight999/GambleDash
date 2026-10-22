@@ -69,8 +69,9 @@ def draw_death_screen():
         casino_button.draw_button(screen)
         casino_button.render_text(screen)
 
-def draw_shop_screen():
-    screen.fill((17, 56, 171))
+def draw_loan_screen():
+    screen.fill((0, 0, 0))
+    pass
 
 def blur_screen():
     screen_copy = screen.copy()
@@ -140,7 +141,7 @@ casino_screen = CasinoScreenManager(screen, 50, SCREENWIDTH, SCREENHEIGHT)
 
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
-chips = 100
+chips = 10
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
 running = True
@@ -148,6 +149,7 @@ in_menu = True
 in_game = False
 in_casino = False
 in_death_screen = False
+in_loan_screen = False
 
 while running:
     #event handling
@@ -157,11 +159,16 @@ while running:
         # sends event to button to see if it's been clicked
         if in_menu:
             if play_button.check_button_click(event):
-                in_menu = False
-                in_game = True
-                chips -= 5
-                game_screen.run_chips = 0
-                game_screen.reset_game(game_screen.player)
+                if chips >= 5:
+                    in_menu = False
+                    in_game = True
+                    chips -= 5
+                    game_screen.run_chips = 0
+                    game_screen.reset_game(game_screen.player)
+                else:
+                    in_loan_screen = True
+                    in_menu = False
+                    draw_loan_screen()
             if casino_button.check_button_click(event):
                 in_menu = False
                 in_casino = True
@@ -191,6 +198,11 @@ while running:
                     in_death_screen = False
                     in_game = True
                     game_screen.reset_game(game_screen.player)
+                else:
+                    in_menu = False
+                    in_death_screen = False
+                    in_loan_screen = True
+                    draw_loan_screen()
 
     if in_game:
         draw_game_screen()
