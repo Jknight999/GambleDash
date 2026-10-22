@@ -137,7 +137,7 @@ continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCR
 
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
-chips = 10000
+chips = 100
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 pygame.display.set_caption("GambleDash")
 running = True
