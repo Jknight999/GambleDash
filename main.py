@@ -71,7 +71,6 @@ def draw_death_screen():
 def draw_shop_screen():
     screen.fill((17, 56, 171))
 
-
 def blur_screen():
     screen_copy = screen.copy()
     #apparently making the screen smaller is more efficient for blurring
