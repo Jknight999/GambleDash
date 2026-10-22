@@ -70,8 +70,11 @@ def draw_death_screen():
         casino_button.render_text(screen)
 
 def draw_loan_screen():
-    screen.fill((0, 0, 0))
-    pass
+    screen.fill((135, 206, 250))
+    pygame.draw.rect(screen, (126, 200, 80), (0, 2 * SCREENHEIGHT / 3, SCREENWIDTH, SCREENHEIGHT / 2.9))
+    bank = pygame.image.load("Assets/bank.png").convert_alpha()
+    bank = pygame.transform.scale(bank, (200, 200))
+    screen.blit(bank, (200, 200))
 
 def blur_screen():
     screen_copy = screen.copy()
