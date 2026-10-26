@@ -30,7 +30,7 @@ class CasinoScreenManager:
         self.chips = chips
 
         #sets default bet amount
-        self.bet_amount = 10
+        self.bet_amount = 0
         self.is_bet_set = False
         self.chips_added = False
 
@@ -77,7 +77,7 @@ class CasinoScreenManager:
         #initializes all the buttons
         hit_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('Hit', 'Assets/casino.ttf', 40, (0, 0, 0)))
         stand_button = Button(self.screen_width * 0.1, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255,0,0), ('Stand', 'Assets/casino.ttf', 40, (0,0,0)))
-        play_again_button = Button(self.screen_width * 0.7, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), ('Play Again', 'Assets/casino.ttf', 40, (0, 0, 0)))
+        play_again_button = Button(self.screen_width * 0.7, self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), ('Play Again', 'Assets/casino.ttf', 40, (0, 0, 0)))
         bet_less_button = Button(self.screen_width * 0.2, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('-10 chips', 'Assets/casino.ttf', 40, (0, 0, 0)))
         set_bet_button = Button(self.screen_width * 0.4, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), (f"Bet {self.bet_amount} chips", 'Assets/casino.ttf', 40, (0, 0, 0)))
         bet_more_button = Button(self.screen_width * 0.6, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('+10 chips', 'Assets/casino.ttf', 40, (0, 0, 0)))
@@ -195,4 +195,5 @@ class CasinoScreenManager:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'Push!', (255, 255, 255))
                     else:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'You Lose!', (255, 255, 255))
+                        self.bet_amount = self.chips
             pygame.display.flip()
