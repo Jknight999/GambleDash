@@ -75,7 +75,10 @@ def draw_loan_screen():
     pygame.draw.rect(screen, (126, 200, 80), (0, 2 * SCREENHEIGHT / 3, SCREENWIDTH, SCREENHEIGHT / 2.9))
     bank = pygame.image.load("Assets/bank.png").convert_alpha()
     bank = pygame.transform.scale(bank, (300, 300))
+    rabbi_yosef = pygame.image.load("Assets/rabbiyosef.png").convert_alpha()
+    rabbi_yosef = pygame.transform.scale(rabbi_yosef, (400, 400))
     screen.blit(bank, (100, 100))
+    screen.blit(rabbi_yosef, (SCREENWIDTH - 350, SCREENHEIGHT - 300))
 
 def blur_screen():
     screen_copy = screen.copy()
@@ -143,7 +146,7 @@ continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCR
 
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
-chips = 10
+chips = 5
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
 
