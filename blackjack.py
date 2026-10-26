@@ -119,6 +119,8 @@ class CasinoScreenManager:
                     #manual exit
                     pygame.quit()
                     sys.exit()
+
+                # Deals a card if the player hits
                 if hit_button.check_button_click(event):
                     self.player_hand.deal_card(self.deck)
                 if stand_button.check_button_click(event):
@@ -134,6 +136,8 @@ class CasinoScreenManager:
                     self.chips_added = False
                 if back_button.check_button_click(event):
                     return self.chips
+
+                # These three all set the bet amount
                 if bet_less_button.check_button_click(event) and not self.is_bet_set:
                     self.bet_amount -= 10
                     if self.bet_amount < 0: self.bet_amount = 0
@@ -145,11 +149,16 @@ class CasinoScreenManager:
                     self.is_bet_set = True
                     back_button.press = False
                     blackjack_in_game = True
+
+            # Always renders how many chips you have
             self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 5), f'Your Chips: {self.chips}', (255, 255, 255))
             if self.is_bet_set:
                 if player_playing:
+                    # Only renders your hand value if you have set your bet to prevent cheating
                     self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 4), f'Hand Value: {self.player_hand.get_hand_value()}', (255, 255, 255))
                     player_hand_value = self.player_hand.get_hand_value()
+
+                    # Checks busting (idk why this is a separate place ask Parker)
                     if self.player_hand.get_hand_value() > 21:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), f'You Busted',(255, 255, 255))
                         self.bet_amount = self.chips
@@ -162,6 +171,7 @@ class CasinoScreenManager:
                         play_again_button.draw_button(self.surface)
                         play_again_button.render_text(self.surface)
                         self.print_player_hand(self.player_hand.cards, 500, 300, 5)
+                    # Checks blackjacks
                     elif player_hand_value == 21:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), f'Blackjack!', (255, 255, 255))
                         if not self.chips_added:
@@ -182,6 +192,8 @@ class CasinoScreenManager:
 
                         self.print_player_hand(self.player_hand.cards, 500, 300, 5)
                         self.print_dealer_start_hand(self.dealer_hand.cards, 500, 50, 5)
+
+                # This runs when the player stands, starts the dealer's turn
                 else:
                     play_again_button.press = True
                     hit_button.press = False
@@ -195,15 +207,25 @@ class CasinoScreenManager:
                     self.print_player_hand(self.dealer_hand.cards, 500, 50, 5)
                     dealer_hand_value = self.dealer_hand.get_hand_value()
                     player_hand_value = self.player_hand.get_hand_value()
+
+                    # The dealer hits below 17
                     while self.dealer_hand.get_hand_value() < 17:
                         self.dealer_hand.deal_card(self.deck)
+
+                    # If the player wins then add double the bet amount
                     if player_hand_value > dealer_hand_value or dealer_hand_value > 21:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'You Win!', (255, 255, 255))
                         if not self.chips_added:
                             self.chips += self.bet_amount * 2
                             self.chips_added = True
+
+                    # If tie then say push and refund the player
                     elif player_hand_value == dealer_hand_value:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'Push!', (255, 255, 255))
+                        self.chips += self.bet_amount
+                        self.chips_added = True
+
+                    # If lose then you get nothing
                     else:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'You Lose!', (255, 255, 255))
                         self.bet_amount = self.chips
