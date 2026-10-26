@@ -7,10 +7,12 @@ from casino_classes import Deck, BlackjackHand
 
 class CasinoScreenManager:
     def __init__(self, screen_to_draw, chips, s_w, s_h):
+        #passes in the screen, screen width, and screen height
         self.surface = screen_to_draw
         self.screen_width = s_w
         self.screen_height = s_h
 
+        #fonts to be used in casino stored in a dict for easier access
         self.fonts = {
             14: pygame.freetype.Font('Assets/casino.ttf', 14),
             18: pygame.freetype.Font('Assets/casino.ttf', 18),
@@ -19,63 +21,88 @@ class CasinoScreenManager:
             50: pygame.freetype.Font('Assets/casino.ttf', 50),
             100: pygame.freetype.Font('Assets/casino.ttf', 100)
         }
-        self.blackjack_possible_actions = {'hit', 'stand', 'double'}
-        self.supported_games = {'blackjack'}
 
-
-        #dictionary mapping card ranks to card values
+        #initializes and shuffles deck
         self.deck = Deck()
         self.deck.shuffle()
+
+        #gets chips passed in
         self.chips = chips
-        self.bet_amount = 10
+
+        #sets default bet amount
+        self.bet_amount = 0
         self.is_bet_set = False
         self.chips_added = False
 
+        #creates image for hidden card
         self.card_back = pygame.image.load('Assets/Cards/0_card_back.png')
         self.card_back = pygame.transform.scale(self.card_back, (70.4, 108.8))
+
+        #initializes empty hands for both player and dealer
         self.player_hand = []
         self.dealer_hand = []
+
+        #sets the game to be played
         self.game = 'blackjack'
 
-    #prints i
+    #prints the hand
     def print_player_hand(self, p_hand, x, y, spacer):
+        #starts the hand at the fully left position
         i = x - (len(p_hand) * p_hand[0].image.get_width() / 2) - (spacer * len(p_hand) // 2)
         for card in p_hand:
+            #draws the card
             self.surface.blit(card.image, (i, y))
+            #increments the card by the width of the card plus the spacer value
             i += card.image.get_width() + spacer
 
     def print_dealer_start_hand(self, d_hand, x, y, spacer):
+        #starts the hand at the fully left position
         i = x - (len(d_hand) * d_hand[0].image.get_width() / 2) - (spacer * len(d_hand) // 2)
         for card in d_hand:
+            #if it is not the last card in the hand, draw
             if card != d_hand[-1]:
                 self.surface.blit(card.image, (i, y))
+            #otherwise, draw the back of a card (hidden card)
             else:
                 self.surface.blit(self.card_back, (i, y))
+            #increments the card by the width of the card plus the spacer value
             i += card.image.get_width() + spacer
 
     def play_blackjack(self):
+        #initializes new instances of the class BlackjackHand (imported from casino_classes)
+        #hand already initialized as an empty list
         self.player_hand = BlackjackHand(self.deck)
         self.dealer_hand = BlackjackHand(self.deck)
 
+        #initializes all the buttons
         hit_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('Hit', 'Assets/casino.ttf', 40, (0, 0, 0)))
         stand_button = Button(self.screen_width * 0.1, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255,0,0), ('Stand', 'Assets/casino.ttf', 40, (0,0,0)))
-        play_again_button = Button(self.screen_width * 0.7, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), ('Play Again', 'Assets/casino.ttf', 40, (0, 0, 0)))
+        play_again_button = Button(self.screen_width * 0.7, self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), ('Play Again', 'Assets/casino.ttf', 40, (0, 0, 0)))
         bet_less_button = Button(self.screen_width * 0.2, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('-10 chips', 'Assets/casino.ttf', 40, (0, 0, 0)))
         set_bet_button = Button(self.screen_width * 0.4, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), (f"Bet {self.bet_amount} chips", 'Assets/casino.ttf', 40, (0, 0, 0)))
         bet_more_button = Button(self.screen_width * 0.6, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('+10 chips', 'Assets/casino.ttf', 40, (0, 0, 0)))
 
+        #removes the ability to press play again button before the game starts
         play_again_button.press = False
 
+        #if the player is actively playing (not the dealer)
         player_playing = True
+        #if the player has the ability to perform actions (hit/stand) (are you on the game screen)
         blackjack_in_game = False
+        #if the program is running (modifying bet, playing, or final result
         blackjack_running = True
+        #game loop
         while blackjack_running:
+            #fills the background
             self.surface.fill((16, 82, 9))
+            #evaluates whether in_game for button presses (hit/stand is available if in_game, otherwise play_again is viable)
             if blackjack_in_game:
                 hit_button.press = True
                 stand_button.press = True
             else:
                 play_again_button.press = True
+
+            #allowing bet changes until the bet is set
             if not self.is_bet_set:
                 bet_less_button.draw_button(self.surface)
                 bet_less_button.render_text(self.surface)
@@ -84,8 +111,11 @@ class CasinoScreenManager:
                 set_bet_button.text = f"Bet {self.bet_amount} chips"
                 set_bet_button.draw_button(self.surface)
                 set_bet_button.render_text(self.surface)
+
+            #figure how to get events and pass them in, perhaps
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    #manual exit
                     pygame.quit()
                     sys.exit()
                 if hit_button.check_button_click(event):
@@ -93,13 +123,12 @@ class CasinoScreenManager:
                 if stand_button.check_button_click(event):
                     player_playing = False
                 if play_again_button.check_button_click(event):
+                    #resets player hand and dealer hand by initializing new instances of the BlackjackHand class (from casino_classes)
                     self.player_hand = BlackjackHand(self.deck)
                     self.dealer_hand = BlackjackHand(self.deck)
                     player_playing = True
                     play_again_button.press = False
-                    hit_button.press = True
-                    stand_button.press = True
-                    blackjack_running = True
+                    blackjack_in_game = True
                     self.is_bet_set = False
                     self.chips_added = False
                 if bet_less_button.check_button_click(event) and not self.is_bet_set:
@@ -119,6 +148,7 @@ class CasinoScreenManager:
                     player_hand_value = self.player_hand.get_hand_value()
                     if self.player_hand.get_hand_value() > 21:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), f'You Busted',(255, 255, 255))
+                        self.bet_amount = self.chips
                         play_again_button.press = True
                         hit_button.press = False
                         stand_button.press = False
@@ -166,4 +196,5 @@ class CasinoScreenManager:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'Push!', (255, 255, 255))
                     else:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'You Lose!', (255, 255, 255))
+                        self.bet_amount = self.chips
             pygame.display.flip()
