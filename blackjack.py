@@ -81,6 +81,7 @@ class CasinoScreenManager:
         bet_less_button = Button(self.screen_width * 0.2, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('-10 chips', 'Assets/casino.ttf', 40, (0, 0, 0)))
         set_bet_button = Button(self.screen_width * 0.4, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), (f"Bet {self.bet_amount} chips", 'Assets/casino.ttf', 40, (0, 0, 0)))
         bet_more_button = Button(self.screen_width * 0.6, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('+10 chips', 'Assets/casino.ttf', 40, (0, 0, 0)))
+        back_button = Button(self.screen_width / 20, self.screen_width / 40, self.screen_height / 10, self.screen_width / 20, (14, 237, 70), ('X', "Assets/pusab.otf", self.screen_height / 20, (245, 200, 76)))
 
         #removes the ability to press play again button before the game starts
         play_again_button.press = False
@@ -131,6 +132,8 @@ class CasinoScreenManager:
                     blackjack_in_game = True
                     self.is_bet_set = False
                     self.chips_added = False
+                if back_button.check_button_click(event):
+                    return self.chips
                 if bet_less_button.check_button_click(event) and not self.is_bet_set:
                     self.bet_amount -= 10
                     if self.bet_amount < 0: self.bet_amount = 0
@@ -140,6 +143,7 @@ class CasinoScreenManager:
                 if set_bet_button.check_button_click(event) and not self.is_bet_set:
                     self.chips -= self.bet_amount
                     self.is_bet_set = True
+                    back_button.press = False
                     blackjack_in_game = True
             self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 5), f'Your Chips: {self.chips}', (255, 255, 255))
             if self.is_bet_set:
@@ -152,6 +156,9 @@ class CasinoScreenManager:
                         play_again_button.press = True
                         hit_button.press = False
                         stand_button.press = False
+                        back_button.press = True
+                        back_button.draw_button(self.surface)
+                        back_button.render_text(self.surface)
                         play_again_button.draw_button(self.surface)
                         play_again_button.render_text(self.surface)
                         self.print_player_hand(self.player_hand.cards, 500, 300, 5)
@@ -179,8 +186,11 @@ class CasinoScreenManager:
                     play_again_button.press = True
                     hit_button.press = False
                     stand_button.press = False
+                    back_button.press = True
                     play_again_button.draw_button(self.surface)
                     play_again_button.render_text(self.surface)
+                    back_button.draw_button(self.surface)
+                    back_button.render_text(self.surface)
                     self.print_player_hand(self.player_hand.cards, 500, 300, 5)
                     self.print_player_hand(self.dealer_hand.cards, 500, 50, 5)
                     dealer_hand_value = self.dealer_hand.get_hand_value()

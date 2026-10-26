@@ -183,7 +183,7 @@ while running:
                 chips += game_screen.run_chips
         if in_casino:
             if blackjack_button.check_button_click(event):
-                casino_screen.play_blackjack()
+                chips = casino_screen.play_blackjack()
             if back_button.check_button_click(event):
                 in_casino = False
                 in_menu = True
