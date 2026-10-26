@@ -1,6 +1,7 @@
 import pygame
 import pygame.freetype
 import math
+
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 from blackjack import CasinoScreenManager
@@ -31,8 +32,8 @@ def draw_casino_screen():
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
     back_button.draw_button(screen)
     back_button.render_text(screen)
-    higher_or_lower_button.draw_button(screen)
-    higher_or_lower_button.render_text(screen)
+    blackjack_button.draw_button(screen)
+    blackjack_button.render_text(screen)
 
 def draw_game_screen():
     screen.blit(bg)
@@ -135,9 +136,9 @@ player.rect = player.rotated_surface.get_rect(center=(player.x + player.w // 2, 
 
 #now takes a text argument - ('text', 'font file name', size, color(R,G,B))
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
-casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
+casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
-higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Blackjack', 'Assets/casino.ttf', 40, (0, 0, 0)))
+blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Blackjack', 'Assets/casino.ttf', 40, (0, 0, 0)))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), ('Continue for 5 Chips?', 'Assets/pusab.otf', 40, (0, 0, 0)))
 
 #in a list, so IT CAN CHANGE
@@ -181,7 +182,8 @@ while running:
                 in_death_screen = False
                 chips += game_screen.run_chips
         if in_casino:
-            casino_screen.play_blackjack()
+            if blackjack_button.check_button_click(event):
+                casino_screen.play_blackjack()
             if back_button.check_button_click(event):
                 in_casino = False
                 in_menu = True
