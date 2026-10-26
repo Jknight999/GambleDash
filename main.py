@@ -70,8 +70,11 @@ def draw_death_screen():
         casino_button.render_text(screen)
 
 def draw_loan_screen():
-    screen.fill((0, 0, 0))
-    pass
+    screen.fill((135, 206, 250))
+    pygame.draw.rect(screen, (126, 200, 80), (0, 2 * SCREENHEIGHT / 3, SCREENWIDTH, SCREENHEIGHT / 2.9))
+    bank = pygame.image.load("Assets/bank.png").convert_alpha()
+    bank = pygame.transform.scale(bank, (300, 300))
+    screen.blit(bank, (100, 100))
 
 def blur_screen():
     screen_copy = screen.copy()
@@ -137,12 +140,12 @@ back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCR
 higher_or_lower_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Blackjack', 'Assets/casino.ttf', 40, (0, 0, 0)))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), ('Continue for 5 Chips?', 'Assets/pusab.otf', 40, (0, 0, 0)))
 
-casino_screen = CasinoScreenManager(screen, 50, SCREENWIDTH, SCREENHEIGHT)
-
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
 chips = 10
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
+casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
+
 pygame.display.set_caption("GambleDash")
 running = True
 in_menu = True
