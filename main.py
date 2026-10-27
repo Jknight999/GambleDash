@@ -7,6 +7,7 @@ from game_screen_manager import GameScreenManager
 from blackjack import CasinoScreenManager
 
 pygame.init()
+pygame.mixer.init()
 pygame.freetype.init()
 
 def draw_menu_screen():
@@ -72,6 +73,9 @@ def draw_death_screen():
 
 def draw_loan_screen():
     screen.fill((135, 206, 250))
+    if not pygame.mixer.music.get_busy():
+        pygame.mixer.music.load('Assets/completely_innocent_song.mp3')
+        pygame.mixer.music.play(-1)
     pygame.draw.rect(screen, (126, 200, 80), (0, 2 * SCREENHEIGHT / 3, SCREENWIDTH, SCREENHEIGHT / 2.9))
     bank = pygame.image.load("Assets/bank.png").convert_alpha()
     bank = pygame.transform.scale(bank, (300, 300))
