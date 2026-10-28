@@ -1,8 +1,14 @@
 # GambleDash
 
 #TASK LIST:
-- Add higher or lower
-- Add a shop with player upgrades that cost chips 
+- Make different screen sizes work
+- Add spaceship + spaceship structures
+- Add upside down?
+- Add a shop with player upgrades that cost chips
+  - Extra lives
+  - More chips per structure
+  - Chip multiplier at end?
+  - Double jumps?
 - Add poker (DIFFICULT)
 - Add an online leaderboard (DIFFICULT)
 

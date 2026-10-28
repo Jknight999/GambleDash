@@ -1,6 +1,5 @@
 import pygame
 import pygame.freetype
-import sys
 
 from game_classes import Button
 from casino_classes import Deck, BlackjackHand
@@ -116,10 +115,7 @@ class CasinoScreenManager:
             #figure how to get events and pass them in, perhaps
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    #manual exit
-                    pygame.quit()
-                    sys.exit()
-
+                    return self.chips, False
                 # Deals a card if the player hits
                 if hit_button.check_button_click(event):
                     self.player_hand.deal_card(self.deck)
@@ -135,7 +131,7 @@ class CasinoScreenManager:
                     self.is_bet_set = False
                     self.chips_added = False
                 if back_button.check_button_click(event):
-                    return self.chips
+                    return self.chips, True
 
                 # These three all set the bet amount
                 if bet_less_button.check_button_click(event) and not self.is_bet_set:
