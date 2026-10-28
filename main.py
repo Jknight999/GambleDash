@@ -79,16 +79,24 @@ def draw_loan_screen():
         pygame.mixer.music.play(-1)
     pygame.draw.rect(screen, (126, 200, 80), (0, 2 * SCREENHEIGHT / 3, SCREENWIDTH, SCREENHEIGHT / 2.9))
     bank = pygame.image.load("Assets/bank.png").convert_alpha()
-    bank = pygame.transform.scale(bank, (300, 300))
+    bank = pygame.transform.scale(bank, (3 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 5))
     rabbi_yosef = pygame.image.load("Assets/rabbiyosef.png").convert_alpha()
-    rabbi_yosef = pygame.transform.scale(rabbi_yosef, (400, 400))
-    screen.blit(bank, (100, 100))
+    rabbi_yosef = pygame.transform.scale(rabbi_yosef, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
+    screen.blit(bank, (SCREENWIDTH / 10, SCREENHEIGHT / 5))
     screen.blit(rabbi_yosef, (SCREENWIDTH - 350, SCREENHEIGHT - 300))
     voice_line_text = current_voice_line
     voice_line_text_rect = GD_FONTS[18].get_rect(voice_line_text)
     voice_line_text_rect.x = 300
     voice_line_text_rect.y = 300
-    GD_FONTS[18].render_to(screen, voice_line_text_rect, voice_line_text, (255, 255, 255))
+    lines = current_voice_line.split("\n")
+
+    y = 100
+    for line in lines:
+        voice_line_text_rect = GD_FONTS[32].get_rect(line)
+        voice_line_text_rect.x = 450
+        voice_line_text_rect.y = y
+        GD_FONTS[32].render_to(screen, voice_line_text_rect, line, (255, 255, 255))
+        y += 30
 
 def blur_screen():
     screen_copy = screen.copy()
@@ -156,7 +164,7 @@ continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCR
 
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
-chips = 1000
+chips = 100
 voice_line_num = 1
 current_voice_line = voice_lines[voice_line_num]
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
@@ -171,7 +179,6 @@ in_death_screen = False
 in_loan_screen = False
 
 while running:
-
     #event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
