@@ -73,7 +73,7 @@ class GameScreenManager:
                     self.tick_counter += 1
                 else:
                     #adds a chip each new structure
-                    self.run_chips += 1
+                    self.run_chips += 10
                     self.tick_counter = 0
                     temp = self.current_structure
                     while temp == self.current_structure:
