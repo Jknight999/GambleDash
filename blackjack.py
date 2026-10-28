@@ -136,10 +136,12 @@ class CasinoScreenManager:
                 # These three all set the bet amount
                 if bet_less_button.check_button_click(event) and not self.is_bet_set:
                     self.bet_amount -= 10
-                    if self.bet_amount < 0: self.bet_amount = 0
+                    if self.bet_amount < 0:
+                        self.bet_amount = 0
                 if bet_more_button.check_button_click(event) and not self.is_bet_set:
                     self.bet_amount += 10
-                    if self.bet_amount > self.chips: self.bet_amount = self.chips
+                    if self.bet_amount > self.chips:
+                        self.bet_amount = self.chips
                 if set_bet_button.check_button_click(event) and not self.is_bet_set:
                     self.chips -= self.bet_amount
                     self.is_bet_set = True
@@ -157,7 +159,8 @@ class CasinoScreenManager:
                     # Checks busting (idk why this is a separate place ask Parker)
                     if self.player_hand.get_hand_value() > 21:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), f'You Busted',(255, 255, 255))
-                        self.bet_amount = self.chips
+                        if self.bet_amount > self.chips:
+                            self.bet_amount = self.chips
                         play_again_button.press = True
                         hit_button.press = False
                         stand_button.press = False
@@ -224,5 +227,6 @@ class CasinoScreenManager:
                     # If lose then you get nothing
                     else:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'You Lose!', (255, 255, 255))
-                        self.bet_amount = self.chips
+                        if self.bet_amount > self.chips:
+                            self.bet_amount = self.chips
             pygame.display.flip()
