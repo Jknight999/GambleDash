@@ -86,10 +86,9 @@ def draw_loan_screen():
     voice_line_text = current_voice_line
     voice_line_text_rect = GD_FONTS[18].get_rect(voice_line_text)
     voice_line_text_rect.x = 300
-    voice_line_text_rect.y = 300
+    voice_line_text_rect.y = 100
     lines = current_voice_line.split("\n")
-
-    y = 100
+    y = voice_line_text_rect.y
     for line in lines:
         voice_line_text_rect = GD_FONTS[32].get_rect(line)
         voice_line_text_rect.x = 450
@@ -187,7 +186,8 @@ while running:
                 if event.key == pygame.K_SPACE:
                     voice_line_num += 1
                     if voice_line_num >= 8:
-                        voice_line_num = 8
+                        in_loan_screen = False
+                        in_menu = True
                     current_voice_line = voice_lines[voice_line_num]
 
         # sends event to button to see if it's been clicked
