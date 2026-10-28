@@ -5,7 +5,7 @@ import math
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 from blackjack import CasinoScreenManager
-from rabbi_yosef_voice_lines import voice_lines
+from loan_shark_voice_lines import voice_lines
 
 pygame.init()
 pygame.mixer.init()
@@ -79,10 +79,10 @@ def draw_loan_screen():
     pygame.draw.rect(screen, (126, 200, 80), (0, 2 * SCREENHEIGHT / 3, SCREENWIDTH, SCREENHEIGHT / 2.9))
     bank = pygame.image.load("Assets/bank.png").convert_alpha()
     bank = pygame.transform.scale(bank, (3 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 5))
-    rabbi_yosef = pygame.image.load("Assets/rabbiyosef.png").convert_alpha()
-    rabbi_yosef = pygame.transform.scale(rabbi_yosef, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
+    loan_shark = pygame.image.load("Assets/loanshark.png").convert_alpha()
+    loan_shark = pygame.transform.scale(loan_shark, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
     screen.blit(bank, (SCREENWIDTH / 10, SCREENHEIGHT / 5))
-    screen.blit(rabbi_yosef, (SCREENWIDTH - 350, SCREENHEIGHT - 300))
+    screen.blit(loan_shark, (SCREENWIDTH - 350, SCREENHEIGHT - 300))
     voice_line_text = current_voice_line
     voice_line_text_rect = GD_FONTS[18].get_rect(voice_line_text)
     voice_line_text_rect.x = 300
