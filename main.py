@@ -156,7 +156,7 @@ continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCR
 
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
-chips = 5
+chips = 1000
 voice_line_num = 1
 current_voice_line = voice_lines[voice_line_num]
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
@@ -187,10 +187,10 @@ while running:
         # sends event to button to see if it's been clicked
         if in_menu:
             if play_button.check_button_click(event):
-                if chips >= 5:
+                if chips >= 50:
                     in_menu = False
                     in_game = True
-                    chips -= 5
+                    chips -= 50
                     game_screen.run_chips = 0
                     game_screen.reset_game(game_screen.player)
                 else:
@@ -222,8 +222,8 @@ while running:
                 in_menu = True
         if in_death_screen:
             if continue_button.check_button_click(event):
-                if chips >= 5:
-                    chips -= 5
+                if chips >= 50:
+                    chips -= 50
                     in_death_screen = False
                     in_game = True
                     game_screen.reset_game(game_screen.player)
