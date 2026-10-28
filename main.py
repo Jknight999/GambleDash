@@ -123,7 +123,7 @@ GD_FONTS = {
     100: pygame.freetype.Font('Assets/pusab.otf', 100)
 }
 
-#initializes the font with default size
+# initializes the font with default size
 casino_font_size = 100
 casino_font = pygame.freetype.Font("Assets/casino.ttf", casino_font_size)
 CASINO_FONTS = {
