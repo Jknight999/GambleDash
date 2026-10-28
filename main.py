@@ -5,6 +5,7 @@ import math
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 from blackjack import CasinoScreenManager
+from rabbi_yosef_voice_lines import voice_lines
 
 pygame.init()
 pygame.mixer.init()
@@ -83,6 +84,11 @@ def draw_loan_screen():
     rabbi_yosef = pygame.transform.scale(rabbi_yosef, (400, 400))
     screen.blit(bank, (100, 100))
     screen.blit(rabbi_yosef, (SCREENWIDTH - 350, SCREENHEIGHT - 300))
+    voice_line_text = current_voice_line
+    voice_line_text_rect = GD_FONTS[18].get_rect(voice_line_text)
+    voice_line_text_rect.x = 300
+    voice_line_text_rect.y = 300
+    GD_FONTS[18].render_to(screen, voice_line_text_rect, voice_line_text, (255, 255, 255))
 
 def blur_screen():
     screen_copy = screen.copy()
@@ -151,6 +157,8 @@ continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCR
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
 chips = 5
+voice_line_num = 1
+current_voice_line = voice_lines[voice_line_num]
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
 
@@ -167,6 +175,14 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if in_loan_screen:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    voice_line_num += 1
+                    if voice_line_num >= 8:
+                        voice_line_num = 8
+                    current_voice_line = voice_lines[voice_line_num]
+
         # sends event to button to see if it's been clicked
         if in_menu:
             if play_button.check_button_click(event):
@@ -214,7 +230,7 @@ while running:
                     in_menu = False
                     in_death_screen = False
                     in_loan_screen = True
-                    draw_loan_screen()
+                    voice_line_num = 1
 
     if in_game:
         draw_game_screen()
@@ -230,5 +246,7 @@ while running:
         draw_menu_screen()
     elif in_death_screen:
         draw_death_screen()
+    elif in_loan_screen:
+        draw_loan_screen()
 
     pygame.display.flip()
