@@ -150,7 +150,7 @@ continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCR
 
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
-chips = 5
+chips = 100
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
 
@@ -190,6 +190,7 @@ while running:
                 chips += game_screen.run_chips
         if in_casino:
             if blackjack_button.check_button_click(event):
+                casino_screen.chips = chips
                 chips = casino_screen.play_blackjack()
             if back_button.check_button_click(event):
                 in_casino = False
