@@ -171,6 +171,7 @@ in_death_screen = False
 in_loan_screen = False
 
 while running:
+
     #event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
