@@ -35,6 +35,8 @@ def draw_casino_screen():
     back_button.render_text(screen)
     blackjack_button.draw_button(screen)
     blackjack_button.render_text(screen)
+    poker_button.draw_button(screen)
+    poker_button.render_text(screen)
 
 def draw_game_screen():
     screen.blit(bg)
@@ -153,6 +155,7 @@ play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREE
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
 blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Blackjack', 'Assets/casino.ttf', 40, (0, 0, 0)))
+poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 - SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Poker', 'Assets/casino.ttf', 40, (0, 0, 0)))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), ('Continue for 50 Chips?', 'Assets/pusab.otf', 40, (0, 0, 0)))
 
 #in a list, so IT CAN CHANGE
@@ -207,6 +210,8 @@ while running:
         if in_casino:
             if blackjack_button.check_button_click(event):
                 chips, running = casino_screen.play_blackjack()
+            if poker_button.check_button_click(event):
+                casino_screen.play_poker()
             if back_button.check_button_click(event):
                 in_casino = False
                 in_menu = True
