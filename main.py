@@ -4,7 +4,7 @@ import math
 
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
-from blackjack import CasinoScreenManager
+from casino_screen_manager import CasinoScreenManager
 from loan_shark_voice_lines import voice_lines
 
 pygame.init()
