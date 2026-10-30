@@ -197,6 +197,7 @@ while running:
                 else:
                     in_loan_screen = True
                     in_menu = False
+                    voice_line_num = 1
                     draw_loan_screen()
             if casino_button.check_button_click(event):
                 in_menu = False
