@@ -50,11 +50,10 @@ def draw_game_screen():
         text_rect.right = SCREENWIDTH - 30
         font.render_to(screen, text_rect, text, (255, 255, 255))
 
-def draw_death_screen(total_chips):
+def draw_death_screen():
     if not game_screen.player_alive:
         font = GD_FONTS[50]
-        total_chips += game_screen.run_chips
-        chip_text = str(total_chips)
+        chip_text = str(chips)
         text_rect = font.get_rect(chip_text)
         text_rect.right = SCREENWIDTH - 70
         font.render_to(screen, text_rect, chip_text, (255, 255, 255))
@@ -164,7 +163,7 @@ current_voice_line = voice_lines[voice_line_num]
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
 
-pygame.display.set_caption("GambleDash")
+pygame.display.set_caption("YambleDash")
 running = True
 in_menu = True
 in_game = False
@@ -173,6 +172,7 @@ in_death_screen = False
 in_loan_screen = False
 
 while running:
+    print(game_screen.run_chips)
     #event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -228,6 +228,7 @@ while running:
                     chips -= 50
                     in_death_screen = False
                     in_game = True
+                    game_screen.run_chips = 0
                     game_screen.reset_game(game_screen.player)
                 else:
                     in_menu = False
@@ -249,7 +250,7 @@ while running:
     elif in_menu:
         draw_menu_screen()
     elif in_death_screen:
-        draw_death_screen(chips)
+        draw_death_screen()
     elif in_loan_screen:
         draw_loan_screen()
 
