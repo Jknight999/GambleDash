@@ -9,5 +9,3 @@ voice_lines = {
     7: "... i need friends ... \n(SPACE)",
     8: ""
 }
-
-#player hits space to go through them
