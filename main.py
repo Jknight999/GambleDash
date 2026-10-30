@@ -57,11 +57,6 @@ def draw_death_screen():
         text_rect = font.get_rect(chip_text)
         text_rect.right = SCREENWIDTH - 70
         font.render_to(screen, text_rect, chip_text, (255, 255, 255))
-        run_text = "+" + str(game_screen.run_chips)
-        run_text_rect = font.get_rect(run_text)
-        run_text_rect.right = SCREENWIDTH - 70
-        run_text_rect.top = 80
-        font.render_to(screen, run_text_rect, run_text, (255, 255, 255))
         chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
         screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
         back_button.draw_button(screen)
@@ -206,27 +201,27 @@ while running:
             if casino_button.check_button_click(event):
                 in_menu = False
                 in_casino = True
-        if in_death_screen:
-            if casino_button.check_button_click(event):
-                in_casino = True
-                in_death_screen = False
-                chips += game_screen.run_chips
         if in_casino:
             if blackjack_button.check_button_click(event):
                 chips, running = casino_screen.play_blackjack()
             if back_button.check_button_click(event):
                 in_casino = False
                 in_menu = True
-        if in_death_screen:
-            if back_button.check_button_click(event):
-                in_death_screen = False
-                in_menu = True
-                chips += game_screen.run_chips
         if in_game:
             if back_button.check_button_click(event):
                 in_game = False
                 in_menu = True
         if in_death_screen:
+            chips += game_screen.run_chips
+            run_chips = 0
+            if back_button.check_button_click(event):
+                in_death_screen = False
+                in_menu = True
+                chips += game_screen.run_chips
+            if casino_button.check_button_click(event):
+                in_casino = True
+                in_death_screen = False
+                casino_screen.chips = chips
             if continue_button.check_button_click(event):
                 if chips >= 50:
                     chips -= 50
