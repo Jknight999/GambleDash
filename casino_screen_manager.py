@@ -1,9 +1,9 @@
 import pygame
 import pygame.freetype
 
-import casino_classes
 from game_classes import Button
-from casino_classes import Deck, BlackjackHand
+from casino_classes import Deck, BlackjackHand, PokerHand, CommunityCards
+from time import sleep
 
 class CasinoScreenManager:
     def __init__(self, screen_to_draw, chips, s_w, s_h):
@@ -41,6 +41,7 @@ class CasinoScreenManager:
         #initializes empty hands for both player and dealer
         self.player_hand = []
         self.dealer_hand = []
+        self.community_cards = []
 
         #sets the game to be played
         self.game = 'blackjack'
@@ -68,12 +69,12 @@ class CasinoScreenManager:
             #increments the card by the width of the card plus the spacer value
             i += card.image.get_width() + spacer
 
-    def print_community_cards(self, community_cards, x, y, spacer, cards_to_show):
+    def print_community_cards(self, community_cards_hand, x, y, spacer, cards_to_show):
         # starts the hand at the fully left position
-        i = x - (len(community_cards) * community_cards[0].image.get_width() / 2) - (spacer * len(d_hand) // 2)
-        for card in community_cards:
+        i = x - (len(community_cards_hand) * community_cards_hand[0].image.get_width() / 2) - (spacer * len(community_cards_hand) // 2)
+        for card in community_cards_hand:
             # if it is not the last card in the hand, draw
-            if card != community_cards[-cards_to_show]:
+            if card != community_cards_hand[-cards_to_show]:
                 self.surface.blit(card.image, (i, y))
             # otherwise, draw the back of a card (hidden card)
             else:
@@ -247,5 +248,12 @@ class CasinoScreenManager:
             pygame.display.flip()
 
     def play_poker(self):
-        community_cards = CommunityCards(self.deck)
-        print_community_cards(community_cards, 500, 500, 5, 3)
+        poker_running = True
+        self.community_cards = CommunityCards(self.deck)
+        while poker_running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    poker_running = False
+            self.surface.fill((16, 82, 9))
+            self.print_community_cards(self.community_cards.cards, 500, 200, 5, 3)
+            pygame.display.flip()
