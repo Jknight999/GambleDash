@@ -195,9 +195,10 @@ while running:
                     game_screen.run_chips = 0
                     game_screen.reset_game(game_screen.player)
                 else:
+                    voice_line_num = 1
                     in_loan_screen = True
                     in_menu = False
-                    voice_line_num = 1
+                    current_voice_line = voice_lines[voice_line_num]
                     draw_loan_screen()
             if casino_button.check_button_click(event):
                 in_menu = False
@@ -234,6 +235,7 @@ while running:
                     in_death_screen = False
                     in_loan_screen = True
                     voice_line_num = 1
+                    current_voice_line = voice_lines[voice_line_num]
 
     if in_game:
         draw_game_screen()
