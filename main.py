@@ -1,6 +1,7 @@
 import pygame
 import pygame.freetype
 import math
+import fonts
 
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
@@ -13,11 +14,10 @@ pygame.freetype.init()
 
 def draw_menu_screen():
     draw_game_screen()
-    font = GD_FONTS[50]
     chip_text = str(chips)
-    text_rect = font.get_rect(chip_text)
+    text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
     text_rect.right = SCREENWIDTH - 70
-    font.render_to(screen, text_rect, chip_text, (255, 255, 255))
+    fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
 
     chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
     screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
@@ -29,7 +29,7 @@ def draw_menu_screen():
 
 def draw_casino_screen():
     screen.fill((94, 6, 6))
-    CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
+    fonts.CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
     back_button.draw_button(screen)
     back_button.render_text(screen)
@@ -44,19 +44,19 @@ def draw_game_screen():
     if game_screen.player_alive and not in_menu:
         back_button.draw_button(screen)
         back_button.render_text(screen)
-        font = GD_FONTS[50]
         text = "+" + str(game_screen.run_chips)
-        text_rect = font.get_rect(text)
+        text_rect = fonts.GD_FONTS[50].get_rect(text)
         text_rect.right = SCREENWIDTH - 30
-        font.render_to(screen, text_rect, text, (255, 255, 255))
+        fonts.GD_FONTS[50].render_to(screen, text_rect, text, (255, 255, 255))
 
 def draw_death_screen():
     if not game_screen.player_alive:
-        font = GD_FONTS[50]
-        chip_text = str(chips)
-        text_rect = font.get_rect(chip_text)
+        total = chips + game_screen.run_chips
+        game_screen.run_chips = 0
+        chip_text = str(total)
+        text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
         text_rect.right = SCREENWIDTH - 70
-        font.render_to(screen, text_rect, chip_text, (255, 255, 255))
+        fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
         chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
         screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
         back_button.draw_button(screen)
@@ -79,16 +79,16 @@ def draw_loan_screen():
     screen.blit(bank, (SCREENWIDTH / 10, SCREENHEIGHT / 5))
     screen.blit(loan_shark, (SCREENWIDTH - 350, SCREENHEIGHT - 300))
     voice_line_text = current_voice_line
-    voice_line_text_rect = GD_FONTS[18].get_rect(voice_line_text)
+    voice_line_text_rect = fonts.GD_FONTS[18].get_rect(voice_line_text)
     voice_line_text_rect.x = 300
     voice_line_text_rect.y = 100
     lines = current_voice_line.split("\n")
     y = voice_line_text_rect.y
     for line in lines:
-        voice_line_text_rect = GD_FONTS[32].get_rect(line)
+        voice_line_text_rect = fonts.GD_FONTS[32].get_rect(line)
         voice_line_text_rect.x = 450
         voice_line_text_rect.y = y
-        GD_FONTS[32].render_to(screen, voice_line_text_rect, line, (255, 255, 255))
+        fonts.GD_FONTS[32].render_to(screen, voice_line_text_rect, line, (255, 255, 255))
         y += 30
 
 def blur_screen():
@@ -114,27 +114,6 @@ gd_font = pygame.freetype.Font("Assets/pusab.otf", gd_font_size)
 #cache of common fonts in a dict - so to use the cached font its GD_FONTS[font_size]
 #did this because changing the size of the fonts everytime took too much code and too long (runtime wise)
 #normally to change it you would have to put gd_font = pygame.freetype.Font('Assets/pusab.otf', the size you wanted to change it to)
-#not cached for buttons
-GD_FONTS = {
-    14: pygame.freetype.Font('Assets/pusab.otf', 14),
-    18: pygame.freetype.Font('Assets/pusab.otf', 18),
-    24: pygame.freetype.Font('Assets/pusab.otf', 24),
-    32: pygame.freetype.Font('Assets/pusab.otf', 32),
-    50: pygame.freetype.Font('Assets/pusab.otf', 50),
-    100: pygame.freetype.Font('Assets/pusab.otf', 100)
-}
-
-# initializes the font with default size
-casino_font_size = 100
-casino_font = pygame.freetype.Font("Assets/casino.ttf", casino_font_size)
-CASINO_FONTS = {
-    14: pygame.freetype.Font('Assets/casino.ttf', 14),
-    18: pygame.freetype.Font('Assets/casino.ttf', 18),
-    24: pygame.freetype.Font('Assets/casino.ttf', 24),
-    32: pygame.freetype.Font('Assets/casino.ttf', 32),
-    50: pygame.freetype.Font('Assets/casino.ttf', 50),
-    100: pygame.freetype.Font('Assets/casino.ttf', 100)
-}
 
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync= 1)
 bg = pygame.image.load("assets/background.png").convert()
@@ -149,11 +128,11 @@ player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
 player.rect = player.rotated_surface.get_rect(center=(player.x + player.w // 2, player.y + player.h // 2))
 
 #now takes a text argument - ('text', 'font file name', size, color(R,G,B))
-play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), ('Dash', "Assets/pusab.otf", 100, (255, 255, 255)))
-casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), ('Gamble', 'Assets/casino.ttf', 80, (0, 0, 0)))
-back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), ('X', "Assets/pusab.otf", SCREENHEIGHT / 20, (245, 200, 76)))
-blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), ('Blackjack', 'Assets/casino.ttf', 40, (0, 0, 0)))
-continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), ('Continue for 50 Chips?', 'Assets/pusab.otf', 40, (0, 0, 0)))
+play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), 'Dash', 'GD', 100, (255, 255, 255))
+casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), 'Yamble', 'CASINO', 80, (0, 0, 0))
+back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), 'X', "GD", 24, (245, 200, 76))
+blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Blackjack', 'CASINO', 40, (0, 0, 0))
+continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), 'Continue for 50 Chips?', 'GD', 40, (0, 0, 0))
 
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
