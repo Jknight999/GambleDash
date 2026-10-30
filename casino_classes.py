@@ -61,3 +61,26 @@ class BlackjackHand:
 
     def deal_card(self, deck):
         self.cards.append(deck.deal())
+
+class PokerHand:
+    def __init__(self, deck):
+        self.cards = []
+        self.card_values = {
+            '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
+            'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14
+        }
+        for _ in range(2):
+            self.cards.append(deck.deal())
+
+    def get_hand_value(self):
+        pass
+
+class CommunityCards:
+    def __init__(self, deck):
+        self.cards = []
+        self.card_values = {
+            '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
+            'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14
+        }
+        for _ in range(5):
+            self.cards.append(deck.deal())
