@@ -129,7 +129,7 @@ player.rect = player.rotated_surface.get_rect(center=(player.x + player.w // 2, 
 
 #now takes a text argument - ('text', 'font file name', size, color(R,G,B))
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), 'Dash', 'GD', 100, (255, 255, 255))
-casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), 'Yamble', 'CASINO', 80, (0, 0, 0))
+casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), 'Gamble', 'CASINO', 80, (0, 0, 0))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), 'X', "GD", 24, (245, 200, 76))
 blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Blackjack', 'CASINO', 40, (0, 0, 0))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), 'Continue for 50 Chips?', 'GD', 40, (0, 0, 0))
@@ -143,7 +143,7 @@ current_voice_line = voice_lines[voice_line_num]
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
 
-pygame.display.set_caption("YambleDash")
+pygame.display.set_caption("GambleDash")
 running = True
 in_menu = True
 in_game = False

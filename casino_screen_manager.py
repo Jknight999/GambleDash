@@ -89,13 +89,13 @@ class CasinoScreenManager:
         self.dealer_hand = BlackjackHand(self.deck)
 
         #initializes all the buttons
-        hit_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('Hit', 'Assets/casino.ttf', 40, (0, 0, 0)))
-        stand_button = Button(self.screen_width * 0.1, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255,0,0), ('Stand', 'Assets/casino.ttf', 40, (0,0,0)))
-        play_again_button = Button(self.screen_width * 0.7, self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), ('Play Again', 'Assets/casino.ttf', 40, (0, 0, 0)))
-        bet_less_button = Button(self.screen_width * 0.2, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('-10 chips', 'Assets/casino.ttf', 40, (0, 0, 0)))
-        set_bet_button = Button(self.screen_width * 0.4, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), (f"Bet {self.bet_amount} chips", 'Assets/casino.ttf', 40, (0, 0, 0)))
-        bet_more_button = Button(self.screen_width * 0.6, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('+10 chips', 'Assets/casino.ttf', 40, (0, 0, 0)))
-        back_button = Button(self.screen_width / 20, self.screen_width / 40, self.screen_height / 10, self.screen_width / 20, (14, 237, 70), ('X', "Assets/pusab.otf", self.screen_height / 20, (245, 200, 76)))
+        hit_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), 'Hit', 'CASINO', 40, (0, 0, 0))
+        stand_button = Button(self.screen_width * 0.1, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255,0,0), 'Stand', 'CASINO', 40, (0,0,0))
+        play_again_button = Button(self.screen_width * 0.7, self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), 'Play Again', 'CASINO', 40, (0, 0, 0))
+        bet_less_button = Button(self.screen_width * 0.2, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), '-10 chips', 'CASINO', 40, (0, 0, 0))
+        set_bet_button = Button(self.screen_width * 0.4, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), f"Bet {self.bet_amount} chips", 'CASINO', 40, (0, 0, 0))
+        bet_more_button = Button(self.screen_width * 0.6, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), '+10 chips', 'CASINO', 40, (0, 0, 0))
+        back_button = Button(self.screen_width / 20, self.screen_width / 40, self.screen_height / 10, self.screen_width / 20, (14, 237, 70), 'X', "GD", 40, (245, 200, 76))
 
         #removes the ability to press play again button before the game starts
         play_again_button.press = False
