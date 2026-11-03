@@ -223,8 +223,9 @@ class CasinoScreenManager:
                     player_hand_value = self.player_hand.get_hand_value()
 
                     # The dealer hits below 17
-                    while self.dealer_hand.get_hand_value() < 17:
+                    while dealer_hand_value < 17:
                         self.dealer_hand.deal_card(self.deck)
+                        dealer_hand_value = self.dealer_hand.get_hand_value()
 
                     # If the player wins then add double the bet amount
                     if player_hand_value > dealer_hand_value or dealer_hand_value > 21:
