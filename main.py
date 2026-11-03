@@ -49,11 +49,11 @@ def draw_game_screen():
         text_rect.right = SCREENWIDTH - 30
         fonts.GD_FONTS[50].render_to(screen, text_rect, text, (255, 255, 255))
 
-def draw_death_screen():
+def draw_death_screen(chipnum):
     if not game_screen.player_alive:
-        total = chips + game_screen.run_chips
         game_screen.run_chips = 0
-        chip_text = str(total)
+        screen.fill((255, 0, 0))
+        chip_text = str(chipnum)
         text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
         text_rect.right = SCREENWIDTH - 70
         fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
@@ -90,15 +90,6 @@ def draw_loan_screen():
         voice_line_text_rect.y = y
         fonts.GD_FONTS[32].render_to(screen, voice_line_text_rect, line, (255, 255, 255))
         y += 30
-
-def blur_screen():
-    screen_copy = screen.copy()
-    #apparently making the screen smaller is more efficient for blurring
-    small_screen = (SCREENWIDTH // 4, SCREENHEIGHT // 4)
-    small_surface = pygame.transform.scale(screen_copy, small_screen)
-    pygame.transform.box_blur(small_surface, radius=3)
-    blurred_screen = pygame.transform.smoothscale(small_surface, (SCREENWIDTH, SCREENHEIGHT))
-    screen.blit(blurred_screen)
 
 #screen setup
 SCREENWIDTH = 1000
@@ -143,7 +134,7 @@ current_voice_line = voice_lines[voice_line_num]
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
 
-pygame.display.set_caption("YambleDash")
+pygame.display.set_caption("GambleDash")
 running = True
 in_menu = True
 in_game = False
@@ -152,7 +143,6 @@ in_death_screen = False
 in_loan_screen = False
 
 while running:
-    print(game_screen.run_chips)
     #event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -221,16 +211,15 @@ while running:
         draw_game_screen()
         game_screen.tick(player)
         if not game_screen.player_alive:
-            draw_game_screen()
-            blur_screen()
             in_game = False
+            chips += 10
             in_death_screen = True
     elif in_casino:
         draw_casino_screen()
     elif in_menu:
         draw_menu_screen()
     elif in_death_screen:
-        draw_death_screen()
+        draw_death_screen(chips)
     elif in_loan_screen:
         draw_loan_screen()
 
