@@ -72,9 +72,6 @@ class PokerHand:
         for _ in range(2):
             self.cards.append(deck.deal())
 
-    def get_hand_value(self):
-        pass
-
 class CommunityCards:
     def __init__(self, deck):
         self.cards = []

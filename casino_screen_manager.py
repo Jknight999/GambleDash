@@ -3,7 +3,6 @@ import pygame.freetype
 
 from game_classes import Button
 from casino_classes import Deck, BlackjackHand, PokerHand, CommunityCards
-from time import sleep
 
 class CasinoScreenManager:
     def __init__(self, screen_to_draw, chips, s_w, s_h):
@@ -81,6 +80,11 @@ class CasinoScreenManager:
                 self.surface.blit(self.card_back, (i, y))
             # increments the card by the width of the card plus the spacer value
             i += card.image.get_width() + spacer
+
+    def check_poker_hands(self, hand_to_check, community):
+        hand_to_check.append(community)
+        hand_to_check.sort(key=len(obj), reverse=True)
+        print(hand_to_check)
 
     def play_blackjack(self):
         #initializes new instances of the class BlackjackHand (imported from casino_classes)
@@ -251,10 +255,13 @@ class CasinoScreenManager:
     def play_poker(self):
         poker_running = True
         self.community_cards = CommunityCards(self.deck)
+        self.player_hand = PokerHand(self.deck)
         while poker_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     poker_running = False
             self.surface.fill((16, 82, 9))
             self.print_community_cards(self.community_cards.cards, 500, 200, 5, 3)
+            self.print_player_hand(self.player_hand.cards, 250, 400, 5)
+            self.check_poker_hands(self.player_hand.cards, self.community_cards.cards)
             pygame.display.flip()
