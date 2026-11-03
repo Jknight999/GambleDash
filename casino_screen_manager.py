@@ -1,9 +1,9 @@
 import pygame
 import pygame.freetype
 
-import casino_classes
 from game_classes import Button
-from casino_classes import Deck, BlackjackHand
+from casino_classes import Deck, BlackjackHand, PokerHand, CommunityCards
+from time import sleep
 
 class CasinoScreenManager:
     def __init__(self, screen_to_draw, chips, s_w, s_h):
@@ -41,6 +41,7 @@ class CasinoScreenManager:
         #initializes empty hands for both player and dealer
         self.player_hand = []
         self.dealer_hand = []
+        self.community_cards = []
 
         #sets the game to be played
         self.game = 'blackjack'
@@ -68,12 +69,12 @@ class CasinoScreenManager:
             #increments the card by the width of the card plus the spacer value
             i += card.image.get_width() + spacer
 
-    def print_community_cards(self, community_cards, x, y, spacer, cards_to_show):
+    def print_community_cards(self, community_cards_hand, x, y, spacer, cards_to_show):
         # starts the hand at the fully left position
-        i = x - (len(community_cards) * community_cards[0].image.get_width() / 2) - (spacer * len(d_hand) // 2)
-        for card in community_cards:
+        i = x - (len(community_cards_hand) * community_cards_hand[0].image.get_width() / 2) - (spacer * len(community_cards_hand) // 2)
+        for card in community_cards_hand:
             # if it is not the last card in the hand, draw
-            if card != community_cards[-cards_to_show]:
+            if card != community_cards_hand[-cards_to_show]:
                 self.surface.blit(card.image, (i, y))
             # otherwise, draw the back of a card (hidden card)
             else:
@@ -88,13 +89,13 @@ class CasinoScreenManager:
         self.dealer_hand = BlackjackHand(self.deck)
 
         #initializes all the buttons
-        hit_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('Hit', 'Assets/casino.ttf', 40, (0, 0, 0)))
-        stand_button = Button(self.screen_width * 0.1, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255,0,0), ('Stand', 'Assets/casino.ttf', 40, (0,0,0)))
-        play_again_button = Button(self.screen_width * 0.7, self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), ('Play Again', 'Assets/casino.ttf', 40, (0, 0, 0)))
-        bet_less_button = Button(self.screen_width * 0.2, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('-10 chips', 'Assets/casino.ttf', 40, (0, 0, 0)))
-        set_bet_button = Button(self.screen_width * 0.4, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), (f"Bet {self.bet_amount} chips", 'Assets/casino.ttf', 40, (0, 0, 0)))
-        bet_more_button = Button(self.screen_width * 0.6, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), ('+10 chips', 'Assets/casino.ttf', 40, (0, 0, 0)))
-        back_button = Button(self.screen_width / 20, self.screen_width / 40, self.screen_height / 10, self.screen_width / 20, (14, 237, 70), ('X', "Assets/pusab.otf", self.screen_height / 20, (245, 200, 76)))
+        hit_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), 'Hit', 'CASINO', 40, (0, 0, 0))
+        stand_button = Button(self.screen_width * 0.1, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255,0,0), 'Stand', 'CASINO', 40, (0,0,0))
+        play_again_button = Button(self.screen_width * 0.7, self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), 'Play Again', 'CASINO', 40, (0, 0, 0))
+        bet_less_button = Button(self.screen_width * 0.2, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), '-10 chips', 'CASINO', 40, (0, 0, 0))
+        set_bet_button = Button(self.screen_width * 0.4, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), f"Bet {self.bet_amount} chips", 'CASINO', 40, (0, 0, 0))
+        bet_more_button = Button(self.screen_width * 0.6, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), '+10 chips', 'CASINO', 40, (0, 0, 0))
+        back_button = Button(self.screen_width / 20, self.screen_width / 40, self.screen_height / 10, self.screen_width / 20, (14, 237, 70), 'X', "GD", 40, (245, 200, 76))
 
         #removes the ability to press play again button before the game starts
         play_again_button.press = False
@@ -222,8 +223,9 @@ class CasinoScreenManager:
                     player_hand_value = self.player_hand.get_hand_value()
 
                     # The dealer hits below 17
-                    while self.dealer_hand.get_hand_value() < 17:
+                    while dealer_hand_value < 17:
                         self.dealer_hand.deal_card(self.deck)
+                        dealer_hand_value = self.dealer_hand.get_hand_value()
 
                     # If the player wins then add double the bet amount
                     if player_hand_value > dealer_hand_value or dealer_hand_value > 21:
@@ -247,5 +249,12 @@ class CasinoScreenManager:
             pygame.display.flip()
 
     def play_poker(self):
-        community_cards = CommunityCards(self.deck)
-        print_community_cards(community_cards, 500, 500, 5, 3)
+        poker_running = True
+        self.community_cards = CommunityCards(self.deck)
+        while poker_running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    poker_running = False
+            self.surface.fill((16, 82, 9))
+            self.print_community_cards(self.community_cards.cards, 500, 200, 5, 3)
+            pygame.display.flip()
