@@ -212,7 +212,7 @@ while running:
         game_screen.tick(player)
         if not game_screen.player_alive:
             in_game = False
-            chips += 10
+            chips += game_screen.run_chips
             in_death_screen = True
     elif in_casino:
         draw_casino_screen()
