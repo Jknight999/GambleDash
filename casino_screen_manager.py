@@ -82,9 +82,10 @@ class CasinoScreenManager:
             i += card.image.get_width() + spacer
 
     def check_poker_hands(self, hand_to_check, community):
-        hand_to_check.append(community)
-        hand_to_check.sort(key=len(obj), reverse=True)
-        print(hand_to_check)
+        cards_to_check = hand_to_check
+        for i in community:
+            cards_to_check.append(i)
+        cards_to_check.sort(key=lambda x: x.rank)
 
     def play_blackjack(self):
         #initializes new instances of the class BlackjackHand (imported from casino_classes)
@@ -254,6 +255,7 @@ class CasinoScreenManager:
 
     def play_poker(self):
         poker_running = True
+        is_done = False
         self.community_cards = CommunityCards(self.deck)
         self.player_hand = PokerHand(self.deck)
         while poker_running:
@@ -262,6 +264,8 @@ class CasinoScreenManager:
                     poker_running = False
             self.surface.fill((16, 82, 9))
             self.print_community_cards(self.community_cards.cards, 500, 200, 5, 3)
-            self.print_player_hand(self.player_hand.cards, 250, 400, 5)
-            self.check_poker_hands(self.player_hand.cards, self.community_cards.cards)
+            self.print_player_hand(self.player_hand.cards, 500, 400, 5)
+            if not is_done:
+                is_done = True
+                self.check_poker_hands(self.player_hand.cards, self.community_cards.cards)
             pygame.display.flip()
