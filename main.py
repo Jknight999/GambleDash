@@ -54,7 +54,6 @@ def draw_game_screen():
 def draw_death_screen(chipnum):
     if not game_screen.player_alive:
         game_screen.run_chips = 0
-        screen.fill((255, 0, 0))
         chip_text = str(chipnum)
         text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
         text_rect.right = SCREENWIDTH - 70
@@ -216,6 +215,7 @@ while running:
         draw_game_screen()
         game_screen.tick(player)
         if not game_screen.player_alive:
+            draw_game_screen()
             in_game = False
             chips += game_screen.run_chips
             in_death_screen = True
