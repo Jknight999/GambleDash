@@ -92,6 +92,10 @@ def draw_loan_screen():
         fonts.GD_FONTS[32].render_to(screen, voice_line_text_rect, line, (255, 255, 255))
         y += 30
 
+def handle_loans():
+    #auto loan out 1000
+    pass
+
 #screen setup
 SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
@@ -152,7 +156,11 @@ while running:
         if in_loan_screen:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    voice_line_num += 1
+                    if voice_line_num != 4:
+                        voice_line_num += 1
+                    if voice_line_num == 4:
+                        #handle loan
+                        pass
                     if voice_line_num >= 8:
                         in_loan_screen = False
                         in_menu = True
