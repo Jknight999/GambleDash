@@ -73,7 +73,7 @@ class CasinoScreenManager:
         i = x - (len(community_cards_hand) * community_cards_hand[0].image.get_width() / 2) - (spacer * len(community_cards_hand) // 2)
         for card in community_cards_hand:
             # if it is not the last card in the hand, draw
-            if card != community_cards_hand[-cards_to_show]:
+            if community_cards_hand.index(card) <= cards_to_show - 1:
                 self.surface.blit(card.image, (i, y))
             # otherwise, draw the back of a card (hidden card)
             else:
@@ -82,10 +82,67 @@ class CasinoScreenManager:
             i += card.image.get_width() + spacer
 
     def check_poker_hands(self, hand_to_check, community):
-        cards_to_check = hand_to_check
+        same_suits = 0
+        return_value = 0
+        cards_to_check = hand_to_check.copy()
         for i in community:
             cards_to_check.append(i)
+        for i in cards_to_check:
+            if i.rank == 'Ace':
+                i.rank = '14'
+            elif i.rank == 'King':
+                i.rank = '13'
+            elif i.rank == 'Queen':
+                i.rank = '12'
+            elif i.rank == 'Jack':
+                i.rank = '11'
+            i.rank = int(i.rank)
         cards_to_check.sort(key=lambda x: x.rank)
+        for i in range(len(cards_to_check) - 1):
+            # Flush
+            for k in cards_to_check:
+                if cards_to_check[i].suit == k.suit:
+                    same_suits += 1
+                    if same_suits == 5:
+                        return_value += 11
+                if cards_to_check.index(k) == 6:
+                    same_suits = 0
+
+            # Straight
+            if i <= 2 and cards_to_check[i].rank - 4 == cards_to_check[i - 4].rank:
+                return_value += 10
+
+            # Pairs, Triples, Fours
+            if cards_to_check[i].rank == cards_to_check[i + 1].rank:
+                if i < 5 and cards_to_check[i].rank == cards_to_check[i + 2].rank:
+                    if i < 4 and cards_to_check[i].rank == cards_to_check[i + 3].rank:
+                        return_value = 4
+                        return 'four_of_a_kind'
+                    else:
+                        return_value += 5
+                else:
+                    return_value += 1
+
+        # Calculates what to return
+        if return_value == 21:
+            return 'straight_flush'
+        elif return_value == 11:
+            return 'flush'
+        elif return_value == 10:
+            return 'straight'
+        elif return_value == 6:
+            return 'full_house'
+        elif return_value == 5:
+            return 'three_of_a_kind'
+        elif return_value == 2:
+            return 'two_pair'
+        elif return_value == 1:
+            return 'pair'
+        else:
+            return 'high_card'
+
+
+
 
     def play_blackjack(self):
         #initializes new instances of the class BlackjackHand (imported from casino_classes)
@@ -263,8 +320,8 @@ class CasinoScreenManager:
                 if event.type == pygame.QUIT:
                     poker_running = False
             self.surface.fill((16, 82, 9))
-            self.print_community_cards(self.community_cards.cards, 500, 200, 5, 3)
-            self.print_player_hand(self.player_hand.cards, 500, 400, 5)
+            self.print_community_cards(self.community_cards.cards, 500, 200, 5, 5)
+            self.print_player_hand(self.player_hand.cards, 500, 390, 5)
             if not is_done:
                 is_done = True
                 self.check_poker_hands(self.player_hand.cards, self.community_cards.cards)
