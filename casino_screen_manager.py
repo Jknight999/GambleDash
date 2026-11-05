@@ -141,9 +141,6 @@ class CasinoScreenManager:
         else:
             return 'high_card'
 
-
-
-
     def play_blackjack(self):
         #initializes new instances of the class BlackjackHand (imported from casino_classes)
         #hand already initialized as an empty list
@@ -311,6 +308,10 @@ class CasinoScreenManager:
             pygame.display.flip()
 
     def play_poker(self):
+        bet_amount = 10
+        fold_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), 'Fold', 'CASINO', 40, (0, 0, 0))
+        check_button = Button(self.screen_width * 0.1, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), f'Call ({bet_amount})', 'CASINO', 40, (0, 0, 0))
+
         poker_running = True
         is_done = False
         self.community_cards = CommunityCards(self.deck)
@@ -320,6 +321,11 @@ class CasinoScreenManager:
                 if event.type == pygame.QUIT:
                     poker_running = False
             self.surface.fill((16, 82, 9))
+            fold_button.draw_button(self.surface)
+            fold_button.render_text(self.surface)
+            check_button.draw_button(self.surface)
+            check_button.render_text(self.surface)
+
             self.print_community_cards(self.community_cards.cards, 500, 200, 5, 5)
             self.print_player_hand(self.player_hand.cards, 500, 390, 5)
             if not is_done:
