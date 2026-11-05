@@ -68,32 +68,36 @@ def draw_death_screen(chipnum):
         casino_button.render_text(screen)
 
 def draw_loan_screen():
-    screen.fill((135, 206, 250))
     if not pygame.mixer.music.get_busy():
         pygame.mixer.music.load('Assets/completely_innocent_song.mp3')
         pygame.mixer.music.play(-1)
-    pygame.draw.rect(screen, (126, 200, 80), (0, 2 * SCREENHEIGHT / 3, SCREENWIDTH, SCREENHEIGHT / 2.9))
-    bank = pygame.image.load("Assets/bank.png").convert_alpha()
-    bank = pygame.transform.scale(bank, (3 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 5))
-    loan_shark = pygame.image.load("Assets/loanshark.png").convert_alpha()
-    loan_shark = pygame.transform.scale(loan_shark, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
-    screen.blit(bank, (SCREENWIDTH / 10, SCREENHEIGHT / 5))
-    screen.blit(loan_shark, (SCREENWIDTH - 350, SCREENHEIGHT - 300))
-    voice_line_text = current_voice_line
-    voice_line_text_rect = fonts.GD_FONTS[18].get_rect(voice_line_text)
-    voice_line_text_rect.x = 300
-    voice_line_text_rect.y = 100
-    lines = current_voice_line.split("\n")
-    y = voice_line_text_rect.y
-    for line in lines:
-        voice_line_text_rect = fonts.GD_FONTS[32].get_rect(line)
-        voice_line_text_rect.x = 450
-        voice_line_text_rect.y = y
-        fonts.GD_FONTS[32].render_to(screen, voice_line_text_rect, line, (255, 255, 255))
-        y += 30
+    if voice_line_num != 5:
+        screen.fill((135, 206, 250))
+        pygame.draw.rect(screen, (126, 200, 80), (0, 2 * SCREENHEIGHT / 3, SCREENWIDTH, SCREENHEIGHT / 2.9))
+        bank = pygame.image.load("Assets/bank.png").convert_alpha()
+        bank = pygame.transform.scale(bank, (3 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 5))
+        loan_shark = pygame.image.load("Assets/loanshark.png").convert_alpha()
+        loan_shark = pygame.transform.scale(loan_shark, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
+        screen.blit(bank, (SCREENWIDTH / 10, SCREENHEIGHT / 5))
+        screen.blit(loan_shark, (SCREENWIDTH - 350, SCREENHEIGHT - 300))
+        voice_line_text = current_voice_line
+        voice_line_text_rect = fonts.GD_FONTS[18].get_rect(voice_line_text)
+        voice_line_text_rect.x = 300
+        voice_line_text_rect.y = 100
+        lines = current_voice_line.split("\n")
+        y = voice_line_text_rect.y
+        for line in lines:
+            voice_line_text_rect = fonts.GD_FONTS[32].get_rect(line)
+            voice_line_text_rect.x = 450
+            voice_line_text_rect.y = y
+            fonts.GD_FONTS[32].render_to(screen, voice_line_text_rect, line, (255, 255, 255))
+            y += 30
 
 def handle_loans():
-    #auto loan out 1000
+    screen.fill((135, 206, 250))
+    contract = pygame.image.load("Assets/loancontract.png").convert_alpha()
+    contract = pygame.transform.scale(contract, (500, 500))
+    screen.blit(contract, ((SCREENWIDTH - 700) / 2, 50))
     pass
 
 #screen setup
@@ -156,9 +160,10 @@ while running:
         if in_loan_screen:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if voice_line_num != 4:
+                    if voice_line_num != 5:
                         voice_line_num += 1
-                    if voice_line_num == 4:
+                    if voice_line_num == 5:
+                        handle_loans()
                         #handle loan
                         pass
                     if voice_line_num >= 8:
