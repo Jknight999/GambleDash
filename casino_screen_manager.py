@@ -68,12 +68,19 @@ class CasinoScreenManager:
             #increments the card by the width of the card plus the spacer value
             i += card.image.get_width() + spacer
 
-    def print_community_cards(self, community_cards_hand, x, y, spacer, cards_to_show):
+    def print_community_cards(self, community_cards_hand, x, y, spacer, betting_stage):
+        if betting_stage == 0: cards_to_print = 0
+        elif betting_stage == 1: cards_to_print = 3
+        elif betting_stage == 2: cards_to_print = 4
+        elif betting_stage == 3: cards_to_print = 5
+        else:
+            cards_to_print = 0
+
         # starts the hand at the fully left position
         i = x - (len(community_cards_hand) * community_cards_hand[0].image.get_width() / 2) - (spacer * len(community_cards_hand) // 2)
         for card in community_cards_hand:
             # if it is not the last card in the hand, draw
-            if community_cards_hand.index(card) <= cards_to_show - 1:
+            if community_cards_hand.index(card) < cards_to_print:
                 self.surface.blit(card.image, (i, y))
             # otherwise, draw the back of a card (hidden card)
             else:
@@ -298,17 +305,23 @@ class CasinoScreenManager:
         is_done = False
         self.community_cards = CommunityCards(self.deck)
         self.player_hand = PokerHand(self.deck)
+        betting_stage = 0
         while poker_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     poker_running = False
+                if check_button.check_button_click(event):
+                    betting_stage += 1
+                if fold_button.check_button_click(event):
+                    betting_stage += 1
             self.surface.fill((16, 82, 9))
             fold_button.draw_button(self.surface)
             check_button.draw_button(self.surface)
 
-            self.print_community_cards(self.community_cards.cards, 500, 200, 5, 5)
+            self.print_community_cards(self.community_cards.cards, 500, 200, 5, betting_stage)
             self.print_player_hand(self.player_hand.cards, 500, 390, 5)
             if not is_done:
                 is_done = True
-                print(self.check_poker_hands(self.player_hand.card_values, self.player_hand.cards, self.community_cards.cards))
+                self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 4),
+                                         f'Hand Value: {self.check_poker_hands(self.player_hand.card_values, self.player_hand.cards, self.community_cards.cards)}', (255, 255, 255))
             pygame.display.flip()
