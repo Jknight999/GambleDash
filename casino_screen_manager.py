@@ -324,5 +324,5 @@ class CasinoScreenManager:
             self.print_player_hand(self.player_hand.cards, 500, 390, 5)
             if not is_done:
                 is_done = True
-                self.check_poker_hands(self.player_hand.cards, self.community_cards.cards)
+                print(self.check_poker_hands(self.player_hand.cards, self.community_cards.cards))
             pygame.display.flip()
