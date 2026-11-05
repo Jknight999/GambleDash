@@ -127,7 +127,7 @@ poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREEN
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), 'Continue for 50 Chips?', 'GD', 40, (0, 0, 0))
 
 
-#in a list, so IT CAN CHANGE
+#in a list, so it can change
 floor_color = [0,42,124]
 chips = 100
 voice_line_num = 1
