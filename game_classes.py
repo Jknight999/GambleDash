@@ -120,9 +120,6 @@ class Button:
         else:
             self.print_text = False
 
-    def render_text(self, surface):
-        pass
-
     #draws the button
     def draw_button(self, surface):
         pygame.draw.rect(surface, self.color, self.rect, border_radius=10)

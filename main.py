@@ -23,20 +23,15 @@ def draw_menu_screen():
     screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
 
     play_button.draw_button(screen)
-    play_button.render_text(screen)
     casino_button.draw_button(screen)
-    casino_button.render_text(screen)
 
 def draw_casino_screen():
     screen.fill((94, 6, 6))
     fonts.CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
     back_button.draw_button(screen)
-    back_button.render_text(screen)
     blackjack_button.draw_button(screen)
-    blackjack_button.render_text(screen)
     poker_button.draw_button(screen)
-    poker_button.render_text(screen)
 
 def draw_game_screen():
     screen.blit(bg)
@@ -45,7 +40,6 @@ def draw_game_screen():
     #draws the back button to the screen
     if game_screen.player_alive and not in_menu:
         back_button.draw_button(screen)
-        back_button.render_text(screen)
         text = "+" + str(game_screen.run_chips)
         text_rect = fonts.GD_FONTS[50].get_rect(text)
         text_rect.right = SCREENWIDTH - 30
@@ -61,11 +55,8 @@ def draw_death_screen(chipnum):
         chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
         screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
         back_button.draw_button(screen)
-        back_button.render_text(screen)
         continue_button.draw_button(screen)
-        continue_button.render_text(screen)
         casino_button.draw_button(screen)
-        casino_button.render_text(screen)
 
 def draw_loan_screen():
     if not pygame.mixer.music.get_busy():
