@@ -81,22 +81,14 @@ class CasinoScreenManager:
             # increments the card by the width of the card plus the spacer value
             i += card.image.get_width() + spacer
 
-    def check_poker_hands(self, hand_to_check, community):
+    def check_poker_hands(self, card_values, player_cards, community_cards):
         same_suits = 0
         return_value = 0
-        cards_to_check = hand_to_check.copy()
-        for i in community:
-            cards_to_check.append(i)
-        for i in cards_to_check:
-            if i.rank == 'Ace':
-                i.rank = '14'
-            elif i.rank == 'King':
-                i.rank = '13'
-            elif i.rank == 'Queen':
-                i.rank = '12'
-            elif i.rank == 'Jack':
-                i.rank = '11'
-            i.rank = int(i.rank)
+        cards_to_check = player_cards.copy()
+        for card in community_cards:
+            cards_to_check.append(card)
+        for card in cards_to_check:
+            card.rank = card_values[card.rank]
         cards_to_check.sort(key=lambda x: x.rank)
         for i in range(len(cards_to_check) - 1):
             # Flush
@@ -318,5 +310,5 @@ class CasinoScreenManager:
             self.print_player_hand(self.player_hand.cards, 500, 390, 5)
             if not is_done:
                 is_done = True
-                print(self.check_poker_hands(self.player_hand.cards, self.community_cards.cards))
+                print(self.check_poker_hands(self.player_hand.card_values, self.player_hand.cards, self.community_cards.cards))
             pygame.display.flip()
