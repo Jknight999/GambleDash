@@ -140,6 +140,10 @@ class CasinoScreenManager:
         else:
             return 'high_card'
 
+    def poker_reset_game(self):
+        self.community_cards = CommunityCards(self.deck)
+        self.player_hand = PokerHand(self.deck)
+
     def play_blackjack(self):
         #initializes new instances of the class BlackjackHand (imported from casino_classes)
         #hand already initialized as an empty list
@@ -298,22 +302,24 @@ class CasinoScreenManager:
             pygame.display.flip()
 
     def play_poker(self):
+        self.community_cards = CommunityCards(self.deck)
+        self.player_hand = PokerHand(self.deck)
         bet_amount = 10
         betting_round = 1
         fold_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), 'Fold', 'CASINO', 40, (0, 0, 0))
         check_button = Button(self.screen_width * 0.05, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), f'Call ({bet_amount})', 'CASINO', 40, (0, 0, 0))
         raise_button = Button(self.screen_width * 0.2, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), f'Raise 10', 'CASINO', 40, (0, 0, 0))
-
+        play_again_button = Button(self.screen_width * 0.7, self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), 'Play Again', 'CASINO', 40, (0, 0, 0))
+        play_again_button.press = False
         poker_running = True
         is_done = False
-        self.community_cards = CommunityCards(self.deck)
-        self.player_hand = PokerHand(self.deck)
+
         while poker_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     poker_running = False
                 if fold_button.check_button_click(event):
-                    betting_round = 3
+                    betting_round = 4
                 if check_button.check_button_click(event):
                     self.chips -= bet_amount
                     betting_round += 1
@@ -321,6 +327,9 @@ class CasinoScreenManager:
                     bet_amount += 10
                     self.chips -= bet_amount
                     betting_round += 1
+                if play_again_button.check_button_click(event):
+                    poker_reset_game()
+                    play_again_button.press = False
             self.surface.fill((16, 82, 9))
             fold_button.draw_button(self.surface)
             check_button.draw_button(self.surface)
@@ -331,6 +340,10 @@ class CasinoScreenManager:
                 self.print_community_cards(self.community_cards.cards, 500, 200, 5, 4)
             elif betting_round == 3:
                 self.print_community_cards(self.community_cards.cards, 500, 200, 5, 5)
+            elif betting_round == 4:
+                self.print_community_cards(self.community_cards.cards, 500, 200, 5, 0)
+                play_again_button.press = True
+                play_again_button.draw_button(self.surface)
             else:
                 betting_round = 1
             self.print_player_hand(self.player_hand.cards, 500, 390, 5)
