@@ -92,13 +92,15 @@ def draw_loan_screen():
             voice_line_text_rect.y = y
             fonts.GD_FONTS[32].render_to(screen, voice_line_text_rect, line, (255, 255, 255))
             y += 30
+    else:
+        handle_loans()
 
 def handle_loans():
     screen.fill((135, 206, 250))
     contract = pygame.image.load("Assets/loancontract.png").convert_alpha()
     contract = pygame.transform.scale(contract, (500, 500))
     screen.blit(contract, ((SCREENWIDTH - 700) / 2, 50))
-    pass
+    screen.blit(signature_surface, (0, 0))
 
 #screen setup
 SCREENWIDTH = 1000
@@ -139,6 +141,9 @@ continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCR
 #in a list, so IT CAN CHANGE
 floor_color = [0,42,124]
 chips = 100
+signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
+drawing = False
+last_signature_pos = None
 voice_line_num = 1
 current_voice_line = voice_lines[voice_line_num]
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
@@ -160,18 +165,30 @@ while running:
         if in_loan_screen:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if voice_line_num != 5:
+                    if voice_line_num < 5:
                         voice_line_num += 1
-                    if voice_line_num == 5:
-                        handle_loans()
-                        #handle loan
-                        pass
-                    if voice_line_num >= 8:
+                    elif voice_line_num >= 8:
                         in_loan_screen = False
                         in_menu = True
                     current_voice_line = voice_lines[voice_line_num]
 
-        # sends event to button to see if it's been clicked
+            if voice_line_num == 5:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        drawing = True
+                        last_signature_pos = event.pos
+
+                elif event.type == pygame.MOUSEMOTION:
+                    if drawing:
+                        if last_signature_pos is not None:
+                            pygame.draw.line(signature_surface, (0, 0, 0), last_signature_pos, event.pos, 3)
+                        last_signature_pos = event.pos
+
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    if event.button == 1:
+                        drawing = False
+                        last_signature_pos = None
+
         if in_menu:
             if play_button.check_button_click(event):
                 if chips >= 50:
