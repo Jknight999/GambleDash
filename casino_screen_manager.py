@@ -35,7 +35,7 @@ class CasinoScreenManager:
 
         #creates image for hidden card
         self.card_back = pygame.image.load('Assets/Cards/0_card_back.png')
-        self.card_back = pygame.transform.scale(self.card_back, (70.4, 108.8))
+        self.card_back = pygame.transform.scale(self.card_back, (352 / (self.screen_width / 400), 544 / (self.screen_width / 400)))
 
         #initializes empty hands for both player and dealer
         self.player_hand = []
