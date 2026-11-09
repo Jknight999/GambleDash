@@ -1,3 +1,4 @@
+#imports
 import random
 from game_classes import Spike, Block, Particle
 import math
@@ -19,7 +20,7 @@ class GameScreenManager:
         self.scroll_speed = 550
         self.tick_counter = 0
         self.frame_counter = 0
-        # dt is the milliseconds since the last frame, capped at a maximum of the framerate
+        #dt is the milliseconds since the last frame, capped at a maximum of the framerate
         self.refresh_rate = pygame.display.get_current_refresh_rate()
         self.dt = 1 / self.refresh_rate
         self.background = bg
@@ -47,7 +48,7 @@ class GameScreenManager:
             self.discard_objects()
 
     def discard_objects(self):
-        # Deletes objects off the screen (or more accurately it keeps objects on the screen)
+        #deletes objects off the screen (or more accurately it keeps objects on the screen)
         self.spikes = [spike for spike in self.spikes if spike.x + spike.width >= 0]
         self.blocks = [block for block in self.blocks if block.x + block.width >= 0]
 
@@ -67,7 +68,7 @@ class GameScreenManager:
             #scrolls the whole level
             self.scroll()
 
-            # counts frames and converts into ticks
+            #counts frames and converts into ticks
             if self.frame_counter % (math.floor(self.screen_width / 200) * (self.refresh_rate / 60)) == 0:
                 if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
                     self.tick_counter += 1
@@ -83,51 +84,51 @@ class GameScreenManager:
 
             self.apply_physics(current_player)
 
-            # rotates the player if they're in the air
+            #rotates the player if they're in the air
             if current_player.y_vel != 0 and not self.colliding_with_block:
                 current_player.rotate_player(self.dt)
 
-            # checks spike and block collisions
+            #checks spike and block collisions
             for k in self.spikes:
                 self.check_spike_player_collision(k, current_player)
             self.colliding_with_block = False
             for k in self.blocks:
-                # checks for each block if they are colliding with the player using colliderect()
+                #checks for each block if they are colliding with the player using colliderect()
                 if k.x - k.width < current_player.x < k.x + k.width and (current_player.rect.colliderect(k.block) or k.y == current_player.rect.bottom):
-                    # if they are, add the block that is to the variable that tracks it
+                    #if they are, add the block that is to the variable that tracks it
                     self.colliding_with = k
-                    # check to see if it is from the top or from the left
+                    #check to see if it is from the top or from the left
                     self.check_block_player_collision(k, current_player, current_player.y_vel)
-                    # only one will be colliding, so you can break after one
+                    #only one will be colliding, so you can break after one
                     break
 
-            # keeps the player above the floor
+            #keeps the player above the floor
             self.check_ground_collisions(current_player)
 
-            # checks for jumping every tick and applies gravity
+            #checks for jumping every tick and applies gravity
             self.check_jump(current_player)
 
-            # draws the game screen and the objects contained
+            #draws the game screen and the objects contained
             self.draw_objects(current_player)
 
-            # draws the player to the screen
+            #draws the player to the screen
             self.surface.blit(current_player.rotated_surface, current_player.rect)
 
     def check_jump(self, current_player):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] or keys[pygame.K_w]:
-            # touching a block
+            #touching a block
             if self.colliding_with_block:
                 current_player.y = self.colliding_with.y - current_player.h
                 current_player.y_vel = current_player.jump_strength
 
-            # touching the ground
+            #touching the ground
             if current_player.y >= self.floor_y - current_player.h:
                 current_player.y = self.floor_y - current_player.h
                 current_player.y_vel = current_player.jump_strength
 
     def apply_physics(self, current_player):
-        # applies gravity and ground collision detection
+        #applies gravity and ground collision detection
         current_player.y_vel += current_player.gravity * self.dt
         current_player.y += current_player.y_vel * self.dt
 
@@ -137,14 +138,14 @@ class GameScreenManager:
             current_player.y = self.floor_y - current_player.h
             current_player.y_vel = 0
 
-            # snaps the cube back to flat on the ground
+            #snaps the cube back to flat on the ground
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
         current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
 
     def check_block_player_collision(self, blk, current_player, current_player_yv):
-        # if the player hits the side of the block then reset the game
-        # checks if the y velocity is less than or equal to 0, or it's way below the block
+        #if the player hits the side of the block then reset the game
+        #checks if the y velocity is less than or equal to 0, or it's way below the block
         offset_x = int(blk.block.x - current_player.rect.x)
         offset_y = int(blk.block.y - current_player.rect.y)
 
@@ -154,7 +155,7 @@ class GameScreenManager:
             return
 
         elif current_player_yv > 0:
-            # sets the tracking bool to true and resets the rect
+            #sets the tracking bool to true and resets the rect
             self.colliding_with_block = True
             current_player.angle = round(current_player.angle / 90) * 90 % 360
             current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
@@ -163,11 +164,11 @@ class GameScreenManager:
             current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
 
     def check_spike_player_collision(self, spk, current_player):
-        # finds offset amount from the hitbox to the player
+        #finds offset amount from the hitbox to the player
         offset_x = int(spk.hitbox.x - current_player.rect.x)
         offset_y = int(spk.hitbox.y - current_player.rect.y)
 
-        # if the player and mask overlap then reset the level
+        #if the player and mask overlap then reset the level
         if current_player.mask.overlap(spk.mask, (offset_x, offset_y)):
             self.surface.fill((0, 0, 0))
             self.player_alive = False
@@ -187,7 +188,7 @@ class GameScreenManager:
                 self.particles_list.remove(particle)
 
     def draw_objects(self, player):
-        # draws the particles to the screen
+        #draws the particles to the screen
         if player.y_vel == 0 and (self.colliding_with_block or player.y >= self.floor_y - player.h):
             self.count_particles(self.surface, self.player)
         self.handle_particle_physics()
@@ -196,11 +197,11 @@ class GameScreenManager:
                 pygame.draw.rect(particle.screen, (206, 224, 244), (particle.x, particle.y, particle.size, particle.size))
 
         for to_draw in self.spikes:
-            # giving myself the ability to separate the vertices
+            #giving myself the ability to separate the vertices
             v_a, v_b, v_c = to_draw.find_vertices()
             pygame.draw.polygon(self.surface, (0, 0, 0), (v_a, v_b, v_c))
 
-            # shrinking the vertices inwards so that the outline doesn't go outside the block allotted
+            #shrinking the vertices inwards so that the outline doesn't go outside the block allotted
             v_a[0] += 5
             v_a[1] -= 3
             v_b[1] += 3
