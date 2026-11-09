@@ -7,8 +7,9 @@ class Card:
         #basic inits
         self.suit = suit
         self.rank = rank
+        screenwidth = pygame.display.get_desktop_sizes()[0][0]
         self.image = pygame.image.load(f"Assets/Cards/{self.rank}of{self.suit}.png")
-        self.image = pygame.transform.scale(self.image, (70.4, 108.8))
+        self.image = pygame.transform.scale(self.image, (352 / (screenwidth / 200), 544 / (screenwidth / 200)))
 
     #basically just represents it as a string (for printing purposes)
     #returns the suit and rank of a card

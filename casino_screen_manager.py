@@ -242,7 +242,7 @@ class CasinoScreenManager:
                         back_button.press = True
                         back_button.draw_button(self.surface)
                         play_again_button.draw_button(self.surface)
-                        self.print_player_hand(self.player_hand.cards, 500, 300, 5)
+                        self.print_player_hand(self.player_hand.cards, self.screen_width / 2, self.screen_height / 2, 5)
                     #checks blackjacks
                     elif player_hand_value == 21:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), f'Blackjack!', (255, 255, 255))
@@ -253,14 +253,14 @@ class CasinoScreenManager:
                         hit_button.press = False
                         stand_button.press = False
                         play_again_button.draw_button(self.surface)
-                        self.print_player_hand(self.player_hand.cards, 500, 300, 5)
-                        self.print_dealer_start_hand(self.dealer_hand.cards, 500, 50, 5)
+                        self.print_player_hand(self.player_hand.cards, self.screen_width / 2, self.screen_height / 2, 5)
+                        self.print_dealer_start_hand(self.dealer_hand.cards, self.screen_width / 2, self.screen_height / 10, 5)
                     else:
                         hit_button.draw_button(self.surface)
                         stand_button.draw_button(self.surface)
 
-                        self.print_player_hand(self.player_hand.cards, 500, 300, 5)
-                        self.print_dealer_start_hand(self.dealer_hand.cards, 500, 50, 5)
+                        self.print_player_hand(self.player_hand.cards, self.screen_width / 2, self.screen_height / 2, 5)
+                        self.print_dealer_start_hand(self.dealer_hand.cards, self.screen_width / 2, self.screen_height / 10, 5)
 
                 #this runs when the player stands, starts the dealer's turn
                 else:
@@ -270,8 +270,8 @@ class CasinoScreenManager:
                     back_button.press = True
                     play_again_button.draw_button(self.surface)
                     back_button.draw_button(self.surface)
-                    self.print_player_hand(self.player_hand.cards, 500, 300, 5)
-                    self.print_player_hand(self.dealer_hand.cards, 500, 50, 5)
+                    self.print_player_hand(self.player_hand.cards, self.screen_width / 2, self.screen_height / 2, 5)
+                    self.print_player_hand(self.dealer_hand.cards, self.screen_width / 2, self.screen_height / 10, 5)
                     dealer_hand_value = self.dealer_hand.get_hand_value()
                     player_hand_value = self.player_hand.get_hand_value()
 

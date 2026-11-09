@@ -18,7 +18,7 @@ class Player:
         self.gravity = 3600 * (self.SCREENHEIGHT / 500)
         self.jump_strength = -900 * (self.SCREENHEIGHT / 500)
         self.angle = 0
-        self.rotation_speed = -(self.gravity / 10)
+        self.rotation_speed = -(self.gravity / 15)
 
         #makes a sprite of the cube asset
         self.image = pygame.image.load("Assets/playerskin01.png").convert_alpha()
