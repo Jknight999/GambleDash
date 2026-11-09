@@ -1,3 +1,4 @@
+#list of all structures
 structure_dictionary = {
     1: (
     '                                                                           ',
