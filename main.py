@@ -1,3 +1,4 @@
+#imports
 import pygame
 import pygame.freetype
 import math
@@ -8,35 +9,44 @@ from game_screen_manager import GameScreenManager
 from casino_screen_manager import CasinoScreenManager
 from loan_shark_voice_lines import voice_lines
 
+#inits
 pygame.init()
 pygame.mixer.init()
 pygame.freetype.init()
 
+#screen drawing functions
 def draw_menu_screen():
     draw_game_screen()
+    
+    #takes the players chips and renders it to the screen
     chip_text = str(chips)
     text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
     text_rect.right = SCREENWIDTH - 70
     fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
-
     chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
     screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
 
+    #draws play and casino buttons
     play_button.draw_button(screen)
     casino_button.draw_button(screen)
 
 def draw_casino_screen():
+    #handles screen background and text
     screen.fill((94, 6, 6))
     fonts.CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
+    
+    #draws back, blackjack, and poker buttons
     back_button.draw_button(screen)
     blackjack_button.draw_button(screen)
     poker_button.draw_button(screen)
 
 def draw_game_screen():
     screen.blit(bg)
-    # calculates so that the floor always draws 2/3 of the way down
+    
+    #calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor_color, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
+    
     #draws the back button to the screen
     if game_screen.player_alive and not in_menu:
         back_button.draw_button(screen)
@@ -47,6 +57,7 @@ def draw_game_screen():
 
 def draw_death_screen(chipnum):
     if not game_screen.player_alive:
+        #resets run chips and renders chips to the screen
         game_screen.run_chips = 0
         chip_text = str(chipnum)
         text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
@@ -54,15 +65,20 @@ def draw_death_screen(chipnum):
         fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
         chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
         screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
+        
+        #draws back, continue, and casino buttons
         back_button.draw_button(screen)
         continue_button.draw_button(screen)
         casino_button.draw_button(screen)
 
 def draw_loan_screen():
+    #plays music when entering the loan screen
     if not pygame.mixer.music.get_busy():
         pygame.mixer.music.load('Assets/completely_innocent_song.mp3')
         pygame.mixer.music.play(-1)
+        
     if voice_line_num != 5:
+        #handles background, text, and sprites
         screen.fill((135, 206, 250))
         pygame.draw.rect(screen, (126, 200, 80), (0, 2 * SCREENHEIGHT / 3, SCREENWIDTH, SCREENHEIGHT / 2.9))
         bank = pygame.image.load("Assets/bank.png").convert_alpha()
@@ -75,6 +91,8 @@ def draw_loan_screen():
         voice_line_text_rect = fonts.GD_FONTS[18].get_rect(voice_line_text)
         voice_line_text_rect.x = 300
         voice_line_text_rect.y = 100
+        
+        #places the voice lines so that they are written in lines to the screen
         lines = current_voice_line.split("\n")
         y = voice_line_text_rect.y
         for line in lines:
@@ -84,9 +102,11 @@ def draw_loan_screen():
             fonts.GD_FONTS[32].render_to(screen, voice_line_text_rect, line, (255, 255, 255))
             y += 30
     else:
+        #when the voiceline number is 5, it calls the handle loan function
         handle_loans()
 
 def handle_loans():
+    #draws background and renders sprites
     screen.fill((135, 206, 250))
     contract = pygame.image.load("Assets/loancontract.png").convert_alpha()
     contract = pygame.transform.scale(contract, (500, 500))
@@ -98,29 +118,24 @@ SCREENWIDTH = 1000
 SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
-SHOW_SPIKE_HITBOXES = True
 
 #default size
 gd_font_size = 80
 gd_font = pygame.freetype.Font("Assets/pusab.otf", gd_font_size)
 
-#cache of common fonts in a dict - so to use the cached font its GD_FONTS[font_size]
-#did this because changing the size of the fonts everytime took too much code and too long (runtime wise)
-#normally to change it you would have to put gd_font = pygame.freetype.Font('Assets/pusab.otf', the size you wanted to change it to)
-
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync= 1)
 bg = pygame.image.load("assets/background.png").convert()
 bg = pygame.transform.scale(bg, (SCREENWIDTH, SCREENHEIGHT))
 
-#initializes first instances of class
-player= Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
+#initializes the player
+player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
 
-# I have absolutely no idea why but this is necessary to make the cube start the right way up
+#I have absolutely no idea why but this is necessary to make the cube start the right way up
 player.angle = 91
 player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
 player.rect = player.rotated_surface.get_rect(center=(player.x + player.w // 2, player.y + player.h // 2))
 
-#now takes a text argument - ('text', 'font file name', size, color(R,G,B))
+#initializes buttons
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), 'Dash', 'GD', 100, (255, 255, 255))
 casino_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (94, 6, 6), 'Gamble', 'CASINO', 80, (0, 0, 0))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), 'X', "GD", 24, (245, 200, 76))
@@ -128,8 +143,6 @@ blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SC
 poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Poker', 'CASINO', 40, (0, 0, 0))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), 'Continue for 50 Chips?', 'GD', 40, (0, 0, 0))
 
-
-#in a list, so it can change
 floor_color = [0,42,124]
 chips = 100
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
@@ -151,9 +164,12 @@ in_loan_screen = False
 while running:
     #event handling
     for event in pygame.event.get():
+        #quit events
         if event.type == pygame.QUIT:
             running = False
+            
         if in_loan_screen:
+            #changes the voice lines when the user hits space
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     if voice_line_num < 5:
@@ -162,19 +178,17 @@ while running:
                         in_loan_screen = False
                         in_menu = True
                     current_voice_line = voice_lines[voice_line_num]
-
             if voice_line_num == 5:
+                #lets the user draw on the screen
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         drawing = True
                         last_signature_pos = event.pos
-
                 elif event.type == pygame.MOUSEMOTION:
                     if drawing:
                         if last_signature_pos is not None:
                             pygame.draw.line(signature_surface, (0, 0, 0), last_signature_pos, event.pos, 3)
                         last_signature_pos = event.pos
-
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1:
                         drawing = False
