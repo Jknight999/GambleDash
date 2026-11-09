@@ -150,7 +150,8 @@ drawing = False
 last_signature_pos = None
 voice_line_num = 1
 current_voice_line = voice_lines[voice_line_num]
-game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg)
+player_state = "cube"
+game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg, player_state)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
 
 pygame.display.set_caption("GambleDash")
