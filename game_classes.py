@@ -15,8 +15,8 @@ class Player:
         self.y = (floor_y - self.h)
         self.color = (14, 237, 70)
         self.y_vel = 0
-        self.gravity = 1800000 / self.SCREENHEIGHT
-        self.jump_strength = -900
+        self.gravity = 3600 * (self.SCREENHEIGHT / 500)
+        self.jump_strength = -900 * (self.SCREENHEIGHT / 500)
         self.angle = 0
         self.rotation_speed = -(self.gravity / 10)
 
