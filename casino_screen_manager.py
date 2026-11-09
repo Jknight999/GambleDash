@@ -1,6 +1,6 @@
+#imports
 import pygame
 import pygame.freetype
-
 from game_classes import Button
 from casino_classes import Deck, BlackjackHand, PokerHand, CommunityCards
 
@@ -81,17 +81,24 @@ class CasinoScreenManager:
             # increments the card by the width of the card plus the spacer value
             i += card.image.get_width() + spacer
 
-    def check_poker_hands(self, card_values, player_cards, community_cards):
+    @staticmethod
+    def check_poker_hands(card_values, player_cards, community_cards):
         same_suits = 0
         return_value = 0
         cards_to_check = player_cards.copy()
+
+        #adds the river cards into a cards to check list
         for card in community_cards:
             cards_to_check.append(card)
         for card in cards_to_check:
             card.rank = card_values[card.rank]
+
+        #sorts the list by rank
         cards_to_check.sort(key=lambda x: x.rank)
+
+        #for loop to check through all cases
         for i in range(len(cards_to_check) - 1):
-            # Flush
+            #flush
             for k in cards_to_check:
                 if cards_to_check[i].suit == k.suit:
                     same_suits += 1
@@ -100,11 +107,11 @@ class CasinoScreenManager:
                 if cards_to_check.index(k) == 6:
                     same_suits = 0
 
-            # Straight
+            #straight
             if i <= 2 and cards_to_check[i].rank - 4 == cards_to_check[i - 4].rank:
                 return_value += 10
 
-            # Pairs, Triples, Fours
+            #pairs, trips, quads
             if cards_to_check[i].rank == cards_to_check[i + 1].rank:
                 if i < 5 and cards_to_check[i].rank == cards_to_check[i + 2].rank:
                     if i < 4 and cards_to_check[i].rank == cards_to_check[i + 3].rank:
@@ -115,7 +122,7 @@ class CasinoScreenManager:
                 else:
                     return_value += 1
 
-        # Calculates what to return
+        #calculates what to return by giving each outcome a return value
         if return_value == 21:
             return 'straight_flush'
         elif return_value == 11:
@@ -158,6 +165,7 @@ class CasinoScreenManager:
         #if the program is running (modifying bet, playing, or final result
         blackjack_running = True
         #game loop
+
         while blackjack_running:
             #fills the background
             self.surface.fill((16, 82, 9))
@@ -179,7 +187,7 @@ class CasinoScreenManager:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return self.chips, False
-                # Deals a card if the player hits
+                #deals a card if the player hits
                 if hit_button.check_button_click(event):
                     self.player_hand.deal_card(self.deck)
                 if stand_button.check_button_click(event):
@@ -196,7 +204,7 @@ class CasinoScreenManager:
                 if back_button.check_button_click(event):
                     return self.chips, True
 
-                # These three all set the bet amount
+                #these three all set the bet amount
                 if bet_less_button.check_button_click(event) and not self.is_bet_set:
                     self.bet_amount -= 10
                     if self.bet_amount < 0:
@@ -211,15 +219,15 @@ class CasinoScreenManager:
                     back_button.press = False
                     blackjack_in_game = True
 
-            # Always renders how many chips you have
+            #always renders how many chips you have
             self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 5), f'Your Chips: {self.chips}', (255, 255, 255))
             if self.is_bet_set:
                 if player_playing:
-                    # Only renders your hand value if you have set your bet to prevent cheating
+                    #only renders your hand value if you have set your bet to prevent cheating
                     self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 4), f'Hand Value: {self.player_hand.get_hand_value()}', (255, 255, 255))
                     player_hand_value = self.player_hand.get_hand_value()
 
-                    # Checks busting (idk why this is a separate place ask Parker)
+                    #checks busting
                     if self.player_hand.get_hand_value() > 21:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), f'You Busted',(255, 255, 255))
                         if self.bet_amount > self.chips:
@@ -231,7 +239,7 @@ class CasinoScreenManager:
                         back_button.draw_button(self.surface)
                         play_again_button.draw_button(self.surface)
                         self.print_player_hand(self.player_hand.cards, 500, 300, 5)
-                    # Checks blackjacks
+                    #checks blackjacks
                     elif player_hand_value == 21:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), f'Blackjack!', (255, 255, 255))
                         if not self.chips_added:
@@ -250,7 +258,7 @@ class CasinoScreenManager:
                         self.print_player_hand(self.player_hand.cards, 500, 300, 5)
                         self.print_dealer_start_hand(self.dealer_hand.cards, 500, 50, 5)
 
-                # This runs when the player stands, starts the dealer's turn
+                #this runs when the player stands, starts the dealer's turn
                 else:
                     play_again_button.press = True
                     hit_button.press = False
@@ -263,26 +271,26 @@ class CasinoScreenManager:
                     dealer_hand_value = self.dealer_hand.get_hand_value()
                     player_hand_value = self.player_hand.get_hand_value()
 
-                    # The dealer hits below 17
+                    #the dealer hits below 17
                     while dealer_hand_value < 17:
                         self.dealer_hand.deal_card(self.deck)
                         dealer_hand_value = self.dealer_hand.get_hand_value()
 
-                    # If the player wins then add double the bet amount
+                    #if the player wins then add double the bet amount
                     if player_hand_value > dealer_hand_value or dealer_hand_value > 21:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'You Win!', (255, 255, 255))
                         if not self.chips_added:
                             self.chips += self.bet_amount * 2
                             self.chips_added = True
 
-                    # If tie then say push and refund the player
+                    #if tie then say push and refund the player
                     elif player_hand_value == dealer_hand_value:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'Push!', (255, 255, 255))
                         if not self.chips_added:
                             self.chips += self.bet_amount
                             self.chips_added = True
 
-                    # If lose then you get nothing
+                    #if lose then you get nothing
                     else:
                         self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'You Lose!', (255, 255, 255))
                         if self.bet_amount > self.chips:
