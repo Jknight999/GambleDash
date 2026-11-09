@@ -1,3 +1,4 @@
+#imports
 import random
 import pygame
 import pygame.freetype
