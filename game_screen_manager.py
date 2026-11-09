@@ -117,27 +117,37 @@ class GameScreenManager:
             self.surface.blit(current_player.rotated_surface, current_player.rect)
 
     def check_jump(self, current_player):
+        keys = pygame.key.get_pressed()
         if self.player_state == 'cube':
-            keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE] or keys[pygame.K_w]:
                 #touching a block
                 if self.colliding_with_block:
                     current_player.y = self.colliding_with.y - current_player.h
                     current_player.y_vel = current_player.jump_strength
-
                 #touching the ground
                 if current_player.y >= self.floor_y - current_player.h:
                     current_player.y = self.floor_y - current_player.h
                     current_player.y_vel = current_player.jump_strength
+        elif self.player_state == 'ship':
+            if keys[pygame.K_SPACE] or keys[pygame.K_w]:
+                current_player.y_vel -= current_player.gravity * 0.5 * self.dt
+            else:
+                current_player.y_vel += current_player.gravity * 0.1 * self.dt
+
+            max_speed = self.screen_height * 1.5
+            current_player.y_vel = max(-max_speed, min(current_player.y_vel, max_speed))
 
     def apply_physics(self, current_player):
-        if self.player_state == "cube":
-            #applies gravity and ground collision detection
+        if self.player_state == 'ship':
+            keys = pygame.key.get_pressed()
+            if not (keys[pygame.K_SPACE] or keys[pygame.K_w]):
+                current_player.y_vel += current_player.gravity * self.dt
+        else:
             current_player.y_vel += current_player.gravity * self.dt
-            current_player.y += current_player.y_vel * self.dt
+
+        current_player.y += current_player.y_vel * self.dt
 
     def check_ground_collisions(self, current_player):
-        if self.player_state == 'cube':
             #checks if the player is on the ground
             if current_player.y >= self.floor_y - current_player.h:
                 current_player.y = self.floor_y - current_player.h
@@ -227,4 +237,4 @@ class GameScreenManager:
         self.frame_counter = 0
         self.current_structure = random.randint(1, len(structure_dictionary))
         self.player_alive = True
-        self.player_state = "cube"
+        self.player_state = "ship"
