@@ -17,7 +17,7 @@ class GameScreenManager:
         self.spikes = []
         self.blocks = []
         self.buttons = []
-        self.scroll_speed = 550
+        self.scroll_speed = 550 * (self.screen_height / 500)
         self.tick_counter = 0
         self.frame_counter = 0
         #dt is the milliseconds since the last frame, capped at a maximum of the framerate
@@ -70,7 +70,7 @@ class GameScreenManager:
             self.scroll()
 
             #counts frames and converts into ticks
-            if self.frame_counter % (math.floor(self.screen_width / 200) * (self.refresh_rate / 60)) == 0:
+            if self.frame_counter % (math.floor(self.screen_width / (self.screen_width / 5)) * (self.refresh_rate / 60)) == 0:
                 if self.tick_counter < len(self.structures[self.current_structure][0]) - 1:
                     self.tick_counter += 1
                 else:
