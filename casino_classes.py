@@ -1,14 +1,17 @@
+#imports
 import pygame
 import random
 
 class Card:
     def __init__(self, suit, rank):
+        #basic inits
         self.suit = suit
         self.rank = rank
         self.image = pygame.image.load(f"Assets/Cards/{self.rank}of{self.suit}.png")
         self.image = pygame.transform.scale(self.image, (70.4, 108.8))
 
     #basically just represents it as a string (for printing purposes)
+    #returns the suit and rank of a card
     def __repr__(self):
         return f'{self.rank} of {self.suit}'
 
@@ -37,6 +40,7 @@ class BlackjackHand:
             '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
             'Jack': 10, 'Queen': 10, 'King': 10, 'Ace': 11
         }
+        #gives the player 2 cards to start
         for _ in range(2):
             self.cards.append(deck.deal())
 
@@ -69,6 +73,7 @@ class PokerHand:
             '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
             'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14
         }
+        #gives 2 player cards
         for _ in range(2):
             self.cards.append(deck.deal())
 
@@ -79,5 +84,6 @@ class CommunityCards:
             '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
             'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14
         }
+        #gives 5 river cards
         for _ in range(5):
             self.cards.append(deck.deal())
