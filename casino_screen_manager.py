@@ -103,7 +103,7 @@ class CasinoScreenManager:
                 if cards_to_check[i].suit == k.suit:
                     same_suits += 1
                     if same_suits == 5:
-                        return_value += 11
+                        return_value += 12
                 if cards_to_check.index(k) == 6:
                     same_suits = 0
 
@@ -123,13 +123,13 @@ class CasinoScreenManager:
                     return_value += 1
 
         #calculates what to return by giving each outcome a return value
-        if return_value == 21:
+        if return_value == 22:
             return 'straight_flush'
-        elif return_value == 11:
+        elif return_value == 12 or return_value == 13:
             return 'flush'
-        elif return_value == 10:
+        elif return_value == 10 or return_value == 11:
             return 'straight'
-        elif return_value == 6:
+        elif return_value == 6 or return_value == 7:
             return 'full_house'
         elif return_value == 5:
             return 'three_of_a_kind'
@@ -299,8 +299,10 @@ class CasinoScreenManager:
 
     def play_poker(self):
         bet_amount = 10
+        betting_round = 1
         fold_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), 'Fold', 'CASINO', 40, (0, 0, 0))
-        check_button = Button(self.screen_width * 0.1, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), f'Call ({bet_amount})', 'CASINO', 40, (0, 0, 0))
+        check_button = Button(self.screen_width * 0.05, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), f'Call ({bet_amount})', 'CASINO', 40, (0, 0, 0))
+        raise_button = Button(self.screen_width * 0.2, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), f'Raise 10', 'CASINO', 40, (0, 0, 0))
 
         poker_running = True
         is_done = False
@@ -310,11 +312,27 @@ class CasinoScreenManager:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     poker_running = False
+                if fold_button.check_button_click(event):
+                    betting_round = 3
+                if check_button.check_button_click(event):
+                    self.chips -= bet_amount
+                    betting_round += 1
+                if raise_button.check_button_click(event):
+                    bet_amount += 10
+                    self.chips -= bet_amount
+                    betting_round += 1
             self.surface.fill((16, 82, 9))
             fold_button.draw_button(self.surface)
             check_button.draw_button(self.surface)
-
-            self.print_community_cards(self.community_cards.cards, 500, 200, 5, 5)
+            raise_button.draw_button(self.surface)
+            if betting_round == 1:
+                self.print_community_cards(self.community_cards.cards, 500, 200, 5, 3)
+            elif betting_round == 2:
+                self.print_community_cards(self.community_cards.cards, 500, 200, 5, 4)
+            elif betting_round == 3:
+                self.print_community_cards(self.community_cards.cards, 500, 200, 5, 5)
+            else:
+                betting_round = 1
             self.print_player_hand(self.player_hand.cards, 500, 390, 5)
             if not is_done:
                 is_done = True
