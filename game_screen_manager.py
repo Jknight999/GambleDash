@@ -7,7 +7,7 @@ from structures import structure_dictionary
 
 class GameScreenManager:
     #basic characteristics
-    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_y, bg):
+    def __init__(self, screen_to_draw, current_player, s_w, s_h, fl_color, f_y, bg, player_state):
         self.surface = screen_to_draw
         self.screen_width = s_w
         self.screen_height = s_h
@@ -33,6 +33,7 @@ class GameScreenManager:
         self.player_alive = True
         self.run_chips = 0
         self.particles_list = []
+        self.player_state = player_state
 
     def scroll(self):
         if self.player_alive:
@@ -85,8 +86,9 @@ class GameScreenManager:
             self.apply_physics(current_player)
 
             #rotates the player if they're in the air
-            if current_player.y_vel != 0 and not self.colliding_with_block:
-                current_player.rotate_player(self.dt)
+            if self.player_state == "cube":
+                if current_player.y_vel != 0 and not self.colliding_with_block:
+                    current_player.rotate_player(self.dt)
 
             #checks spike and block collisions
             for k in self.spikes:
@@ -115,33 +117,36 @@ class GameScreenManager:
             self.surface.blit(current_player.rotated_surface, current_player.rect)
 
     def check_jump(self, current_player):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] or keys[pygame.K_w]:
-            #touching a block
-            if self.colliding_with_block:
-                current_player.y = self.colliding_with.y - current_player.h
-                current_player.y_vel = current_player.jump_strength
+        if self.player_state == 'cube':
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE] or keys[pygame.K_w]:
+                #touching a block
+                if self.colliding_with_block:
+                    current_player.y = self.colliding_with.y - current_player.h
+                    current_player.y_vel = current_player.jump_strength
 
-            #touching the ground
-            if current_player.y >= self.floor_y - current_player.h:
-                current_player.y = self.floor_y - current_player.h
-                current_player.y_vel = current_player.jump_strength
+                #touching the ground
+                if current_player.y >= self.floor_y - current_player.h:
+                    current_player.y = self.floor_y - current_player.h
+                    current_player.y_vel = current_player.jump_strength
 
     def apply_physics(self, current_player):
-        #applies gravity and ground collision detection
-        current_player.y_vel += current_player.gravity * self.dt
-        current_player.y += current_player.y_vel * self.dt
+        if self.player_state == "cube":
+            #applies gravity and ground collision detection
+            current_player.y_vel += current_player.gravity * self.dt
+            current_player.y += current_player.y_vel * self.dt
 
     def check_ground_collisions(self, current_player):
-        #checks if the player is on the ground
-        if current_player.y >= self.floor_y - current_player.h:
-            current_player.y = self.floor_y - current_player.h
-            current_player.y_vel = 0
+        if self.player_state == 'cube':
+            #checks if the player is on the ground
+            if current_player.y >= self.floor_y - current_player.h:
+                current_player.y = self.floor_y - current_player.h
+                current_player.y_vel = 0
 
-            #snaps the cube back to flat on the ground
-            current_player.angle = round(current_player.angle / 90) * 90 % 360
-            current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
-        current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
+                #snaps the cube back to flat on the ground
+                current_player.angle = round(current_player.angle / 90) * 90 % 360
+                current_player.rotated_surface = pygame.transform.rotate(current_player.image, current_player.angle)
+            current_player.rect = current_player.rotated_surface.get_rect(center=(current_player.x + current_player.w // 2, current_player.y + current_player.h // 2))
 
     def check_block_player_collision(self, blk, current_player, current_player_yv):
         #if the player hits the side of the block then reset the game
@@ -222,3 +227,4 @@ class GameScreenManager:
         self.frame_counter = 0
         self.current_structure = random.randint(1, len(structure_dictionary))
         self.player_alive = True
+        self.player_state = "cube"
