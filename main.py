@@ -114,7 +114,7 @@ def handle_loans():
     screen.blit(signature_surface, (0, 0))
 
 #screen setup
-SCREENWIDTH = 1000
+SCREENWIDTH = pygame.display.get_desktop_sizes()[0][0]
 SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
