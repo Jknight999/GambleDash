@@ -93,7 +93,7 @@ class Block:
         self.image = Block.shared_image
         self.mask = Block.shared_mask
 
-        self.block = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.block = pygame.Rect(self.x, self.y, self.width, self.height/2)
 
 class Button:
     #takes in characteristics as arguments and makes a rect with them
@@ -107,6 +107,7 @@ class Button:
         self.press = True
         self.fontsize = fontsize
         self.textcolor = textcolor
+        self.print_text = True
 
         if font == "GD":
             self.font = fonts.GD_FONTS[self.fontsize]
@@ -116,19 +117,19 @@ class Button:
         #if the text argument is filled it will parse the tuple and change the font size to the specified num
         if text != 0:
             self.text = text
-
-    def render_text(self, surface):
-
-        #gets the rectangle that bounds the text
-        text_rect = self.font.get_rect(self.text)
-        #sets the center to the center of the button
-        text_rect.center = (self.x + self.w / 2, self.y + self.h / 2)
-        #prints (renders) the text to the screen
-        self.font.render_to(surface, text_rect, self.text, self.textcolor)
+        else:
+            self.print_text = False
 
     #draws the button
     def draw_button(self, surface):
         pygame.draw.rect(surface, self.color, self.rect, border_radius=10)
+        if self.print_text:
+            # gets the rectangle that bounds the text
+            text_rect = self.font.get_rect(self.text)
+            # sets the center to the center of the button
+            text_rect.center = (self.x + self.w / 2, self.y + self.h / 2)
+            # prints (renders) the text to the screen
+            self.font.render_to(surface, text_rect, self.text, self.textcolor)
 
     #checks if the button is clicked
     def check_button_click(self, click_event):

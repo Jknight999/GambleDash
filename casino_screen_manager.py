@@ -81,22 +81,14 @@ class CasinoScreenManager:
             # increments the card by the width of the card plus the spacer value
             i += card.image.get_width() + spacer
 
-    def check_poker_hands(self, hand_to_check, community):
+    def check_poker_hands(self, card_values, player_cards, community_cards):
         same_suits = 0
         return_value = 0
-        cards_to_check = hand_to_check.copy()
-        for i in community:
-            cards_to_check.append(i)
-        for i in cards_to_check:
-            if i.rank == 'Ace':
-                i.rank = '14'
-            elif i.rank == 'King':
-                i.rank = '13'
-            elif i.rank == 'Queen':
-                i.rank = '12'
-            elif i.rank == 'Jack':
-                i.rank = '11'
-            i.rank = int(i.rank)
+        cards_to_check = player_cards.copy()
+        for card in community_cards:
+            cards_to_check.append(card)
+        for card in cards_to_check:
+            card.rank = card_values[card.rank]
         cards_to_check.sort(key=lambda x: x.rank)
         for i in range(len(cards_to_check) - 1):
             # Flush
@@ -141,9 +133,6 @@ class CasinoScreenManager:
         else:
             return 'high_card'
 
-
-
-
     def play_blackjack(self):
         #initializes new instances of the class BlackjackHand (imported from casino_classes)
         #hand already initialized as an empty list
@@ -182,12 +171,9 @@ class CasinoScreenManager:
             #allowing bet changes until the bet is set
             if not self.is_bet_set:
                 bet_less_button.draw_button(self.surface)
-                bet_less_button.render_text(self.surface)
                 bet_more_button.draw_button(self.surface)
-                bet_more_button.render_text(self.surface)
                 set_bet_button.text = f"Bet {self.bet_amount} chips"
                 set_bet_button.draw_button(self.surface)
-                set_bet_button.render_text(self.surface)
 
             #figure how to get events and pass them in, perhaps
             for event in pygame.event.get():
@@ -243,9 +229,7 @@ class CasinoScreenManager:
                         stand_button.press = False
                         back_button.press = True
                         back_button.draw_button(self.surface)
-                        back_button.render_text(self.surface)
                         play_again_button.draw_button(self.surface)
-                        play_again_button.render_text(self.surface)
                         self.print_player_hand(self.player_hand.cards, 500, 300, 5)
                     # Checks blackjacks
                     elif player_hand_value == 21:
@@ -257,14 +241,11 @@ class CasinoScreenManager:
                         hit_button.press = False
                         stand_button.press = False
                         play_again_button.draw_button(self.surface)
-                        play_again_button.render_text(self.surface)
                         self.print_player_hand(self.player_hand.cards, 500, 300, 5)
                         self.print_dealer_start_hand(self.dealer_hand.cards, 500, 50, 5)
                     else:
                         hit_button.draw_button(self.surface)
-                        hit_button.render_text(self.surface)
                         stand_button.draw_button(self.surface)
-                        stand_button.render_text(self.surface)
 
                         self.print_player_hand(self.player_hand.cards, 500, 300, 5)
                         self.print_dealer_start_hand(self.dealer_hand.cards, 500, 50, 5)
@@ -276,9 +257,7 @@ class CasinoScreenManager:
                     stand_button.press = False
                     back_button.press = True
                     play_again_button.draw_button(self.surface)
-                    play_again_button.render_text(self.surface)
                     back_button.draw_button(self.surface)
-                    back_button.render_text(self.surface)
                     self.print_player_hand(self.player_hand.cards, 500, 300, 5)
                     self.print_player_hand(self.dealer_hand.cards, 500, 50, 5)
                     dealer_hand_value = self.dealer_hand.get_hand_value()
@@ -311,6 +290,10 @@ class CasinoScreenManager:
             pygame.display.flip()
 
     def play_poker(self):
+        bet_amount = 10
+        fold_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), 'Fold', 'CASINO', 40, (0, 0, 0))
+        check_button = Button(self.screen_width * 0.1, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), f'Call ({bet_amount})', 'CASINO', 40, (0, 0, 0))
+
         poker_running = True
         is_done = False
         self.community_cards = CommunityCards(self.deck)
@@ -320,9 +303,12 @@ class CasinoScreenManager:
                 if event.type == pygame.QUIT:
                     poker_running = False
             self.surface.fill((16, 82, 9))
+            fold_button.draw_button(self.surface)
+            check_button.draw_button(self.surface)
+
             self.print_community_cards(self.community_cards.cards, 500, 200, 5, 5)
             self.print_player_hand(self.player_hand.cards, 500, 390, 5)
             if not is_done:
                 is_done = True
-                self.check_poker_hands(self.player_hand.cards, self.community_cards.cards)
+                print(self.check_poker_hands(self.player_hand.card_values, self.player_hand.cards, self.community_cards.cards))
             pygame.display.flip()
