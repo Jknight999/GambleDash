@@ -9,7 +9,6 @@
   - More chips per structure
   - Chip multiplier at end?
   - Double jumps?
-- Add poker (DIFFICULT)
 - Add an online leaderboard (DIFFICULT)
 
 Optional Tasks:
