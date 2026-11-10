@@ -130,21 +130,16 @@ class GameScreenManager:
                     current_player.y_vel = current_player.jump_strength
         elif self.player_state == 'ship':
             if keys[pygame.K_SPACE] or keys[pygame.K_w]:
-                current_player.y_vel -= current_player.gravity * 0.5 * self.dt
+                current_player.y_vel -= 20
             else:
-                current_player.y_vel += current_player.gravity * 0.1 * self.dt
+                current_player.y_vel += 20
 
-            max_speed = self.screen_height * 1.5
+            max_speed = 750
             current_player.y_vel = max(-max_speed, min(current_player.y_vel, max_speed))
 
     def apply_physics(self, current_player):
-        if self.player_state == 'ship':
-            keys = pygame.key.get_pressed()
-            if not (keys[pygame.K_SPACE] or keys[pygame.K_w]):
-                current_player.y_vel += current_player.gravity * self.dt
-        else:
+        if self.player_state == 'cube':
             current_player.y_vel += current_player.gravity * self.dt
-
         current_player.y += current_player.y_vel * self.dt
 
     def check_ground_collisions(self, current_player):
