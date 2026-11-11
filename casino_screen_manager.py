@@ -198,7 +198,7 @@ class CasinoScreenManager:
                 if stand_button.check_button_click(event):
                     player_playing = False
                 if play_again_button.check_button_click(event):
-                    #resets player hand and dealer hand by initializing new instances of the BlackjackHand class (from casino_classes)
+                    #resets player hand and dealer hand by initializing new instances of the  BlackjackHand class (from casino_classes)
                     self.player_hand = BlackjackHand(self.deck)
                     self.dealer_hand = BlackjackHand(self.deck)
                     player_playing = True
