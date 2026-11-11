@@ -154,7 +154,7 @@ current_voice_line = voice_lines[voice_line_num]
 player_state = "cube"
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg, player_state)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
-upgrade_screen = UpgradeScreenManager(screen, game_screen)
+upgrade_screen = UpgradeScreenManager(screen, SCREENWIDTH, SCREENHEIGHT, game_screen)
 
 pygame.display.set_caption("GambleDash")
 running = True
