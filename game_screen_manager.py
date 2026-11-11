@@ -34,6 +34,7 @@ class GameScreenManager:
         self.run_chips = 0
         self.particles_list = []
         self.player_state = player_state
+        self.chip_multiplier = 1
 
     def scroll(self):
         if self.player_alive:
