@@ -8,6 +8,7 @@ from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 from casino_screen_manager import CasinoScreenManager
 from loan_shark_voice_lines import voice_lines
+from upgrade_screen_manager import UpgradeScreenManager
 
 #inits
 pygame.init()
@@ -153,6 +154,7 @@ current_voice_line = voice_lines[voice_line_num]
 player_state = "cube"
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg, player_state)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
+upgrade_screen = UpgradeScreenManager(screen, game_screen)
 
 pygame.display.set_caption("GambleDash")
 running = True
@@ -228,7 +230,7 @@ while running:
             if back_button.check_button_click(event):
                 in_death_screen = False
                 in_menu = True
-                chips += game_screen.run_chips
+                chips += game_screen.run_chips * game_screen.chip_multiplier
             if casino_button.check_button_click(event):
                 in_casino = True
                 in_death_screen = False
