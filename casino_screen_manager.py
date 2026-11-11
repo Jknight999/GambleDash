@@ -198,7 +198,7 @@ class CasinoScreenManager:
                 if stand_button.check_button_click(event):
                     player_playing = False
                 if play_again_button.check_button_click(event):
-                    #resets player hand and dealer hand by initializing new instances of the  BlackjackHand class (from casino_classes)
+                    #resets player hand and dealer hand by initializing new instances of the BlackjackHand class (from casino_classes)
                     self.player_hand = BlackjackHand(self.deck)
                     self.dealer_hand = BlackjackHand(self.deck)
                     player_playing = True
@@ -302,12 +302,36 @@ class CasinoScreenManager:
                             self.bet_amount = self.chips
             pygame.display.flip()
 
+    def cpus_play(self, cpus):
+        pass
+        '''
+        for cpu in cpus:
+            #if they are still playing
+            if cpu[1]:
+        '''
+
+
+    def print_cpu_hands(self):
+        spacer = self.screen_width / 200
+        card_width = self.card_back.get_width()
+        cpu_positions = ((self.screen_width * 0.25, self.screen_height * 0.4), (self.screen_width * 0.5, self.screen_height * 0.15), (self.screen_width * 0.75, self.screen_height * 0.4))
+        for position in cpu_positions:
+            i = position[0] - (card_width + spacer)
+            for _ in range(2):
+                # draws the card
+                self.surface.blit(self.card_back, (i, position[1]))
+                # increments the card by the width of the card plus the spacer value
+                i += card_width + spacer
+
+
     def play_poker(self):
         self.community_cards = CommunityCards(self.deck)
         self.player_hand = PokerHand(self.deck)
-        cpu_1_hand = PokerHand(self.deck)
-        cpu_2_hand = PokerHand(self.deck)
-        cpu_3_hand = PokerHand(self.deck)
+        #the cards in the hand and whether they are still playing (have not folded)
+        cpu_1_hand = [PokerHand(self.deck), True]
+        cpu_2_hand = [PokerHand(self.deck), True]
+        cpu_3_hand = [PokerHand(self.deck), True]
+        cpu_hands = [cpu_1_hand, cpu_2_hand, cpu_3_hand]
         self.bet_amount = 0
         betting_round = 0
         fold_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), 'Fold', 'CASINO', 40, (0, 0, 0))
@@ -319,9 +343,11 @@ class CasinoScreenManager:
         is_done = False
         pot = 10
         current_bet = 0
+        cpu_played = False
 
         while poker_running:
             check_button.text = f'Call ({pot - self.bet_amount})'
+            if not cpu_played: self.cpus_play(cpu_hands)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     poker_running = False
@@ -359,6 +385,7 @@ class CasinoScreenManager:
             else:
                 betting_round = 0
             self.print_player_hand(self.player_hand.cards, self.screen_width / 2, self.screen_height * 0.65, 5)
+            self.print_cpu_hands()
             if not is_done:
                 is_done = True
                 print(self.check_poker_hands(self.player_hand.card_values, self.player_hand.cards, self.community_cards.cards))
