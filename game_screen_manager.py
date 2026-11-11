@@ -111,6 +111,7 @@ class GameScreenManager:
             #checks for jumping every tick and applies gravity
             self.check_jump(current_player)
 
+            self.ship_check_off_screen(current_player)
             #draws the game screen and the objects contained
             self.draw_objects(current_player)
 
@@ -131,21 +132,22 @@ class GameScreenManager:
                     current_player.y_vel = current_player.jump_strength
         elif self.player_state == 'ship':
             if keys[pygame.K_SPACE] or keys[pygame.K_w]:
-                current_player.y_vel -= current_player.gravity * 0.5 * self.dt
+                current_player.y_vel -= 40
             else:
-                current_player.y_vel += current_player.gravity * 0.1 * self.dt
+                current_player.y_vel += 40
 
-            max_speed = self.screen_height * 1.5
+            max_speed = 750
             current_player.y_vel = max(-max_speed, min(current_player.y_vel, max_speed))
 
-    def apply_physics(self, current_player):
+    def ship_check_off_screen(self, current_player):
         if self.player_state == 'ship':
-            keys = pygame.key.get_pressed()
-            if not (keys[pygame.K_SPACE] or keys[pygame.K_w]):
-                current_player.y_vel += current_player.gravity * self.dt
-        else:
-            current_player.y_vel += current_player.gravity * self.dt
+            if current_player.y < 0:
+                current_player.y = 0
+                current_player.y_vel = 0
 
+    def apply_physics(self, current_player):
+        if self.player_state == 'cube':
+            current_player.y_vel += current_player.gravity * self.dt
         current_player.y += current_player.y_vel * self.dt
 
     def check_ground_collisions(self, current_player):
