@@ -8,7 +8,6 @@ from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 from casino_screen_manager import CasinoScreenManager
 from loan_shark_voice_lines import voice_lines
-from upgrade_screen_manager import UpgradeScreenManager
 
 #inits
 pygame.init()
@@ -30,6 +29,7 @@ def draw_menu_screen():
     #draws play and casino buttons
     play_button.draw_button(screen)
     casino_button.draw_button(screen)
+    upgrade_button.draw_button(screen)
 
 def draw_casino_screen():
     #handles screen background and text
@@ -71,6 +71,7 @@ def draw_death_screen(chipnum):
         back_button.draw_button(screen)
         continue_button.draw_button(screen)
         casino_button.draw_button(screen)
+        upgrade_button.draw_button(screen)
 
 def draw_loan_screen():
     #plays music when entering the loan screen
@@ -114,6 +115,10 @@ def handle_loans():
     screen.blit(contract, ((SCREENWIDTH - 700) / 2, 50))
     screen.blit(signature_surface, (0, 0))
 
+def draw_upgrade_screen():
+    screen.fill((0,128,0))
+
+
 #screen setup
 SCREENWIDTH = pygame.display.get_desktop_sizes()[0][0]
 SCREENHEIGHT = SCREENWIDTH * 0.5
@@ -143,6 +148,8 @@ back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCR
 blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Blackjack', 'CASINO', 40, (0, 0, 0))
 poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Poker', 'CASINO', 40, (0, 0, 0))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), 'Continue for 50 Chips?', 'GD', 40, (0, 0, 0))
+shop_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), 'Shop', 'GD', 40, (0,0,0))
+chip_mult_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (100)', 'GD', 40, (0,0,0))
 
 floor_color = [0,42,124]
 chips = 100
@@ -154,7 +161,6 @@ current_voice_line = voice_lines[voice_line_num]
 player_state = "cube"
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg, player_state)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
-upgrade_screen = UpgradeScreenManager(screen, SCREENWIDTH, SCREENHEIGHT, game_screen)
 
 pygame.display.set_caption("GambleDash")
 running = True
@@ -163,6 +169,7 @@ in_game = False
 in_casino = False
 in_death_screen = False
 in_loan_screen = False
+in_shop = False
 
 while running:
     #event handling
@@ -214,6 +221,7 @@ while running:
             if casino_button.check_button_click(event):
                 in_menu = False
                 in_casino = True
+
         if in_casino:
             if blackjack_button.check_button_click(event):
                 chips, running = casino_screen.play_blackjack()
@@ -222,10 +230,12 @@ while running:
             if back_button.check_button_click(event):
                 in_casino = False
                 in_menu = True
+
         if in_game:
             if back_button.check_button_click(event):
                 in_game = False
                 in_menu = True
+
         if in_death_screen:
             if back_button.check_button_click(event):
                 in_death_screen = False
