@@ -3,6 +3,7 @@ import pygame
 import pygame.freetype
 import math
 import fonts
+from time import sleep
 
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
@@ -29,7 +30,7 @@ def draw_menu_screen():
     #draws play and casino buttons
     play_button.draw_button(screen)
     casino_button.draw_button(screen)
-    upgrade_button.draw_button(screen)
+    shop_button.draw_button(screen)
 
 def draw_casino_screen():
     #handles screen background and text
@@ -71,7 +72,7 @@ def draw_death_screen(chipnum):
         back_button.draw_button(screen)
         continue_button.draw_button(screen)
         casino_button.draw_button(screen)
-        upgrade_button.draw_button(screen)
+        shop_button.draw_button(screen)
 
 def draw_loan_screen():
     #plays music when entering the loan screen
@@ -115,8 +116,10 @@ def handle_loans():
     screen.blit(contract, ((SCREENWIDTH - 700) / 2, 50))
     screen.blit(signature_surface, (0, 0))
 
-def draw_upgrade_screen():
+def draw_shop_screen():
     screen.fill((0,128,0))
+    chip_mult_button.draw_button(screen)
+    back_button.draw_button(screen)
 
 
 #screen setup
@@ -221,6 +224,9 @@ while running:
             if casino_button.check_button_click(event):
                 in_menu = False
                 in_casino = True
+            if shop_button.check_button_click(event):
+                in_menu = False
+                in_shop = True
 
         if in_casino:
             if blackjack_button.check_button_click(event):
@@ -258,15 +264,26 @@ while running:
                     in_loan_screen = True
                     voice_line_num = 1
                     current_voice_line = voice_lines[voice_line_num]
+            if shop_button.check_button_click(event):
+                in_death_screen = False
+                in_shop = True
+
+        if in_shop:
+            if back_button.check_button_click(event):
+                in_shop = False
+                in_menu = True
+            if chip_mult_button.check_button_click(event):
+                game_screen.chip_multiplier += 1
 
     if in_game:
         draw_game_screen()
         game_screen.tick(player)
         if not game_screen.player_alive:
+            chips += game_screen.run_chips
             draw_game_screen()
             in_game = False
-            chips += game_screen.run_chips
             in_death_screen = True
+
     elif in_casino:
         draw_casino_screen()
     elif in_menu:
@@ -275,5 +292,7 @@ while running:
         draw_death_screen(chips)
     elif in_loan_screen:
         draw_loan_screen()
+    elif in_shop:
+        draw_shop_screen()
 
     pygame.display.flip()
