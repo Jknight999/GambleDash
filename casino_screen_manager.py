@@ -2,7 +2,7 @@
 import pygame
 import pygame.freetype
 from game_classes import Button
-from casino_classes import Deck, BlackjackHand, PokerHand, CommunityCards
+from casino_classes import Deck, BlackjackHand, PokerHand, CommunityCards, PokerCPU
 
 class CasinoScreenManager:
     def __init__(self, screen_to_draw, chips, s_w, s_h):
@@ -19,6 +19,11 @@ class CasinoScreenManager:
             32: pygame.freetype.Font('Assets/casino.ttf', 32),
             50: pygame.freetype.Font('Assets/casino.ttf', 50),
             100: pygame.freetype.Font('Assets/casino.ttf', 100)
+        }
+
+        self.poker_card_values = {
+            '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
+            'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14
         }
 
         #initializes and shuffles deck
@@ -67,83 +72,6 @@ class CasinoScreenManager:
                 self.surface.blit(self.card_back, (i, y))
             #increments the card by the width of the card plus the spacer value
             i += card.image.get_width() + spacer
-
-    def print_community_cards(self, community_cards_hand, x, y, spacer, cards_to_show):
-        # starts the hand at the fully left position
-        i = x - (len(community_cards_hand) * community_cards_hand[0].image.get_width() / 2) - (spacer * len(community_cards_hand) // 2)
-        for card in community_cards_hand:
-            # if it is not the last card in the hand, draw
-            if community_cards_hand.index(card) <= cards_to_show - 1:
-                self.surface.blit(card.image, (i, y))
-            # otherwise, draw the back of a card (hidden card)
-            else:
-                self.surface.blit(self.card_back, (i, y))
-            # increments the card by the width of the card plus the spacer value
-            i += card.image.get_width() + spacer
-
-    @staticmethod
-    def check_poker_hands(card_values, player_cards, community_cards):
-        same_suits = 0
-        return_value = 0
-        cards_to_check = player_cards.copy()
-
-        #adds the river cards into a cards to check list
-        for card in community_cards:
-            cards_to_check.append(card)
-        for card in cards_to_check:
-            card.rank = card_values[card.rank]
-
-        #sorts the list by rank
-        cards_to_check.sort(key=lambda x: x.rank)
-
-        #for loop to check through all cases
-        for i in range(len(cards_to_check) - 1):
-            #flush
-            for k in cards_to_check:
-                if cards_to_check[i].suit == k.suit:
-                    same_suits += 1
-                    if same_suits == 5:
-                        return_value += 12
-                if cards_to_check.index(k) == 6:
-                    same_suits = 0
-
-            #straight
-            if i <= 2 and cards_to_check[i].rank - 4 == cards_to_check[i - 4].rank:
-                return_value += 10
-
-            #pairs, trips, quads
-            if cards_to_check[i].rank == cards_to_check[i + 1].rank:
-                if i < 5 and cards_to_check[i].rank == cards_to_check[i + 2].rank:
-                    if i < 4 and cards_to_check[i].rank == cards_to_check[i + 3].rank:
-                        return_value = 4
-                        return 'four_of_a_kind'
-                    else:
-                        return_value += 5
-                else:
-                    return_value += 1
-
-        #calculates what to return by giving each outcome a return value
-        if return_value == 22:
-            return 'straight_flush'
-        elif return_value == 12 or return_value == 13:
-            return 'flush'
-        elif return_value == 10 or return_value == 11:
-            return 'straight'
-        elif return_value == 6 or return_value == 7:
-            return 'full_house'
-        elif return_value == 5:
-            return 'three_of_a_kind'
-        elif return_value == 2:
-            return 'two_pair'
-        elif return_value == 1:
-            return 'pair'
-        else:
-            return 'high_card'
-
-    def poker_reset_game(self):
-        self.community_cards = CommunityCards(self.deck)
-        self.player_hand = PokerHand(self.deck)
-        self.bet_amount = 0
 
     def play_blackjack(self):
         #initializes new instances of the class BlackjackHand (imported from casino_classes)
@@ -302,24 +230,101 @@ class CasinoScreenManager:
                             self.bet_amount = self.chips
             pygame.display.flip()
 
+    def print_community_cards(self, community_cards_hand, x, y, spacer, cards_to_show):
+        # starts the hand at the fully left position
+        i = x - (len(community_cards_hand) * community_cards_hand[0].image.get_width() / 2) - (spacer * len(community_cards_hand) // 2)
+        for card in community_cards_hand:
+            # if it is not the last card in the hand, draw
+            if community_cards_hand.index(card) <= cards_to_show - 1:
+                self.surface.blit(card.image, (i, y))
+            # otherwise, draw the back of a card (hidden card)
+            else:
+                self.surface.blit(self.card_back, (i, y))
+            # increments the card by the width of the card plus the spacer value
+            i += card.image.get_width() + spacer
+
+    def check_poker_hands(self, player_cards, community_cards):
+        same_suits = 0
+        return_value = 0
+        cards_to_check = player_cards.copy()
+
+        #adds the river cards into a cards to check list
+        for card in community_cards:
+            cards_to_check.append(card)
+        for card in cards_to_check:
+            if isinstance(card.rank, str): card.rank = self.poker_card_values[card.rank]
+
+        #sorts the list by rank
+        cards_to_check.sort(key=lambda x: x.rank)
+
+        #for loop to check through all cases
+        for i in range(len(cards_to_check) - 1):
+            #flush
+            for k in cards_to_check:
+                if cards_to_check[i].suit == k.suit:
+                    same_suits += 1
+                    if same_suits == 5:
+                        return_value += 12
+                if cards_to_check.index(k) == 6:
+                    same_suits = 0
+
+            #straight
+            if i <= 2 and cards_to_check[i].rank - 4 == cards_to_check[i - 4].rank:
+                return_value += 10
+
+            #pairs, trips, quads
+            if cards_to_check[i].rank == cards_to_check[i + 1].rank:
+                if i < 5 and cards_to_check[i].rank == cards_to_check[i + 2].rank:
+                    if i < 4 and cards_to_check[i].rank == cards_to_check[i + 3].rank:
+                        return_value = 4
+                        return 'four_of_a_kind'
+                    else:
+                        return_value += 5
+                else:
+                    return_value += 1
+
+        #calculates what to return by giving each outcome a return value
+        if return_value == 22:
+            return 'straight_flush'
+        elif return_value == 12 or return_value == 13:
+            return 'flush'
+        elif return_value == 10 or return_value == 11:
+            return 'straight'
+        elif return_value == 6 or return_value == 7:
+            return 'full_house'
+        elif return_value == 5:
+            return 'three_of_a_kind'
+        elif return_value == 2:
+            return 'two_pair'
+        elif return_value == 1:
+            return 'pair'
+        else:
+            return 'high_card'
+
+    def poker_reset_game(self):
+        self.community_cards = CommunityCards(self.deck)
+        self.player_hand = PokerHand(self.deck)
+        self.bet_amount = 0
+
     def cpus_play(self, cpus):
-        pass
-        '''
         for cpu in cpus:
             #if they are still playing
-            if cpu[1]:
-        '''
+            if cpu.playing:
+                print(cpu.hand_value)
+                cpu.playing = False
 
 
-    def print_cpu_hands(self):
+    def print_cpu_hands(self, showdown, cards):
+        if cards == None: cards = (None, None, None)
         spacer = self.screen_width / 200
         card_width = self.card_back.get_width()
-        cpu_positions = ((self.screen_width * 0.25, self.screen_height * 0.4), (self.screen_width * 0.5, self.screen_height * 0.15), (self.screen_width * 0.75, self.screen_height * 0.4))
-        for position in cpu_positions:
-            i = position[0] - (card_width + spacer)
-            for _ in range(2):
+        cpu_hands = ((cards[0], (self.screen_width * 0.25, self.screen_height * 0.4)), (cards[1], (self.screen_width * 0.5, self.screen_height * 0.15)), (cards[2], (self.screen_width * 0.75, self.screen_height * 0.4)))
+        for hand in cpu_hands:
+            i = hand[1][0] - (card_width + spacer)
+            for x in range(2):
                 # draws the card
-                self.surface.blit(self.card_back, (i, position[1]))
+                if showdown: self.surface.blit(hand[0][x].image, (i, hand[1][1]))
+                else: self.surface.blit(self.card_back, (i, hand[1][1]))
                 # increments the card by the width of the card plus the spacer value
                 i += card_width + spacer
 
@@ -328,10 +333,12 @@ class CasinoScreenManager:
         self.community_cards = CommunityCards(self.deck)
         self.player_hand = PokerHand(self.deck)
         #the cards in the hand and whether they are still playing (have not folded)
-        cpu_1_hand = [PokerHand(self.deck), True]
-        cpu_2_hand = [PokerHand(self.deck), True]
-        cpu_3_hand = [PokerHand(self.deck), True]
-        cpu_hands = [cpu_1_hand, cpu_2_hand, cpu_3_hand]
+        print(self.community_cards.cards)
+        cpu_1 = PokerCPU(self.deck, self.community_cards.cards)
+        cpu_2 = PokerCPU(self.deck, self.community_cards.cards)
+        cpu_3 = PokerCPU(self.deck, self.community_cards.cards)
+        cpus = [cpu_1, cpu_2, cpu_3]
+        cpu_hands = [cpu_1.hand, cpu_2.hand, cpu_3.hand]
         self.bet_amount = 0
         betting_round = 0
         fold_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 4, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), 'Fold', 'CASINO', 40, (0, 0, 0))
@@ -347,7 +354,7 @@ class CasinoScreenManager:
 
         while poker_running:
             check_button.text = f'Call ({pot - self.bet_amount})'
-            if not cpu_played: self.cpus_play(cpu_hands)
+            if not cpu_played: self.cpus_play(cpus)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     poker_running = False
@@ -374,20 +381,28 @@ class CasinoScreenManager:
             fold_button.draw_button(self.surface)
             check_button.draw_button(self.surface)
             raise_button.draw_button(self.surface)
-            if betting_round == 0: self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 0)
-            elif betting_round == 1: self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 3)
-            elif betting_round == 2: self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 4)
-            elif betting_round == 3: self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 5)
+            if betting_round == 0:
+                self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 0)
+                self.print_cpu_hands(0, None)
+            elif betting_round == 1:
+                self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 3)
+                self.print_cpu_hands(0, None)
+            elif betting_round == 2:
+                self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 4)
+                self.print_cpu_hands(0, None)
+            elif betting_round == 3:
+                self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 5)
+                self.print_cpu_hands(0, None)
             elif betting_round == 4:
-                self.print_community_cards(self.community_cards.cards, self.screen_width / 2, 200, 5, 5)
+                self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 5)
                 play_again_button.press = True
                 play_again_button.draw_button(self.surface)
+                self.print_cpu_hands(1, cpu_hands)
             else:
                 betting_round = 0
             self.print_player_hand(self.player_hand.cards, self.screen_width / 2, self.screen_height * 0.65, 5)
-            self.print_cpu_hands()
             if not is_done:
                 is_done = True
-                print(self.check_poker_hands(self.player_hand.card_values, self.player_hand.cards, self.community_cards.cards))
+                print(self.check_poker_hands(self.player_hand.cards, self.community_cards.cards))
             pygame.display.flip()
 

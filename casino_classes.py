@@ -88,3 +88,72 @@ class CommunityCards:
         #gives 5 river cards
         for _ in range(5):
             self.cards.append(deck.deal())
+
+class PokerCPU:
+    def __init__(self, deck, central_cards):
+        self.hand = [deck.deal(), deck.deal()]
+        self.playing = True
+        self.bet = 0
+        self.poker_card_values = {
+            '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
+            'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14
+        }
+        self.hand_value = self.calculate_hand_value(self.hand, central_cards)
+
+    def calculate_hand_value(self, player_cards, community_cards,):
+        same_suits = 0
+        return_value = 0
+        cards_to_check = player_cards.copy()
+
+        # adds the river cards into a cards to check list
+        for card in community_cards:
+            cards_to_check.append(card)
+        for card in cards_to_check:
+            if isinstance(card.rank, str): card.rank = self.poker_card_values[card.rank]
+
+        # sorts the list by rank
+        cards_to_check.sort(key=lambda x: x.rank)
+
+        # for loop to check through all cases
+        for i in range(len(cards_to_check) - 1):
+            # flush
+            for k in cards_to_check:
+                if cards_to_check[i].suit == k.suit:
+                    same_suits += 1
+                    if same_suits == 5:
+                        return_value += 12
+                if cards_to_check.index(k) == 6:
+                    same_suits = 0
+
+            # straight
+            if i <= 2 and cards_to_check[i].rank - 4 == cards_to_check[i - 4].rank:
+                return_value += 10
+
+            # pairs, trips, quads
+            if cards_to_check[i].rank == cards_to_check[i + 1].rank:
+                if i < 5 and cards_to_check[i].rank == cards_to_check[i + 2].rank:
+                    if i < 4 and cards_to_check[i].rank == cards_to_check[i + 3].rank:
+                        return_value = 4
+                        return 'four_of_a_kind'
+                    else:
+                        return_value += 5
+                else:
+                    return_value += 1
+
+        # calculates what to return by giving each outcome a return value
+        if return_value == 22:
+            return 'straight_flush'
+        elif return_value == 12 or return_value == 13:
+            return 'flush'
+        elif return_value == 10 or return_value == 11:
+            return 'straight'
+        elif return_value == 6 or return_value == 7:
+            return 'full_house'
+        elif return_value == 5:
+            return 'three_of_a_kind'
+        elif return_value == 2:
+            return 'two_pair'
+        elif return_value == 1:
+            return 'pair'
+        else:
+            return 'high_card'
