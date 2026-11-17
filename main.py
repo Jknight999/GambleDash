@@ -187,6 +187,7 @@ in_loan_screen = False
 in_shop = False
 
 while running:
+    print(voice_line_num)
     #event handling
     for event in pygame.event.get():
         #quit events
@@ -197,11 +198,8 @@ while running:
             #changes the voice lines when the user hits space
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if voice_line_num < 5:
+                    if voice_line_num != 5:
                         voice_line_num += 1
-                    elif voice_line_num >= 8:
-                        in_loan_screen = False
-                        in_menu = True
                     current_voice_line = voice_lines[voice_line_num]
             if voice_line_num == 5:
                 #lets the user draw on the screen
@@ -221,6 +219,11 @@ while running:
 
             if confirm_sign_button.check_button_click(event):
                 voice_line_num += 1
+
+            if voice_line_num == 8:
+                chips += 1000
+                in_menu = True
+                in_loan_screen = False
 
         if in_menu:
             if play_button.check_button_click(event):
