@@ -134,7 +134,10 @@ def draw_shop_screen():
 
 
 #screen setup
-SCREENWIDTH = pygame.display.get_desktop_sizes()[0][0]
+try:
+    SCREENWIDTH = pygame.display.get_desktop_sizes()[0][0]
+except:
+    SCREENWIDTH = 1920
 SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
