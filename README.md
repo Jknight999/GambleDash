@@ -15,3 +15,8 @@ Optional Tasks:
 - Premade levels
 - Ingame level editor
 - microtransactions to steal christopher's money
+
+BUGS:
+- not being able to rebet
+- awful quit event handling
+- 

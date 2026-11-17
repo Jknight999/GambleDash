@@ -115,10 +115,21 @@ def handle_loans():
     contract = pygame.transform.scale(contract, (500, 500))
     screen.blit(contract, ((SCREENWIDTH - 700) / 2, 50))
     screen.blit(signature_surface, (0, 0))
+    confirm_sign_button.draw_button(screen)
 
 def draw_shop_screen():
     screen.fill((0,128,0))
+
+    #takes the players chips and renders it to the screen
+    chip_text = str(chips)
+    text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
+    text_rect.right = SCREENWIDTH - 70
+    fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
+    chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
+    screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
+
     chip_mult_button.draw_button(screen)
+    fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 3, chip_mult_button.y + chip_mult_button.h - 30), f'Currently  {game_screen.chip_multiplier}', (255, 255, 255))
     back_button.draw_button(screen)
 
 
@@ -151,8 +162,9 @@ back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCR
 blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Blackjack', 'CASINO', 40, (0, 0, 0))
 poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Poker', 'CASINO', 40, (0, 0, 0))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), 'Continue for 50 Chips?', 'GD', 40, (0, 0, 0))
-shop_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), 'Shop', 'GD', 40, (0,0,0))
-chip_mult_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (100)', 'GD', 40, (0,0,0))
+shop_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), 'Shop', 'GD', 40, (0,0,0))
+confirm_sign_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4, SCREENHEIGHT / 5, (80, 200, 120), 'Confirm', 'GD', 40, (0, 0, 0))
+chip_mult_button = Button(SCREENWIDTH - SCREENWIDTH / 3 - 10, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
 
 floor_color = [0,42,124]
 chips = 100
@@ -175,6 +187,7 @@ in_loan_screen = False
 in_shop = False
 
 while running:
+    print(voice_line_num)
     #event handling
     for event in pygame.event.get():
         #quit events
@@ -185,11 +198,8 @@ while running:
             #changes the voice lines when the user hits space
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if voice_line_num < 5:
+                    if voice_line_num != 5:
                         voice_line_num += 1
-                    elif voice_line_num >= 8:
-                        in_loan_screen = False
-                        in_menu = True
                     current_voice_line = voice_lines[voice_line_num]
             if voice_line_num == 5:
                 #lets the user draw on the screen
@@ -206,6 +216,14 @@ while running:
                     if event.button == 1:
                         drawing = False
                         last_signature_pos = None
+
+            if confirm_sign_button.check_button_click(event):
+                voice_line_num += 1
+
+            if voice_line_num == 8:
+                chips += 1000
+                in_menu = True
+                in_loan_screen = False
 
         if in_menu:
             if play_button.check_button_click(event):
@@ -272,7 +290,7 @@ while running:
             if back_button.check_button_click(event):
                 in_shop = False
                 in_menu = True
-            if chip_mult_button.check_button_click(event):
+            if chip_mult_button.check_button_click(event) and chips >= 10000:
                 game_screen.chip_multiplier += 1
 
     if in_game:
