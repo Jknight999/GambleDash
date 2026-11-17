@@ -134,7 +134,7 @@ class PokerCPU:
             if cards_to_check[i].rank == cards_to_check[i + 1].rank:
                 if i < 5 and cards_to_check[i].rank == cards_to_check[i + 2].rank:
                     if i < 4 and cards_to_check[i].rank == cards_to_check[i + 3].rank:
-                        return 'four_of_a_kind'
+                        return 'Four of a Kind'
                     else:
                         return_value += 5
                 else:

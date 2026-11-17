@@ -314,20 +314,21 @@ class CasinoScreenManager:
     def poker_reset_game(self):
         self.community_cards = CommunityCards(self.deck)
         self.player_hand = PokerHand(self.deck)
-        self.cpu_1 = PokerCPU(self.deck, self.community_cards.cards, 5)
-        self.cpu_2 = PokerCPU(self.deck, self.community_cards.cards, 0)
-        self.cpu_3 = PokerCPU(self.deck, self.community_cards.cards, 10)
+        self.cpu_1.__init__(self.deck, self.community_cards.cards, 5)
+        self.cpu_2.__init__(self.deck, self.community_cards.cards, 0)
+        self.cpu_3.__init__(self.deck, self.community_cards.cards, 10)
         self.bet_amount = 0
         self.betting_round = 0
 
 
-    def cpu_play(self, cpu, btc):
-        if self.poker_hand_rankings[cpu.hand_value] < self.poker_hand_rankings[self.player_hand_value]:
-            return cpu.bet, False
+    def cpu_play(self, cpu, chb):
+        btc = chb - cpu.bet
+        if self.poker_hand_rankings[cpu.hand_value] < 0:
+            return cpu.bet, False, True
         else:
             cpu.bet += btc
             print('called')
-            return cpu.bet, True
+            return cpu.bet, True, True
 
 
     def print_cpu_hands(self, showdown, cards):
@@ -367,11 +368,12 @@ class CasinoScreenManager:
         original_chips = self.chips
 
         while poker_running:
+            pot = sum(bets)
             current_highest_bet = max(bets)
             bet_to_call = current_highest_bet - self.bet_amount
             check_button.text = f'Call ({bet_to_call})'
             for cpu in cpus:
-                if not cpu.played: cpu.bet, cpu.played = self.cpu_play(cpu, bet_to_call)
+                if cpu.playing and not cpu.played: cpu.bet, cpu.playing, cpu.played = self.cpu_play(cpu, current_highest_bet)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     poker_running = False
@@ -380,15 +382,20 @@ class CasinoScreenManager:
                 if check_button.check_button_click(event):
                     self.bet_amount += bet_to_call
                     self.betting_round += 1
+                    for cpu in cpus:
+                        cpu.played = False
                 if raise_button.check_button_click(event):
                     self.bet_amount += bet_to_call + 10
                     self.betting_round += 1
+                    for cpu in cpus:
+                        cpu.played = False
                 if play_again_button.check_button_click(event):
                     self.poker_reset_game()
                     play_again_button.press = False
             self.surface.fill((16, 82, 9))
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.47, self.screen_height * 0.83), f'Your Bet: {self.bet_amount}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.47, self.screen_height * 0.86), f'Your Chips: {self.chips}', (255, 255, 255))
+            self.fonts[18].render_to(self.surface, (self.screen_width * 0.47, self.screen_height * 0.89), f'Your Hand: {self.player_hand_value}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 3), f'Pot: {pot}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.2, self.screen_height * 0.59),f'Bet: {self.cpu_1.bet}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.45, self.screen_height * 0.32),f'Bet: {self.cpu_2.bet}', (255, 255, 255))
