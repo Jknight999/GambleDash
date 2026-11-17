@@ -90,10 +90,11 @@ class CommunityCards:
             self.cards.append(deck.deal())
 
 class PokerCPU:
-    def __init__(self, deck, central_cards):
+    def __init__(self, deck, central_cards, starting_bet):
         self.hand = [deck.deal(), deck.deal()]
         self.playing = True
-        self.bet = 0
+        self.played = False
+        self.bet = starting_bet
         self.poker_card_values = {
             '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
             'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14
@@ -142,18 +143,18 @@ class PokerCPU:
 
         # calculates what to return by giving each outcome a return value
         if return_value == 22:
-            return 'straight_flush'
+            return 'Straight Flush'
         elif return_value == 12 or return_value == 13:
-            return 'flush'
+            return 'Flush'
         elif return_value == 10 or return_value == 11:
-            return 'straight'
+            return 'Straight'
         elif return_value == 6 or return_value == 7:
-            return 'full_house'
+            return 'Full House'
         elif return_value == 5:
-            return 'three_of_a_kind'
+            return 'Three of a Kind'
         elif return_value == 2:
-            return 'two_pair'
+            return 'Two Pair'
         elif return_value == 1:
-            return 'pair'
+            return 'One Pair'
         else:
-            return 'high_card'
+            return 'High Card'
