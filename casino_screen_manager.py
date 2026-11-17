@@ -329,22 +329,40 @@ class CasinoScreenManager:
 
 
     def cpu_play(self, cpu, chb):
+        #determines the necessary bet to call
         btc = chb - cpu.bet
+        random_num = random.random()
+        print(random_num)
         if self.poker_hand_rankings[cpu.hand_value] < self.poker_hand_rankings[self.player_hand_value]:
-            if random.random() < 0.8:
+            #will fold 80% if the time its down
+            if 0.1 < random_num < 0.8:
+                print('I folded because I am down')
                 return cpu.bet, False, True
+            #will raise 10% of the time its down (bluff)
+            elif random_num <= 0.1:
+                cpu.bet += btc + 10
+                print('I raised even though I am down')
+                return cpu.bet, True, True
+            # otherwise it will call
             else:
                 cpu.bet += btc
-                print('random')
+                print('I called even though I am down')
                 return cpu.bet, True, True
         else:
-            if random.random() < 0.9:
+            #will raise 30% of the time when its winning
+            if random_num <= 0.3:
+                print('I raised since I am winning')
+                cpu.bet += btc + 10
+                return cpu.bet, True, True
+            #will check 65% of the time
+            elif 0.3 < random_num < 0.95:
+                print('I called since I am winning')
                 cpu.bet += btc
                 return cpu.bet, True, True
+            #will fold the rest of the time (to make it a little bit more fair)
             else:
-                print('random')
+                print('I folded even though I am winning')
                 return cpu.bet, False, True
-
 
     def print_cpu_hands(self, showdown, cards):
         if cards == None: cards = (None, None, None)
@@ -389,7 +407,12 @@ class CasinoScreenManager:
             bet_to_call = current_highest_bet - self.bet_amount
             check_button.text = f'Call ({bet_to_call})'
             for cpu in self.cpus:
-                if cpu.playing and not cpu.played: cpu.bet, cpu.playing, cpu.played = self.cpu_play(cpu, current_highest_bet)
+                if cpu.playing and not cpu.played:
+                    cpu.bet, cpu.playing, cpu.played = self.cpu_play(cpu, current_highest_bet)
+                    bets = [self.bet_amount, self.cpu_1.bet, self.cpu_2.bet, self.cpu_3.bet]
+                    pot = sum(bets)
+                    current_highest_bet = max(bets)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     poker_running = False
