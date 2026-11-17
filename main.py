@@ -3,7 +3,6 @@ import pygame
 import pygame.freetype
 import math
 import fonts
-from time import sleep
 
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
