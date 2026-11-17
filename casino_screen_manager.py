@@ -323,11 +323,11 @@ class CasinoScreenManager:
 
     def cpu_play(self, cpu, chb):
         btc = chb - cpu.bet
-        if self.poker_hand_rankings[cpu.hand_value] < 0:
+        if self.poker_hand_rankings[cpu.hand_value] < self.poker_hand_rankings[self.player_hand_value]:
             return cpu.bet, False, True
         else:
             cpu.bet += btc
-            print('called')
+            print(f'called, new bet = {cpu.bet}')
             return cpu.bet, True, True
 
 
@@ -368,6 +368,7 @@ class CasinoScreenManager:
         original_chips = self.chips
 
         while poker_running:
+            bets = [self.bet_amount, self.cpu_1.bet, self.cpu_2.bet, self.cpu_3.bet]
             pot = sum(bets)
             current_highest_bet = max(bets)
             bet_to_call = current_highest_bet - self.bet_amount
@@ -380,10 +381,12 @@ class CasinoScreenManager:
                 if fold_button.check_button_click(event):
                     self.betting_round = 4
                 if check_button.check_button_click(event):
-                    self.bet_amount += bet_to_call
+                    self.bet_amount += bet_to_call + 10
                     self.betting_round += 1
                     for cpu in cpus:
-                        cpu.played = False
+                        if cpu.playing:
+                            cpu.played = False
+                            print('can play again')
                 if raise_button.check_button_click(event):
                     self.bet_amount += bet_to_call + 10
                     self.betting_round += 1
