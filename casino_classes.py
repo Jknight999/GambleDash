@@ -90,7 +90,7 @@ class CommunityCards:
             self.cards.append(deck.deal())
 
 class PokerCPU:
-    def __init__(self, deck, central_cards, starting_bet):
+    def __init__(self, deck, starting_bet):
         self.hand = [deck.deal(), deck.deal()]
         self.playing = True
         self.played = False
@@ -99,61 +99,4 @@ class PokerCPU:
             '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
             'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14
         }
-        self.hand_value = self.calculate_hand_value(self.hand, central_cards)
-
-    def calculate_hand_value(self, cpu_cards, community_cards):
-        same_suits = 0
-        return_value = 0
-        cards_to_check = community_cards.copy()
-
-        # adds the river cards into a cards to check list
-        for card in cpu_cards:
-            cards_to_check.append(card)
-        for card in cards_to_check:
-            if isinstance(card.rank, str): card.rank = self.poker_card_values[card.rank]
-
-        # sorts the list by rank
-        cards_to_check.sort(key=lambda x: x.rank)
-
-        # for loop to check through all cases
-        for i in range(len(cards_to_check) - 1):
-            # flush
-            for k in cards_to_check:
-                if cards_to_check[i].suit == k.suit:
-                    same_suits += 1
-                    if same_suits == 5:
-                        return_value += 12
-                if cards_to_check.index(k) == 6:
-                    same_suits = 0
-
-            # straight
-            if i <= 2 and cards_to_check[i].rank - 4 == cards_to_check[i - 4].rank:
-                return_value += 10
-
-            # pairs, trips, quads
-            if cards_to_check[i].rank == cards_to_check[i + 1].rank:
-                if i < 5 and cards_to_check[i].rank == cards_to_check[i + 2].rank:
-                    if i < 4 and cards_to_check[i].rank == cards_to_check[i + 3].rank:
-                        return 'Four of a Kind'
-                    else:
-                        return_value += 5
-                else:
-                    return_value += 1
-
-        # calculates what to return by giving each outcome a return value
-        if return_value == 22:
-            return 'Straight Flush'
-        elif return_value == 12 or return_value == 13:
-            return 'Flush'
-        elif return_value == 10 or return_value == 11:
-            return 'Straight'
-        elif return_value == 6 or return_value == 7:
-            return 'Full House'
-        elif return_value == 5:
-            return 'Three of a Kind'
-        elif return_value == 2:
-            return 'Two Pair'
-        elif return_value == 1:
-            return 'One Pair'
-        else:
-            return 'High Card'
+        self.hand_value = 0
