@@ -279,7 +279,7 @@ while running:
         draw_game_screen()
         game_screen.tick(player)
         if not game_screen.player_alive:
-            chips += game_screen.run_chips
+            chips += game_screen.run_chips * game_screen.chip_multiplier
             draw_game_screen()
             in_game = False
             in_death_screen = True

@@ -265,10 +265,10 @@ class CasinoScreenManager:
     def check_poker_hands(self, player_cards, community_cards):
         same_suits = 0
         return_value = 0
-        cards_to_check = player_cards.copy()
+        cards_to_check = community_cards.copy()
 
         #adds the river cards into a cards to check list
-        for card in community_cards:
+        for card in player_cards:
             cards_to_check.append(card)
         for card in cards_to_check:
             if isinstance(card.rank, str): card.rank = self.poker_card_values[card.rank]

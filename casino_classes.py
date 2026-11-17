@@ -101,13 +101,13 @@ class PokerCPU:
         }
         self.hand_value = self.calculate_hand_value(self.hand, central_cards)
 
-    def calculate_hand_value(self, player_cards, community_cards,):
+    def calculate_hand_value(self, player_cards, community_cards):
         same_suits = 0
         return_value = 0
-        cards_to_check = player_cards.copy()
+        cards_to_check = community_cards.copy()
 
         # adds the river cards into a cards to check list
-        for card in community_cards:
+        for card in player_cards:
             cards_to_check.append(card)
         for card in cards_to_check:
             if isinstance(card.rank, str): card.rank = self.poker_card_values[card.rank]
@@ -134,7 +134,6 @@ class PokerCPU:
             if cards_to_check[i].rank == cards_to_check[i + 1].rank:
                 if i < 5 and cards_to_check[i].rank == cards_to_check[i + 2].rank:
                     if i < 4 and cards_to_check[i].rank == cards_to_check[i + 3].rank:
-                        return_value = 4
                         return 'four_of_a_kind'
                     else:
                         return_value += 5
