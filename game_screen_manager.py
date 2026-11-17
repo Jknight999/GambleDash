@@ -20,8 +20,13 @@ class GameScreenManager:
         self.scroll_speed = 550 * (self.screen_height / 500)
         self.tick_counter = 0
         self.frame_counter = 0
+        # use pygame-ce for best experience
+        try:
+            self.refresh_rate = pygame.display.get_current_refresh_rate()
+        except AttributeError:
+            self.refresh_rate = 60
+
         #dt is the milliseconds since the last frame, capped at a maximum of the framerate
-        self.refresh_rate = pygame.display.get_current_refresh_rate()
         self.dt = 1 / self.refresh_rate
         self.background = bg
         #all possible structures

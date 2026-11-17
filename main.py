@@ -131,11 +131,10 @@ def draw_shop_screen():
     fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 3, chip_mult_button.y + chip_mult_button.h - 30), f'Currently  {game_screen.chip_multiplier}', (255, 255, 255))
     back_button.draw_button(screen)
 
-
-#screen setup
+#screen setup, use pygame-ce for best experience
 try:
     SCREENWIDTH = (pygame.display.get_desktop_sizes())[0][0]
-except:
+except AttributeError:
     SCREENWIDTH = 1920
 SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
