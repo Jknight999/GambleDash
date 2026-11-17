@@ -3,7 +3,6 @@ import pygame
 import pygame.freetype
 import math
 import fonts
-from time import sleep
 
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
@@ -89,18 +88,18 @@ def draw_loan_screen():
         loan_shark = pygame.image.load("Assets/loanshark.png").convert_alpha()
         loan_shark = pygame.transform.scale(loan_shark, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
         screen.blit(bank, (SCREENWIDTH / 10, SCREENHEIGHT / 5))
-        screen.blit(loan_shark, (SCREENWIDTH - 350, SCREENHEIGHT - 300))
+        screen.blit(loan_shark, (6.5 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 10))
         voice_line_text = current_voice_line
         voice_line_text_rect = fonts.GD_FONTS[18].get_rect(voice_line_text)
-        voice_line_text_rect.x = 300
-        voice_line_text_rect.y = 100
+        voice_line_text_rect.x =  0
+        voice_line_text_rect.y = SCREENHEIGHT / 5
         
         #places the voice lines so that they are written in lines to the screen
         lines = current_voice_line.split("\n")
         y = voice_line_text_rect.y
         for line in lines:
             voice_line_text_rect = fonts.GD_FONTS[32].get_rect(line)
-            voice_line_text_rect.x = 450
+            voice_line_text_rect.x = 9 * SCREENWIDTH / 20
             voice_line_text_rect.y = y
             fonts.GD_FONTS[32].render_to(screen, voice_line_text_rect, line, (255, 255, 255))
             y += 30
@@ -134,10 +133,7 @@ def draw_shop_screen():
 
 
 #screen setup
-try:
-    SCREENWIDTH = pygame.display.get_desktop_sizes()[0][0]
-except:
-    SCREENWIDTH = 1920
+SCREENWIDTH = (pygame.display.get_desktop_sizes())[0][0]
 SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
@@ -170,7 +166,7 @@ confirm_sign_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4
 chip_mult_button = Button(SCREENWIDTH - SCREENWIDTH / 3 - 10, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
 
 floor_color = [0,42,124]
-chips = 100
+chips = 10
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None
@@ -190,7 +186,6 @@ in_loan_screen = False
 in_shop = False
 
 while running:
-    print(voice_line_num)
     #event handling
     for event in pygame.event.get():
         #quit events
