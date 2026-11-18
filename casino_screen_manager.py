@@ -66,9 +66,9 @@ class CasinoScreenManager:
 
         self.player_hand_value = None
 
-        self.cpu_1 = PokerCPU(self.deck, 0)
-        self.cpu_2 = PokerCPU(self.deck, 0)
-        self.cpu_3 = PokerCPU(self.deck, 0)
+        self.cpu_1 = PokerCPU(self.deck, 0, 'CPU1')
+        self.cpu_2 = PokerCPU(self.deck, 0, 'CPU2')
+        self.cpu_3 = PokerCPU(self.deck, 0, 'CPU3')
 
         self.cpus = [self.cpu_1, self.cpu_2, self.cpu_3]
 
@@ -317,9 +317,9 @@ class CasinoScreenManager:
     def poker_reset_game(self):
         self.community_cards = CommunityCards(self.deck)
         self.player_hand = PokerHand(self.deck)
-        self.cpu_1.__init__(self.deck, 5)
-        self.cpu_2.__init__(self.deck, 0)
-        self.cpu_3.__init__(self.deck, 10)
+        self.cpu_1.__init__(self.deck, 5, 'CPU1')
+        self.cpu_2.__init__(self.deck, 0, 'CPU2')
+        self.cpu_3.__init__(self.deck, 10, 'CPU3')
         for cpu in self.cpus:
             cpu.hand_value = self.check_poker_hands(cpu.hand, self.community_cards.cards)
             print('done')
@@ -332,7 +332,6 @@ class CasinoScreenManager:
         #determines the necessary bet to call
         btc = chb - cpu.bet
         random_num = random.random()
-        print(random_num)
         if self.poker_hand_rankings[cpu.hand_value] < self.poker_hand_rankings[self.player_hand_value]:
             #will fold 80% if the time its down
             if 0.1 < random_num < 0.8:
@@ -364,40 +363,64 @@ class CasinoScreenManager:
                 print('I folded even though I am winning')
                 return cpu.bet, False, True
 
+    #the cards argument is all the cards from every cpu hand
     def print_cpu_hands(self, showdown, cards):
+        #won't print cards if there aren't any to print
         if cards == None: cards = (None, None, None)
+        #calculates the space that should be in between each card
         spacer = self.screen_width / 200
         card_width = self.card_back.get_width()
+        #one for each hand, stored as (cards (the index is which cpu it is), (x, y))
         cpu_hands = ((cards[0], (self.screen_width * 0.25, self.screen_height * 0.4)), (cards[1], (self.screen_width * 0.5, self.screen_height * 0.15)), (cards[2], (self.screen_width * 0.75, self.screen_height * 0.4)))
         for hand in cpu_hands:
+            #hand[1][0] is the x pos, as it refers to the first element (x) of the second element (the tuple (x,y) of the element of cpu_hands (the cpu hand it is currently on0
             i = hand[1][0] - (card_width + spacer)
             for x in range(2):
                 # draws the card
+                #cards will always be defined if showdown is true, so you will always be able to index this (don't worry about the error)
                 if showdown: self.surface.blit(hand[0][x].image, (i, hand[1][1]))
+                #else print the backs of the cards
                 else: self.surface.blit(self.card_back, (i, hand[1][1]))
                 # increments the card by the width of the card plus the spacer value
                 i += card_width + spacer
 
+    def poker_check_win(self):
+        winning_hand_value = max(self.poker_hand_rankings[self.player_hand_value], self.poker_hand_rankings[self.cpu_1.hand_value], self.poker_hand_rankings[self.cpu_2.hand_value], self.poker_hand_rankings[self.cpu_3.hand_value])
+        for cpu in self.cpus:
+            if self.poker_hand_rankings[cpu.hand_value] == winning_hand_value and cpu.playing:
+                print(f'{cpu.name} wins')
+        if self.poker_hand_rankings[self.player_hand_value] == winning_hand_value: print('player wins')
+
     def play_poker(self):
+        #initializes the center cards
         self.community_cards = CommunityCards(self.deck)
+        #initializes the player hand
         self.player_hand = PokerHand(self.deck)
+        #immediately checks the value of the player hand
         self.player_hand_value = self.check_poker_hands(self.player_hand.cards, self.community_cards.cards)
-        #the cards in the hand and whether they are still playing (have not folded)
-        self.cpu_1 = PokerCPU(self.deck, 5)
-        self.cpu_2 = PokerCPU(self.deck, 0)
-        self.cpu_3 = PokerCPU(self.deck, 10)
+        #initializes the 3 cpus - cpu_1 is betting the small blind and cpu_3 is betting the big blind always
+        self.cpu_1 = PokerCPU(self.deck, 5, 'CPU1')
+        self.cpu_2 = PokerCPU(self.deck, 0, 'CPU2')
+        self.cpu_3 = PokerCPU(self.deck, 10, 'CPU3')
+        #a list of the cpus (so you can iterate through each
         self.cpus = [self.cpu_1, self.cpu_2, self.cpu_3]
+        #a list of the cpus hands (useful for printing them)
         cpu_hands = [self.cpu_1.hand, self.cpu_2.hand, self.cpu_3.hand]
+        #checks the value of each of the cpus hands
         for cpu in self.cpus:
             cpu.hand_value = self.check_poker_hands(cpu.hand, self.community_cards.cards)
+        #sets your initial bet to 0 and the betting round to the 1st (pre-flop)
         self.bet_amount = 0
         self.betting_round = 0
+        #initializes the buttons
         fold_button = Button(self.screen_width * 0.61, self.screen_height / 2 + self.screen_height / 5, self.screen_width / 8, self.screen_height / 10, (255, 0, 0), 'Fold', 'CASINO', 40, (0, 0, 0))
         check_button = Button(self.screen_width * 0.27, self.screen_height / 2 + self.screen_height / 5, self.screen_width / 8, self.screen_height / 10, (255, 0, 0), f'Call ({self.bet_amount})', 'CASINO', 40, (0, 0, 0))
         raise_button = Button(self.screen_width * 0.27, self.screen_height / 2 + self.screen_height / 3, self.screen_width / 8, self.screen_height / 10, (255, 0, 0), f'Raise 10', 'CASINO', 40, (0, 0, 0))
         play_again_button = Button(self.screen_width * 0.7, self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), 'Play Again', 'CASINO', 40, (0, 0, 0))
         play_again_button.press = False
         poker_running = True
+
+        win_checked = False
 
         while poker_running:
             self.cpus = [self.cpu_1, self.cpu_2, self.cpu_3]
@@ -409,10 +432,6 @@ class CasinoScreenManager:
             for cpu in self.cpus:
                 if cpu.playing and not cpu.played:
                     cpu.bet, cpu.playing, cpu.played = self.cpu_play(cpu, current_highest_bet)
-                    bets = [self.bet_amount, self.cpu_1.bet, self.cpu_2.bet, self.cpu_3.bet]
-                    pot = sum(bets)
-                    current_highest_bet = max(bets)
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     poker_running = False
@@ -431,6 +450,9 @@ class CasinoScreenManager:
                         cpu.played = False
                 if play_again_button.check_button_click(event):
                     self.poker_reset_game()
+                    check_button.press = True
+                    raise_button.press = True
+                    fold_button.press = True
                     play_again_button.press = False
 
             self.surface.fill((16, 82, 9))
@@ -459,6 +481,11 @@ class CasinoScreenManager:
             elif self.betting_round == 4:
                 self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 5)
                 play_again_button.press = True
+                check_button.press = False
+                raise_button.press = False
+                fold_button.press = False
+                if not win_checked:
+                    self.poker_check_win()
                 play_again_button.draw_button(self.surface)
                 self.print_cpu_hands(1, cpu_hands)
             else: self.betting_round = 0

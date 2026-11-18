@@ -90,7 +90,7 @@ class CommunityCards:
             self.cards.append(deck.deal())
 
 class PokerCPU:
-    def __init__(self, deck, starting_bet):
+    def __init__(self, deck, starting_bet, name):
         self.hand = [deck.deal(), deck.deal()]
         self.playing = True
         self.played = False
@@ -100,3 +100,4 @@ class PokerCPU:
             'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14
         }
         self.hand_value = 0
+        self.name = name
