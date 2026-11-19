@@ -500,4 +500,3 @@ class CasinoScreenManager:
             self.fonts[18].render_to(self.surface, (20, 160), f'bet: {self.cpu_3.bet}', (255, 255, 255))
 
             pygame.display.flip()
-
