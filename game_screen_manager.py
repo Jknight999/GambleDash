@@ -20,6 +20,7 @@ class GameScreenManager:
         self.scroll_speed = 550 * (self.screen_height / 500)
         self.tick_counter = 0
         self.frame_counter = 0
+        self.skin_num = 1
         # use pygame-ce for best experience
         try:
             self.refresh_rate = pygame.display.get_current_refresh_rate()
@@ -238,7 +239,7 @@ class GameScreenManager:
 
     #resets the game
     def reset_game(self, current_player):
-        current_player.__init__(self.screen_width, self.screen_height, self.floor_y)
+        current_player.__init__(self.screen_width, self.screen_height, self.floor_y, self.skin_num)
         self.spikes = []
         self.blocks = []
         self.tick_counter = 0

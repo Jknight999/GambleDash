@@ -149,7 +149,7 @@ bg = pygame.image.load("assets/background.png").convert()
 bg = pygame.transform.scale(bg, (SCREENWIDTH, SCREENHEIGHT))
 
 #initializes the player
-player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y)
+player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y, 1)
 
 #I have absolutely no idea why but this is necessary to make the cube start the right way up
 player.angle = 91
@@ -168,7 +168,7 @@ confirm_sign_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4
 chip_mult_button = Button(SCREENWIDTH - SCREENWIDTH / 3 - 10, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
 
 floor_color = [0,42,124]
-chips = 10
+chips = 1000
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None

@@ -6,7 +6,7 @@ import fonts
 
 class Player:
     #basic player characteristics
-    def __init__(self, sw, sh, floor_y):
+    def __init__(self, sw, sh, floor_y, skin):
         self.SCREENWIDTH = sw
         self.SCREENHEIGHT = sh
         self.w = self.SCREENWIDTH / 20
@@ -19,9 +19,10 @@ class Player:
         self.jump_strength = -900 * (self.SCREENHEIGHT / 500)
         self.angle = 0
         self.rotation_speed = -(self.gravity / 15)
+        self.skin_num = skin
 
         #makes a sprite of the cube asset
-        self.image = pygame.image.load("Assets/playerskin01.png").convert_alpha()
+        self.image = pygame.image.load(f"Assets/playerskin0{self.skin_num}.png").convert_alpha()
         #sets the size of the sprite to 40 x 40
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
         self.rotated_surface = self.image
