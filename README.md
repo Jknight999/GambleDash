@@ -3,7 +3,6 @@
 #TASK LIST:
 - Poker (PARKER)
 - Add spaceship + spaceship structures (DANNY)
-- Add upside down?
 - Add skin changing
 
 Optional Tasks:

@@ -20,7 +20,6 @@ class GameScreenManager:
         self.scroll_speed = 550 * (self.screen_height / 500)
         self.tick_counter = 0
         self.frame_counter = 0
-        self.skin_num = 1
         # use pygame-ce for best experience
         try:
             self.refresh_rate = pygame.display.get_current_refresh_rate()
@@ -41,6 +40,7 @@ class GameScreenManager:
         self.particles_list = []
         self.player_state = player_state
         self.chip_multiplier = 1
+        self.skin_num = 1
 
     def scroll(self):
         if self.player_alive:

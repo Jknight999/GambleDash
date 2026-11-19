@@ -3,6 +3,7 @@ import pygame
 import pygame.freetype
 import math
 import fonts
+import random
 
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
@@ -127,8 +128,12 @@ def draw_shop_screen():
     chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
     screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
 
-    chip_mult_button.draw_button(screen)
-    fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 3, chip_mult_button.y + chip_mult_button.h - 30), f'Currently  {game_screen.chip_multiplier}', (255, 255, 255))
+    if loan_out:
+        pay_loan_button.draw_button(screen)
+    else:
+        chip_mult_button.draw_button(screen)
+        skin_change_button.draw_button(screen)
+        fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 3, chip_mult_button.y + chip_mult_button.h - 30), f'Currently  {game_screen.chip_multiplier}', (255, 255, 255))
     back_button.draw_button(screen)
 
 #screen setup, use pygame-ce for best experience
@@ -166,9 +171,14 @@ continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCR
 shop_button = Button(SCREENWIDTH / 5, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), 'Shop', 'GD', 40, (0,0,0))
 confirm_sign_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4, SCREENHEIGHT / 5, (80, 200, 120), 'Confirm', 'GD', 40, (0, 0, 0))
 chip_mult_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
+chip_mult_button.press = False
+skin_change_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 6, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), 'Change Skin (1,000)', 'GD', 40, (255,255,255))
+skin_change_button.press = False
+pay_loan_button = Button(10, SCREENHEIGHT / 2, SCREENWIDTH - 20, SCREENHEIGHT / 2, (255,0,0), 'Pay Back Loan (1,100)', 'GD', 100, (255,255,255))
+pay_loan_button.press = False
 
 floor_color = [0,42,124]
-chips = 100000
+chips = 10
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None
@@ -186,6 +196,7 @@ in_casino = False
 in_death_screen = False
 in_loan_screen = False
 in_shop = False
+loan_out = False
 
 while running:
     #event handling
@@ -224,6 +235,7 @@ while running:
                 chips += 1000
                 in_menu = True
                 in_loan_screen = False
+                loan_out = True
 
         if in_menu:
             if play_button.check_button_click(event):
@@ -242,6 +254,7 @@ while running:
             if casino_button.check_button_click(event):
                 in_menu = False
                 in_casino = True
+                casino_screen.chips = chips
             if shop_button.check_button_click(event):
                 in_menu = False
                 in_shop = True
@@ -287,12 +300,23 @@ while running:
                 in_shop = True
 
         if in_shop:
+            if loan_out:
+                if pay_loan_button.check_button_click(event) and chips >= 1100:
+                    chips -= 1100
+                    loan_out = False
+                    pay_loan_button.press = False
+            else:
+                if chip_mult_button.check_button_click(event) and chips >= 10000:
+                    game_screen.chip_multiplier += 1
+                    chips -= 10000
+                if skin_change_button.check_button_click(event) and chips >= 1000:
+                    game_screen.skin_num = random.randint(1,5)
+                    chips -= 1000
             if back_button.check_button_click(event):
                 in_shop = False
                 in_menu = True
-            if chip_mult_button.check_button_click(event) and chips >= 10000:
-                game_screen.chip_multiplier += 1
-                chips -= 10000
+                skin_change_button.press = False
+                chip_mult_button.press = False
 
     if in_game:
         draw_game_screen()
@@ -312,6 +336,11 @@ while running:
     elif in_loan_screen:
         draw_loan_screen()
     elif in_shop:
+        if loan_out:
+            pay_loan_button.press = True
+        else:
+            chip_mult_button.press = True
+            skin_change_button.press = True
         draw_shop_screen()
 
     pygame.display.flip()
