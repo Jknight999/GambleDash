@@ -133,6 +133,9 @@ def draw_shop_screen():
     else:
         chip_mult_button.draw_button(screen)
         skin_change_button.draw_button(screen)
+        player_skin = pygame.image.load(f"Assets/playerskin0{game_screen.skin_num}.png").convert_alpha()
+        player_skin = pygame.transform.scale(player_skin, (SCREENHEIGHT / 5, SCREENHEIGHT / 5))
+        screen.blit(player_skin, (skin_change_button.x + skin_change_button.w + 20, 3 * SCREENHEIGHT / 6))
         fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 3, chip_mult_button.y + chip_mult_button.h - 30), f'Currently  {game_screen.chip_multiplier}', (255, 255, 255))
     back_button.draw_button(screen)
 
@@ -170,15 +173,15 @@ poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREEN
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), 'Continue for 50 Chips?', 'GD', 40, (0, 0, 0))
 shop_button = Button(SCREENWIDTH / 5, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), 'Shop', 'GD', 40, (0,0,0))
 confirm_sign_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4, SCREENHEIGHT / 5, (80, 200, 120), 'Confirm', 'GD', 40, (0, 0, 0))
-chip_mult_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
+chip_mult_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
 chip_mult_button.press = False
-skin_change_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 6, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), 'Change Skin (1,000)', 'GD', 40, (255,255,255))
+skin_change_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 6, SCREENWIDTH / 3, SCREENHEIGHT / 5, (0,0,255), 'Change Skin (1,000)', 'GD', 40, (255,255,255))
 skin_change_button.press = False
 pay_loan_button = Button(10, SCREENHEIGHT / 2, SCREENWIDTH - 20, SCREENHEIGHT / 2, (255,0,0), 'Pay Back Loan (1,100)', 'GD', 100, (255,255,255))
 pay_loan_button.press = False
 
 floor_color = [0,42,124]
-chips = 10
+chips = 10000
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None
@@ -310,7 +313,11 @@ while running:
                     game_screen.chip_multiplier += 1
                     chips -= 10000
                 if skin_change_button.check_button_click(event) and chips >= 1000:
+                    old_skin_num = game_screen.skin_num
                     game_screen.skin_num = random.randint(1,5)
+                    while game_screen.skin_num == old_skin_num:
+                        old_skin_num = game_screen.skin_num
+                        game_screen.skin_num = random.randint(1,5)
                     chips -= 1000
             if back_button.check_button_click(event):
                 in_shop = False
