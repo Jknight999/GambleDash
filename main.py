@@ -181,7 +181,7 @@ pay_loan_button = Button(10, SCREENHEIGHT / 2, SCREENWIDTH - 20, SCREENHEIGHT / 
 pay_loan_button.press = False
 
 floor_color = [0,42,124]
-chips = 10000
+chips = 100000
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None
@@ -314,10 +314,10 @@ while running:
                     chips -= 10000
                 if skin_change_button.check_button_click(event) and chips >= 1000:
                     old_skin_num = game_screen.skin_num
-                    game_screen.skin_num = random.randint(1,5)
+                    game_screen.skin_num = random.randint(1,10)
                     while game_screen.skin_num == old_skin_num:
                         old_skin_num = game_screen.skin_num
-                        game_screen.skin_num = random.randint(1,5)
+                        game_screen.skin_num = random.randint(1,10)
                     chips -= 1000
             if back_button.check_button_click(event):
                 in_shop = False
