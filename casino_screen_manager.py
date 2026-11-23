@@ -37,7 +37,6 @@ class CasinoScreenManager:
             "Full House": 7,
             "Four of a Kind": 8,
             "Straight Flush": 9,
-            "Royal Flush": 10,
         }
 
         #initializes and shuffles deck
@@ -267,8 +266,10 @@ class CasinoScreenManager:
 
     def check_poker_hands(self, player_cards, community_cards):
         same_suits = 0
-        return_value = 0
+        same_suit_ranks = []
+        return_value = 'High Card'
         cards_to_check = community_cards.copy()
+        card_ranks = []
 
         #adds the river cards into a cards to check list
         for card in player_cards:
@@ -279,40 +280,63 @@ class CasinoScreenManager:
         #sorts the list by rank
         cards_to_check.sort(key=lambda x: x.rank)
 
-        #for loop to check through all cases
-        for i in range(len(cards_to_check) - 1):
+        # Creates a list of only card ranks for faster checking later
+        for i in cards_to_check:
+            card_ranks.append(i.rank)
+
+        #for loop to check through all cards, this is a very inefficient function
+        for i in cards_to_check:
             #flush
             for k in cards_to_check:
-                if cards_to_check[i].suit == k.suit:
+                if i.suit == k.suit:
                     same_suits += 1
+                    same_suit_ranks.append(k.rank)
+                    same_suit_ranks.sort()
                     if same_suits == 5:
-                        return_value += 12
+                        if same_suit_ranks[0] + 4 == same_suit_ranks[4]:
+                             return_value = 'Straight Flush'
+                        else:
+                            if self.poker_hand_rankings[return_value] < self.poker_hand_rankings['Flush']:
+                                return_value = 'Flush'
                 if cards_to_check.index(k) == 6:
                     same_suits = 0
+                    same_suit_ranks = []
 
             #straight
-            if i <= 2 and cards_to_check[i].rank - 4 == cards_to_check[i - 4].rank:
-                return_value += 10
+            if i.rank + 1 in card_ranks and i.rank + 2 in card_ranks and i.rank + 3 in card_ranks and i.rank + 4 in card_ranks:
+                if self.poker_hand_rankings[return_value] < self.poker_hand_rankings['Straight']:
+                    return_value = 'Straight'
 
-            #pairs, trips, quads
-            if cards_to_check[i].rank == cards_to_check[i + 1].rank:
-                if i < 5 and cards_to_check[i].rank == cards_to_check[i + 2].rank:
-                    if i < 4 and cards_to_check[i].rank == cards_to_check[i + 3].rank:
-                        return 'Four of a Kind'
-                    else:
-                        return_value += 5
+            #quads
+            if cards_to_check.index(i) <= 3 and i.rank == cards_to_check[(cards_to_check.index(i) + 3)].rank:
+                if self.poker_hand_rankings[return_value] < self.poker_hand_rankings['Four of a Kind']:
+                    return_value = 'Four of a Kind'
+
+            #trips and full house
+            if cards_to_check.index(i) <= 4 and i.rank == cards_to_check[(cards_to_check.index(i) + 2)].rank:
+                current_rank = i.rank
+                for k in card_ranks:
+                    if card_ranks.index(k) <= 5 and k == card_ranks[(card_ranks.index(k) + 1)] and k != current_rank:
+                        if self.poker_hand_rankings[return_value] < self.poker_hand_rankings['Full House']:
+                            return_value = 'Full House'
+                            break
                 else:
-                    return_value += 1
+                    if self.poker_hand_rankings[return_value] < self.poker_hand_rankings['Three of a Kind']:
+                        return_value = 'Three of a Kind'
 
-        #calculates what to return by giving each outcome a return value
-        if return_value == 22: return 'Straight Flush'
-        elif return_value == 12 or return_value == 13: return 'Flush'
-        elif return_value == 10 or return_value == 11: return 'Straight'
-        elif return_value == 6 or return_value == 7: return 'Full House'
-        elif return_value == 5: return 'Three of a Kind'
-        elif return_value == 2: return 'Two Pair'
-        elif return_value == 1: return 'One Pair'
-        else: return 'High Card'
+            # pair and two pair
+            if cards_to_check.index(i) <= 5 and i.rank == cards_to_check[(cards_to_check.index(i) + 1)].rank:
+                current_rank = i.rank
+                for k in card_ranks:
+                    if card_ranks.index(k) <= 5 and k == card_ranks[(card_ranks.index(k) + 1)] and k != current_rank:
+                        if self.poker_hand_rankings[return_value] < self.poker_hand_rankings['Two Pair']:
+                            return_value = 'Two Pair'
+                            break
+                else:
+                    if self.poker_hand_rankings[return_value] < self.poker_hand_rankings['One Pair']:
+                        return_value = 'One Pair'
+
+        return return_value
 
     def poker_reset_game(self):
         self.community_cards = CommunityCards(self.deck)
