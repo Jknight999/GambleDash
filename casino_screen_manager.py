@@ -269,6 +269,7 @@ class CasinoScreenManager:
         same_suit_ranks = []
         return_value = 'High Card'
         cards_to_check = community_cards.copy()
+        print(cards_to_check)
         card_ranks = []
 
         #adds the river cards into a cards to check list
@@ -276,6 +277,8 @@ class CasinoScreenManager:
             cards_to_check.append(card)
         for card in cards_to_check:
             if isinstance(card.rank, str): card.rank = self.poker_card_values[card.rank]
+
+        print(cards_to_check)
 
         #sorts the list by rank
         cards_to_check.sort(key=lambda x: x.rank)
@@ -346,8 +349,8 @@ class CasinoScreenManager:
         self.cpu_3.__init__(self.deck, 10, 'CPU3')
         for cpu in self.cpus:
             cpu.hand_value = self.check_poker_hands(cpu.hand, self.community_cards.cards)
-            print('done')
         print('\n\n\n\n')
+        self.player_hand_value = self.check_poker_hands(self.player_hand.cards, self.community_cards.cards)
         self.bet_amount = 0
         self.betting_round = 0
 
@@ -448,6 +451,7 @@ class CasinoScreenManager:
 
         while poker_running:
             self.cpus = [self.cpu_1, self.cpu_2, self.cpu_3]
+            cpu_hands = [self.cpu_1.hand, self.cpu_2.hand, self.cpu_3.hand]
             bets = [self.bet_amount, self.cpu_1.bet, self.cpu_2.bet, self.cpu_3.bet]
             pot = sum(bets)
             current_highest_bet = max(bets)
@@ -474,6 +478,7 @@ class CasinoScreenManager:
                         cpu.played = False
                 if play_again_button.check_button_click(event):
                     self.poker_reset_game()
+                    win_checked = False
                     check_button.press = True
                     raise_button.press = True
                     fold_button.press = True
@@ -492,16 +497,16 @@ class CasinoScreenManager:
             raise_button.draw_button(self.surface)
             if self.betting_round == 0:
                 self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 0)
-                self.print_cpu_hands(0, None)
+                self.print_cpu_hands(1, cpu_hands)
             elif self.betting_round == 1:
                 self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 3)
-                self.print_cpu_hands(0, None)
+                self.print_cpu_hands(1, cpu_hands)
             elif self.betting_round == 2:
                 self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 4)
-                self.print_cpu_hands(0, None)
+                self.print_cpu_hands(1, cpu_hands)
             elif self.betting_round == 3:
                 self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 5)
-                self.print_cpu_hands(0, None)
+                self.print_cpu_hands(1, cpu_hands)
             elif self.betting_round == 4:
                 self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 5)
                 play_again_button.press = True
@@ -510,6 +515,7 @@ class CasinoScreenManager:
                 fold_button.press = False
                 if not win_checked:
                     self.poker_check_win()
+                    win_checked = True
                 play_again_button.draw_button(self.surface)
                 self.print_cpu_hands(1, cpu_hands)
             else: self.betting_round = 0

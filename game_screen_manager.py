@@ -246,4 +246,4 @@ class GameScreenManager:
         self.frame_counter = 0
         self.current_structure = random.randint(1, len(structure_dictionary))
         self.player_alive = True
-        self.player_state = "ship"
+        self.player_state = "cube"
