@@ -151,13 +151,13 @@ bg = pygame.transform.scale(bg, (SCREENWIDTH, SCREENHEIGHT))
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y, 1)
 
 #initializes buttons
-play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), 'Dash', 'GD', 100, (255, 255, 255))
-casino_button = Button(SCREENWIDTH * 0.55, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (94, 6, 6), 'Gamble', 'CASINO', 80, (0, 0, 0))
+play_button = Button(SCREENWIDTH * 0.4, SCREENHEIGHT * 0.2, SCREENWIDTH * 0.2, SCREENHEIGHT * 0.4, (19, 232, 63), 'Dash', 'GD', 100, (255, 255, 255))
+casino_button = Button(SCREENWIDTH * 0.7, SCREENHEIGHT * 0.3, SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3, (229, 27, 53), 'Gamble', 'CASINO', 80, (0, 0, 0))
+shop_button = Button(SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3, SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3, (8, 123, 255), 'Shop', 'GD', 40, (0,0,0))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), 'X', "GD", 24, (245, 200, 76))
 blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Blackjack', 'CASINO', 40, (0, 0, 0))
 poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Poker', 'CASINO', 40, (0, 0, 0))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), 'Continue for 50 Chips?', 'GD', 40, (0, 0, 0))
-shop_button = Button(SCREENWIDTH / 5, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), 'Shop', 'GD', 40, (0,0,0))
 confirm_sign_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4, SCREENHEIGHT / 5, (80, 200, 120), 'Confirm', 'GD', 40, (0, 0, 0))
 chip_mult_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
 chip_mult_button.press = False
