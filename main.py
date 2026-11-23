@@ -24,7 +24,6 @@ def draw_menu_screen():
     text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
     text_rect.right = SCREENWIDTH - 70
     fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
-    chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
     screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
 
     #draws play and casino buttons
@@ -65,7 +64,6 @@ def draw_death_screen(chipnum):
         text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
         text_rect.right = SCREENWIDTH - 70
         fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
-        chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
         screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
         
         #draws back, continue, and casino buttons
@@ -84,10 +82,6 @@ def draw_loan_screen():
         #handles background, text, and sprites
         screen.fill((135, 206, 250))
         pygame.draw.rect(screen, (126, 200, 80), (0, 2 * SCREENHEIGHT / 3, SCREENWIDTH, SCREENHEIGHT / 2.9))
-        bank = pygame.image.load("Assets/bank.png").convert_alpha()
-        bank = pygame.transform.scale(bank, (3 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 5))
-        loan_shark = pygame.image.load("Assets/loanshark.png").convert_alpha()
-        loan_shark = pygame.transform.scale(loan_shark, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
         screen.blit(bank, (SCREENWIDTH / 10, SCREENHEIGHT / 5))
         screen.blit(loan_shark, (6.5 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 10))
         voice_line_text = current_voice_line
@@ -111,8 +105,6 @@ def draw_loan_screen():
 def handle_loans():
     #draws background and renders sprites
     screen.fill((135, 206, 250))
-    contract = pygame.image.load("Assets/loancontract.png").convert_alpha()
-    contract = pygame.transform.scale(contract, (500, 500))
     screen.blit(contract, ((SCREENWIDTH - 700) / 2, 50))
     screen.blit(signature_surface, (0, 0))
     confirm_sign_button.draw_button(screen)
@@ -125,7 +117,6 @@ def draw_shop_screen():
     text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
     text_rect.right = SCREENWIDTH - 70
     fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
-    chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
     screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
 
     if loan_out:
@@ -191,6 +182,16 @@ player_state = "cube"
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg, player_state)
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
 
+# Loads and scales all the images that never change
+chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
+contract = pygame.image.load("Assets/loancontract.png").convert_alpha()
+contract = pygame.transform.scale(contract, (500, 500))
+bank = pygame.image.load("Assets/bank.png").convert_alpha()
+bank = pygame.transform.scale(bank, (3 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 5))
+loan_shark = pygame.image.load("Assets/loanshark.png").convert_alpha()
+loan_shark = pygame.transform.scale(loan_shark, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
+
+
 pygame.display.set_caption("GambleDash")
 running = True
 in_menu = True
@@ -239,6 +240,7 @@ while running:
                 in_menu = True
                 in_loan_screen = False
                 loan_out = True
+                pygame.mixer.music.stop()
 
         if in_menu:
             if play_button.check_button_click(event):
