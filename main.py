@@ -175,6 +175,23 @@ def draw_shop_screen():
         fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 3, chip_mult_button.y + chip_mult_button.h - 30), f'Currently  {game_screen.chip_multiplier}', (255, 255, 255))
     back_button.draw_button(screen)
 
+def transition_screens(next_screen_draw_function):
+    transition_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT))
+    transition_surface.fill((0, 0, 0))
+
+    for alpha in range(0, 255, 15):
+        transition_surface.set_alpha(alpha)
+        screen.blit(transition_surface)
+        pygame.display.flip()
+        pygame.time.delay(15)
+
+    for alpha in range(255, -1, -15):
+        next_screen_draw_function()
+        transition_surface.set_alpha(alpha)
+        screen.blit(transition_surface)
+        pygame.display.flip()
+        pygame.time.delay(15)
+
 #screen setup, use pygame-ce for best experience
 try:
     SCREENWIDTH = (pygame.display.get_desktop_sizes())[0][0]
@@ -300,6 +317,7 @@ while running:
         if in_menu:
             if play_button.check_button_click(event):
                 if chips >= 50:
+                    transition_screens(draw_game_screen)
                     in_menu = False
                     in_game = True
                     chips -= 50
@@ -312,10 +330,12 @@ while running:
                     current_voice_line = voice_lines[voice_line_num]
                     draw_loan_screen()
             if casino_button.check_button_click(event):
+                transition_screens(draw_casino_screen)
                 in_menu = False
                 in_casino = True
                 casino_screen.chips = chips
             if shop_button.check_button_click(event):
+                transition_screens(draw_shop_screen)
                 in_menu = False
                 in_shop = True
 
@@ -325,37 +345,44 @@ while running:
             if poker_button.check_button_click(event):
                 casino_screen.play_poker()
             if back_button.check_button_click(event):
+                transition_screens(draw_menu_screen)
                 in_casino = False
                 in_menu = True
 
         if in_game:
             if back_button.check_button_click(event):
+                transition_screens(draw_menu_screen)
                 in_game = False
                 in_menu = True
 
         if in_death_screen:
             if back_button.check_button_click(event):
+                transition_screens(draw_menu_screen)
                 in_death_screen = False
                 in_menu = True
                 chips += game_screen.run_chips * game_screen.chip_multiplier
             if casino_button.check_button_click(event):
+                transition_screens(draw_casino_screen)
                 in_casino = True
                 in_death_screen = False
                 casino_screen.chips = chips
             if continue_button.check_button_click(event):
                 if chips >= 50:
                     chips -= 50
+                    transition_screens(draw_game_screen)
                     in_death_screen = False
                     in_game = True
                     game_screen.run_chips = 0
                     game_screen.reset_game(game_screen.player)
                 else:
+                    transition_screens(draw_loan_screen)
                     in_menu = False
                     in_death_screen = False
                     in_loan_screen = True
                     voice_line_num = 1
                     current_voice_line = voice_lines[voice_line_num]
             if shop_button.check_button_click(event):
+                transition_screens(draw_shop_screen)
                 in_death_screen = False
                 in_shop = True
 
@@ -377,6 +404,7 @@ while running:
                         game_screen.skin_num = random.randint(1,10)
                     chips -= 1000
             if back_button.check_button_click(event):
+                transition_screens(draw_menu_screen)
                 in_shop = False
                 in_menu = True
                 skin_change_button.press = False
