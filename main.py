@@ -29,16 +29,10 @@ def draw_menu_screen():
 
     #draws play and casino buttons
     play_button.draw_button(screen)
-    play_icon = pygame.image.load("Assets/playicon.png").convert_alpha()
-    play_icon = pygame.transform.scale(play_icon, (SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3))
     screen.blit(play_icon, (SCREENWIDTH * 0.4475, SCREENHEIGHT * 0.235))
     casino_button.draw_button(screen)
-    casino_icon = pygame.image.load("Assets/casinoicon.png").convert_alpha()
-    casino_icon = pygame.transform.scale(casino_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
     screen.blit(casino_icon, (SCREENWIDTH * 0.7375, SCREENHEIGHT * 0.3125))
     shop_button.draw_button(screen)
-    shop_icon = pygame.image.load("Assets/shopicon.png").convert_alpha()
-    shop_icon = pygame.transform.scale(shop_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
     screen.blit(shop_icon, (SCREENWIDTH * 0.1725, SCREENHEIGHT * 0.3125))
 
 def draw_casino_screen():
@@ -80,12 +74,8 @@ def draw_death_screen(chipnum):
         back_button.draw_button(screen)
         continue_button.draw_button(screen)
         casino_button.draw_button(screen)
-        casino_icon = pygame.image.load("Assets/casinoicon.png").convert_alpha()
-        casino_icon = pygame.transform.scale(casino_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
         screen.blit(casino_icon, (SCREENWIDTH * 0.7375, SCREENHEIGHT * 0.3125))
         shop_button.draw_button(screen)
-        shop_icon = pygame.image.load("Assets/shopicon.png").convert_alpha()
-        shop_icon = pygame.transform.scale(shop_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
         screen.blit(shop_icon, (SCREENWIDTH * 0.1725, SCREENHEIGHT * 0.3125))
 
 def draw_loan_screen():
@@ -201,6 +191,12 @@ bank = pygame.image.load("Assets/bank.png").convert_alpha()
 bank = pygame.transform.scale(bank, (3 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 5))
 loan_shark = pygame.image.load("Assets/loanshark.png").convert_alpha()
 loan_shark = pygame.transform.scale(loan_shark, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
+play_icon = pygame.image.load("Assets/playicon.png").convert_alpha()
+play_icon = pygame.transform.scale(play_icon, (SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3))
+casino_icon = pygame.image.load("Assets/casinoicon.png").convert_alpha()
+casino_icon = pygame.transform.scale(casino_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
+shop_icon = pygame.image.load("Assets/shopicon.png").convert_alpha()
+shop_icon = pygame.transform.scale(shop_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
 
 
 pygame.display.set_caption("GambleDash")
