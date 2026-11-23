@@ -87,7 +87,7 @@ def draw_casino_screen():
 
 def draw_game_screen():
     screen.blit(bg)
-    
+
     #calculates so that the floor always draws 2/3 of the way down
     pygame.draw.rect(screen, floor_color, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
     
@@ -118,10 +118,6 @@ def draw_death_screen(chipnum):
         screen.blit(shop_icon, (SCREENWIDTH * 0.2225, SCREENHEIGHT * 0.3125))
 
 def draw_loan_screen():
-    #plays music when entering the loan screen
-    if not pygame.mixer.music.get_busy():
-        pygame.mixer.music.load('Assets/completely_innocent_song.mp3')
-        pygame.mixer.music.play(-1)
         
     if voice_line_num != 5:
         #handles background, text, and sprites
@@ -161,7 +157,7 @@ def draw_shop_screen():
     chip_text = str(chips)
     text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
     text_rect.right = SCREENWIDTH - 70
-    fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
+    fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))  
     screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
 
     if loan_out:
@@ -309,7 +305,7 @@ while running:
                 in_menu = True
                 in_loan_screen = False
                 loan_out = True
-                pygame.mixer.music.stop()
+                pygame.mixer.music.fadeout(5000)
                 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
                 drawing = False
                 last_signature_pos = None
@@ -357,6 +353,7 @@ while running:
                 in_menu = True
 
         if in_death_screen:
+            pygame.mixer.music.fadeout(2000)
             if back_button.check_button_click(event):
                 transition_screens(draw_menu_screen)
                 in_death_screen = False
@@ -412,6 +409,10 @@ while running:
                 chip_mult_button.press = False
 
     if in_game:
+        # plays music
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load('Assets/MainTheme.mp3')
+            pygame.mixer.music.play(-1)
         draw_game_screen()
         game_screen.tick(player)
         if not game_screen.player_alive:
@@ -427,6 +428,10 @@ while running:
     elif in_death_screen:
         draw_death_screen(chips)
     elif in_loan_screen:
+        # plays music when entering the loan screen
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load('Assets/completely_innocent_song.mp3')
+            pygame.mixer.music.play(-1)
         draw_loan_screen()
     elif in_shop:
         if loan_out:
