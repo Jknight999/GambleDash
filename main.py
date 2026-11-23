@@ -17,7 +17,6 @@ pygame.init()
 pygame.mixer.init()
 pygame.freetype.init()
 
-#screen drawing functions
 def draw_menu_screen():
     draw_game_screen()
     
