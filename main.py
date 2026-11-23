@@ -9,15 +9,42 @@ from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 from casino_screen_manager import CasinoScreenManager
 from loan_shark_voice_lines import voice_lines
+import structures
 
 #inits
 pygame.init()
 pygame.mixer.init()
 pygame.freetype.init()
 
-#screen drawing functions
+def draw_menu_bg():
+    screen.blit(bg, (0, 0))
+    pygame.draw.rect(screen, floor_color, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
+
+    scan_x = 0
+    scan_y = 0
+    level = structures.home_screen_structures[1]
+    for row in level:
+        for item in row:
+            if item == '0':
+                screen.blit(block, (scan_x, scan_y))
+            if item == 'u':
+                v1 = scan_x + 3, scan_y
+                v2 = scan_x + SCREENWIDTH / 20 - 5, scan_y
+                v3 = (v1[0] + v2[0]) / 2, scan_y + SCREENHEIGHT / 10
+                pygame.draw.polygon(screen, (0, 0, 0), [v1, v2, v3])
+                pygame.draw.polygon(screen, (255, 255, 255), [v1, v2, v3], width=3)
+            if item == '1':
+                v1 = scan_x + 3, scan_y + SCREENHEIGHT / 10
+                v2 = scan_x + SCREENWIDTH / 20 - 5, scan_y + SCREENHEIGHT / 10
+                v3 = (v1[0] + v2[0]) / 2, scan_y
+                pygame.draw.polygon(screen, (0, 0, 0), [v1, v2, v3])
+                pygame.draw.polygon(screen, (255, 255, 255), [v1, v2, v3], width=3)
+            scan_x += SCREENWIDTH / 20
+        scan_y += SCREENHEIGHT / 10
+        scan_x = 0
+
 def draw_menu_screen():
-    draw_game_screen()
+    draw_menu_bg()
     
     #takes the players chips and renders it to the screen
     chip_text = str(chips)
@@ -28,8 +55,11 @@ def draw_menu_screen():
 
     #draws play and casino buttons
     play_button.draw_button(screen)
+    screen.blit(play_icon, (SCREENWIDTH * 0.4475, SCREENHEIGHT * 0.285))
     casino_button.draw_button(screen)
+    screen.blit(casino_icon, (SCREENWIDTH * 0.6875, SCREENHEIGHT * 0.3125))
     shop_button.draw_button(screen)
+    screen.blit(shop_icon, (SCREENWIDTH * 0.2225, SCREENHEIGHT * 0.3125))
 
 def draw_casino_screen():
     #handles screen background and text
@@ -70,7 +100,9 @@ def draw_death_screen(chipnum):
         back_button.draw_button(screen)
         continue_button.draw_button(screen)
         casino_button.draw_button(screen)
+        screen.blit(casino_icon, (SCREENWIDTH * 0.7375, SCREENHEIGHT * 0.3125))
         shop_button.draw_button(screen)
+        screen.blit(shop_icon, (SCREENWIDTH * 0.1725, SCREENHEIGHT * 0.3125))
 
 def draw_loan_screen():
     #plays music when entering the loan screen
@@ -137,7 +169,7 @@ except AttributeError:
     SCREENWIDTH = 1920
 SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
-GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
+GROUND_Y = math.floor(0.9 * SCREENHEIGHT)
 
 #default size
 gd_font_size = 80
@@ -145,19 +177,19 @@ gd_font = pygame.freetype.Font("Assets/pusab.otf", gd_font_size)
 
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync= 1)
 bg = pygame.image.load("Assets/background.png").convert()
-bg = pygame.transform.scale(bg, (SCREENWIDTH, SCREENHEIGHT))
+bg = pygame.transform.scale(bg, (SCREENWIDTH * 1.25, SCREENHEIGHT * 1.25))
 
 #initializes the player
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y, 1)
 
 #initializes buttons
-play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), 'Dash', 'GD', 100, (255, 255, 255))
-casino_button = Button(SCREENWIDTH * 0.55, SCREENHEIGHT / 2 + SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (94, 6, 6), 'Gamble', 'CASINO', 80, (0, 0, 0))
+play_button = Button(SCREENWIDTH * 0.4, SCREENHEIGHT * 0.25, SCREENWIDTH * 0.2, SCREENHEIGHT * 0.4, (19, 232, 63), 'Dash', 'GD', 100, (0, 0, 0))
+casino_button = Button(SCREENWIDTH * 0.65, SCREENHEIGHT * 0.3, SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3, (229, 27, 53), 'Casino', 'GD', 40, (0, 0, 0))
+shop_button = Button(SCREENWIDTH * 0.2, SCREENHEIGHT * 0.3, SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3, (8, 123, 255), 'Shop', 'GD', 40, (0,0,0))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), 'X', "GD", 24, (245, 200, 76))
 blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Blackjack', 'CASINO', 40, (0, 0, 0))
 poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Poker', 'CASINO', 40, (0, 0, 0))
 continue_button = Button(SCREENWIDTH / 4, SCREENHEIGHT / 4, SCREENWIDTH / 2, SCREENHEIGHT / 5, (14, 237, 70), 'Continue for 50 Chips?', 'GD', 40, (0, 0, 0))
-shop_button = Button(SCREENWIDTH / 5, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), 'Shop', 'GD', 40, (0,0,0))
 confirm_sign_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4, SCREENHEIGHT / 5, (80, 200, 120), 'Confirm', 'GD', 40, (0, 0, 0))
 chip_mult_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
 chip_mult_button.press = False
@@ -167,7 +199,7 @@ pay_loan_button = Button(10, SCREENHEIGHT / 2, SCREENWIDTH - 20, SCREENHEIGHT / 
 pay_loan_button.press = False
 
 floor_color = [0,42,124]
-chips = 10
+chips = 1000000
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None
@@ -185,6 +217,17 @@ bank = pygame.image.load("Assets/bank.png").convert_alpha()
 bank = pygame.transform.scale(bank, (3 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 5))
 loan_shark = pygame.image.load("Assets/loanshark.png").convert_alpha()
 loan_shark = pygame.transform.scale(loan_shark, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
+play_icon = pygame.image.load("Assets/playicon.png").convert_alpha()
+play_icon = pygame.transform.scale(play_icon, (SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3))
+casino_icon = pygame.image.load("Assets/casinoicon.png").convert_alpha()
+casino_icon = pygame.transform.scale(casino_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
+shop_icon = pygame.image.load("Assets/shopicon.png").convert_alpha()
+shop_icon = pygame.transform.scale(shop_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
+block = pygame.image.load("Assets/gambledashblock.png").convert_alpha()
+block = pygame.transform.scale(block, (SCREENWIDTH / 20, SCREENHEIGHT / 10))
+spike = pygame.image.load("Assets/spike.png").convert_alpha()
+spike = pygame.transform.scale(spike, (100, 100))
+spike = pygame.transform.scale(spike, (SCREENWIDTH / 20, SCREENHEIGHT / 10))
 
 
 pygame.display.set_caption("GambleDash")

@@ -111,6 +111,11 @@ class Button:
         self.textcolor = textcolor
         self.print_text = True
 
+        #makes a surface the size of the button
+        self.shadow_surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
+        #draws the shadow to the shadow surface
+        pygame.draw.rect(self.shadow_surface, (0, 0, 0, 150), self.shadow_surface.get_rect(), border_radius=20)
+
         if font == "GD":
             self.font = fonts.GD_FONTS[self.fontsize]
         elif font == "CASINO":
@@ -124,12 +129,24 @@ class Button:
 
     #draws the button
     def draw_button(self, surface):
-        pygame.draw.rect(surface, self.color, self.rect, border_radius=10)
+        #draws the shadow surface first
+        surface.blit(self.shadow_surface, (self.rect.x, self.rect.y + 5))
+        #draws button
+        pygame.draw.rect(surface, self.color, self.rect, border_radius=20)
+        #draws black outline
+        pygame.draw.rect(surface, (0, 0, 0), self.rect, width=5, border_radius=20)
+        #makes a new rect that is smaller than the original button
+        inner_rect = self.rect.inflate(-7, -7)
+        #white line inside the black outline
+        pygame.draw.rect(surface, (255, 255, 255), inner_rect, width=2, border_radius=18)
+
         if self.print_text:
             # gets the rectangle that bounds the text
             text_rect = self.font.get_rect(self.text)
             # sets the center to the center of the button
             text_rect.center = (self.x + self.w / 2, self.y + self.h / 2)
+            if self.text == "Dash" or self.text == "Shop" or self.text == "Casino":
+                text_rect.center = (self.x + self.w / 2, self.y + self.h * 0.8)
             # prints (renders) the text to the screen
             self.font.render_to(surface, text_rect, self.text, self.textcolor)
 
