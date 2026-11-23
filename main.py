@@ -81,7 +81,13 @@ def draw_death_screen(chipnum):
         back_button.draw_button(screen)
         continue_button.draw_button(screen)
         casino_button.draw_button(screen)
+        casino_icon = pygame.image.load("Assets/casinoicon.png").convert_alpha()
+        casino_icon = pygame.transform.scale(casino_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
+        screen.blit(casino_icon, (SCREENWIDTH * 0.7375, SCREENHEIGHT * 0.3125))
         shop_button.draw_button(screen)
+        shop_icon = pygame.image.load("Assets/shopicon.png").convert_alpha()
+        shop_icon = pygame.transform.scale(shop_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
+        screen.blit(shop_icon, (SCREENWIDTH * 0.1725, SCREENHEIGHT * 0.3125))
 
 def draw_loan_screen():
     #plays music when entering the loan screen
@@ -156,7 +162,7 @@ gd_font = pygame.freetype.Font("Assets/pusab.otf", gd_font_size)
 
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync= 1)
 bg = pygame.image.load("Assets/background.png").convert()
-bg = pygame.transform.scale(bg, (SCREENWIDTH, SCREENHEIGHT))
+bg = pygame.transform.scale(bg, (SCREENWIDTH * 1.15, SCREENHEIGHT * 1.15))
 
 #initializes the player
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y, 1)
@@ -178,7 +184,7 @@ pay_loan_button = Button(10, SCREENHEIGHT / 2, SCREENWIDTH - 20, SCREENHEIGHT / 
 pay_loan_button.press = False
 
 floor_color = [0,42,124]
-chips = 10
+chips = 1000000
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None
