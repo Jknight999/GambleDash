@@ -9,14 +9,42 @@ from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
 from casino_screen_manager import CasinoScreenManager
 from loan_shark_voice_lines import voice_lines
+import structures
 
 #inits
 pygame.init()
 pygame.mixer.init()
 pygame.freetype.init()
 
+def draw_menu_bg():
+    screen.blit(bg, (0, 0))
+    pygame.draw.rect(screen, floor_color, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
+
+    scan_x = 0
+    scan_y = 0
+    level = structures.home_screen_structures[1]
+    for row in level:
+        for item in row:
+            if item == '0':
+                screen.blit(block, (scan_x, scan_y))
+            if item == 'u':
+                v1 = scan_x + 3, scan_y
+                v2 = scan_x + SCREENWIDTH / 20 - 5, scan_y
+                v3 = (v1[0] + v2[0]) / 2, scan_y + SCREENHEIGHT / 10
+                pygame.draw.polygon(screen, (0, 0, 0), [v1, v2, v3])
+                pygame.draw.polygon(screen, (255, 255, 255), [v1, v2, v3], width=3)
+            if item == '1':
+                v1 = scan_x + 3, scan_y + SCREENHEIGHT / 10
+                v2 = scan_x + SCREENWIDTH / 20 - 5, scan_y + SCREENHEIGHT / 10
+                v3 = (v1[0] + v2[0]) / 2, scan_y
+                pygame.draw.polygon(screen, (0, 0, 0), [v1, v2, v3])
+                pygame.draw.polygon(screen, (255, 255, 255), [v1, v2, v3], width=3)
+            scan_x += SCREENWIDTH / 20
+        scan_y += SCREENHEIGHT / 10
+        scan_x = 0
+
 def draw_menu_screen():
-    draw_game_screen()
+    draw_menu_bg()
     
     #takes the players chips and renders it to the screen
     chip_text = str(chips)
@@ -141,7 +169,7 @@ except AttributeError:
     SCREENWIDTH = 1920
 SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
-GROUND_Y = math.floor(0.8 * SCREENHEIGHT)
+GROUND_Y = math.floor(0.9 * SCREENHEIGHT)
 
 #default size
 gd_font_size = 80
@@ -149,7 +177,7 @@ gd_font = pygame.freetype.Font("Assets/pusab.otf", gd_font_size)
 
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync= 1)
 bg = pygame.image.load("Assets/background.png").convert()
-bg = pygame.transform.scale(bg, (SCREENWIDTH * 1.15, SCREENHEIGHT * 1.15))
+bg = pygame.transform.scale(bg, (SCREENWIDTH * 1.25, SCREENHEIGHT * 1.25))
 
 #initializes the player
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y, 1)
@@ -195,6 +223,11 @@ casino_icon = pygame.image.load("Assets/casinoicon.png").convert_alpha()
 casino_icon = pygame.transform.scale(casino_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
 shop_icon = pygame.image.load("Assets/shopicon.png").convert_alpha()
 shop_icon = pygame.transform.scale(shop_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
+block = pygame.image.load("Assets/gambledashblock.png").convert_alpha()
+block = pygame.transform.scale(block, (SCREENWIDTH / 20, SCREENHEIGHT / 10))
+spike = pygame.image.load("Assets/spike.png").convert_alpha()
+spike = pygame.transform.scale(spike, (100, 100))
+spike = pygame.transform.scale(spike, (SCREENWIDTH / 20, SCREENHEIGHT / 10))
 
 
 pygame.display.set_caption("GambleDash")

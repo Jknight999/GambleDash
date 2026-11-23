@@ -61,7 +61,6 @@ class GameScreenManager:
         self.blocks = [block for block in self.blocks if block.x + block.width >= 0]
 
     def print_level(self, level, tick):
-        if self.player_alive:
             #goes through each item in the structures list
             for row_number in range(len(level)):
                 #if it is a 1 then makes a spike
