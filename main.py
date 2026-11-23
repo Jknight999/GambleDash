@@ -144,16 +144,11 @@ gd_font_size = 80
 gd_font = pygame.freetype.Font("Assets/pusab.otf", gd_font_size)
 
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), vsync= 1)
-bg = pygame.image.load("assets/background.png").convert()
+bg = pygame.image.load("Assets/background.png").convert()
 bg = pygame.transform.scale(bg, (SCREENWIDTH, SCREENHEIGHT))
 
 #initializes the player
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y, 1)
-
-#I have absolutely no idea why but this is necessary to make the cube start the right way up
-player.angle = 91
-player.rotated_surface = pygame.transform.rotate(player.image, player.angle)
-player.rect = player.rotated_surface.get_rect(center=(player.x + player.w // 2, player.y + player.h // 2))
 
 #initializes buttons
 play_button = Button(SCREENWIDTH / 5, SCREENHEIGHT / 6, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.4, (14, 237, 70), 'Dash', 'GD', 100, (255, 255, 255))
@@ -241,6 +236,7 @@ while running:
                 in_loan_screen = False
                 loan_out = True
                 pygame.mixer.music.stop()
+                pygame.screen.clear(signature_surface)
 
         if in_menu:
             if play_button.check_button_click(event):
