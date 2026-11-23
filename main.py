@@ -55,11 +55,11 @@ def draw_menu_screen():
 
     #draws play and casino buttons
     play_button.draw_button(screen)
-    screen.blit(play_icon, (SCREENWIDTH * 0.4475, SCREENHEIGHT * 0.235))
+    screen.blit(play_icon, (SCREENWIDTH * 0.4475, SCREENHEIGHT * 0.285))
     casino_button.draw_button(screen)
-    screen.blit(casino_icon, (SCREENWIDTH * 0.7375, SCREENHEIGHT * 0.3125))
+    screen.blit(casino_icon, (SCREENWIDTH * 0.6875, SCREENHEIGHT * 0.3125))
     shop_button.draw_button(screen)
-    screen.blit(shop_icon, (SCREENWIDTH * 0.1725, SCREENHEIGHT * 0.3125))
+    screen.blit(shop_icon, (SCREENWIDTH * 0.2225, SCREENHEIGHT * 0.3125))
 
 def draw_casino_screen():
     #handles screen background and text
@@ -183,9 +183,9 @@ bg = pygame.transform.scale(bg, (SCREENWIDTH * 1.25, SCREENHEIGHT * 1.25))
 player = Player(SCREENWIDTH, SCREENHEIGHT, GROUND_Y, 1)
 
 #initializes buttons
-play_button = Button(SCREENWIDTH * 0.4, SCREENHEIGHT * 0.2, SCREENWIDTH * 0.2, SCREENHEIGHT * 0.4, (19, 232, 63), 'Dash', 'GD', 100, (0, 0, 0))
-casino_button = Button(SCREENWIDTH * 0.7, SCREENHEIGHT * 0.3, SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3, (229, 27, 53), 'Casino', 'GD', 40, (0, 0, 0))
-shop_button = Button(SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3, SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3, (8, 123, 255), 'Shop', 'GD', 40, (0,0,0))
+play_button = Button(SCREENWIDTH * 0.4, SCREENHEIGHT * 0.25, SCREENWIDTH * 0.2, SCREENHEIGHT * 0.4, (19, 232, 63), 'Dash', 'GD', 100, (0, 0, 0))
+casino_button = Button(SCREENWIDTH * 0.65, SCREENHEIGHT * 0.3, SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3, (229, 27, 53), 'Casino', 'GD', 40, (0, 0, 0))
+shop_button = Button(SCREENWIDTH * 0.2, SCREENHEIGHT * 0.3, SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3, (8, 123, 255), 'Shop', 'GD', 40, (0,0,0))
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), 'X', "GD", 24, (245, 200, 76))
 blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Blackjack', 'CASINO', 40, (0, 0, 0))
 poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Poker', 'CASINO', 40, (0, 0, 0))
