@@ -145,6 +145,8 @@ class Button:
             text_rect = self.font.get_rect(self.text)
             # sets the center to the center of the button
             text_rect.center = (self.x + self.w / 2, self.y + self.h / 2)
+            if self.text == "Dash" or self.text == "Shop" or self.text == "Casino":
+                text_rect.center = (self.x + self.w / 2, self.y + self.h * 0.8)
             # prints (renders) the text to the screen
             self.font.render_to(surface, text_rect, self.text, self.textcolor)
 
