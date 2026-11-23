@@ -229,7 +229,7 @@ pay_loan_button = Button(10, SCREENHEIGHT / 2, SCREENWIDTH - 20, SCREENHEIGHT / 
 pay_loan_button.press = False
 
 floor_color = [0,42,124]
-chips = 1000000
+chips = 10
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None
@@ -325,6 +325,7 @@ while running:
                     game_screen.reset_game(game_screen.player)
                 else:
                     voice_line_num = 1
+                    transition_screens(draw_loan_screen)
                     in_loan_screen = True
                     in_menu = False
                     current_voice_line = voice_lines[voice_line_num]
