@@ -1,6 +1,4 @@
 #imports
-from turtledemo.nim import SCREENWIDTH
-
 import pygame
 import pygame.freetype
 import math
