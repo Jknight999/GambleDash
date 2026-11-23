@@ -45,13 +45,26 @@ def draw_menu_bg():
 
 def draw_menu_screen():
     draw_menu_bg()
-    
+
     #takes the players chips and renders it to the screen
     chip_text = str(chips)
     text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
-    text_rect.right = SCREENWIDTH - 70
+    text_rect.right = SCREENWIDTH * 0.95 - 40
+    text_rect.bottom = 85
+
+    #makes a rectangle and places it based off of the text rect
+    border_rect = pygame.Rect(100, 100, 100, 100)
+    border_rect.width = text_rect.width + 60
+    border_rect.right = SCREENWIDTH * 0.95
+    border_rect.height = 30 + text_rect.height
+    border_rect.bottom = text_rect.bottom + 15
+
+    #draws it and adds a border
+    pygame.draw.rect(screen, (0, 0, 0), border_rect, border_radius=20)
+    pygame.draw.rect(screen, (255, 255, 255), border_rect, width=2, border_radius=20)
+
     fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
-    screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
+    screen.blit(chips_icon, (SCREENWIDTH * 0.95 - 30, 30))
 
     #draws play and casino buttons
     play_button.draw_button(screen)
@@ -100,9 +113,9 @@ def draw_death_screen(chipnum):
         back_button.draw_button(screen)
         continue_button.draw_button(screen)
         casino_button.draw_button(screen)
-        screen.blit(casino_icon, (SCREENWIDTH * 0.7375, SCREENHEIGHT * 0.3125))
+        screen.blit(casino_icon, (SCREENWIDTH * 0.6875, SCREENHEIGHT * 0.3125))
         shop_button.draw_button(screen)
-        screen.blit(shop_icon, (SCREENWIDTH * 0.1725, SCREENHEIGHT * 0.3125))
+        screen.blit(shop_icon, (SCREENWIDTH * 0.2225, SCREENHEIGHT * 0.3125))
 
 def draw_loan_screen():
     #plays music when entering the loan screen
@@ -211,6 +224,7 @@ casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
 
 # Loads and scales all the images that never change
 chips_icon = pygame.image.load("Assets/chipsicon.png").convert_alpha()
+chips_icon = pygame.transform.scale(chips_icon, (SCREENWIDTH / 20, SCREENHEIGHT / 10))
 contract = pygame.image.load("Assets/loancontract.png").convert_alpha()
 contract = pygame.transform.scale(contract, (500, 500))
 bank = pygame.image.load("Assets/bank.png").convert_alpha()
