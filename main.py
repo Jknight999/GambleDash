@@ -148,7 +148,7 @@ except AttributeError:
     SCREENWIDTH = 1920
 SCREENHEIGHT = SCREENWIDTH * 0.5
 #where the top of the floor is (for collision physics principles)
-GROUND_Y = math.floor(0.7 * SCREENHEIGHT)
+GROUND_Y = math.floor(0.8 * SCREENHEIGHT)
 
 #default size
 gd_font_size = 80
