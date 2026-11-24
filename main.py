@@ -353,7 +353,7 @@ while running:
                 in_menu = True
 
         if in_death_screen:
-            pygame.mixer.music.fadeout(2000)
+            pygame.mixer.music.stop()
             if back_button.check_button_click(event):
                 transition_screens(draw_menu_screen)
                 in_death_screen = False

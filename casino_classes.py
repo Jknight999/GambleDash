@@ -101,3 +101,16 @@ class PokerCPU:
         }
         self.hand_value = 0
         self.name = name
+
+class PokerPlayer:
+    def __init__(self, deck, starting_bet, name):
+        self.hand = [deck.deal(), deck.deal()]
+        self.playing = True
+        self.played = False
+        self.bet = starting_bet
+        self.poker_card_values = {
+            '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
+            'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14
+        }
+        self.hand_value = 0
+        self.name = name
