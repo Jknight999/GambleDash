@@ -103,7 +103,7 @@ class CasinoScreenManager:
         #initializes all the buttons
         hit_button = Button(self.screen_width * 0.8, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), 'Hit', 'CASINO', 40, (0, 0, 0))
         stand_button = Button(self.screen_width * 0.1, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255,0,0), 'Stand', 'CASINO', 40, (0,0,0))
-        play_again_button = Button(self.screen_width * 0.7, self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), 'Play Again', 'CASINO', 40, (0, 0, 0))
+        play_again_button = Button(self.screen_width * 0.8, self.screen_height * 0.66, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), 'Play Again?', 'CASINO', 40, (0, 0, 0))
         bet_less_button = Button(self.screen_width * 0.2, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), '-10 chips', 'CASINO', 40, (0, 0, 0))
         set_bet_button = Button(self.screen_width * 0.4, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), f"Bet {self.bet_amount} chips", 'CASINO', 40, (0, 0, 0))
         bet_more_button = Button(self.screen_width * 0.6, self.screen_height / 2 + self.screen_height / 6, self.screen_width / 8, self.screen_height / 5, (255, 0, 0), '+10 chips', 'CASINO', 40, (0, 0, 0))
@@ -118,16 +118,20 @@ class CasinoScreenManager:
         blackjack_in_game = False
         #if the program is running (modifying bet, playing, or final result
         blackjack_running = True
+        win_state = ''
         #game loop
 
         while blackjack_running:
             #fills the background
             self.surface.fill((16, 82, 9))
             #evaluates whether in_game for button presses (hit/stand is available if in_game, otherwise play_again is viable)
+            self.fonts[100].render_to(self.surface, (self.screen_width / 3, self.screen_height / 2.7), f'{win_state}',(255, 255, 255))
             if blackjack_in_game:
                 hit_button.press = True
                 stand_button.press = True
             else:
+                hit_button.press = False
+                stand_button.press = False
                 play_again_button.press = True
 
             #allowing bet changes until the bet is set
@@ -146,6 +150,7 @@ class CasinoScreenManager:
                     self.player_hand.deal_card(self.deck)
                 if stand_button.check_button_click(event):
                     player_playing = False
+                    blackjack_in_game = False
                 if play_again_button.check_button_click(event):
                     #resets player hand and dealer hand by initializing new instances of the BlackjackHand class (from casino_classes)
                     self.player_hand = BlackjackHand(self.deck)
@@ -155,6 +160,7 @@ class CasinoScreenManager:
                     blackjack_in_game = True
                     self.is_bet_set = False
                     self.chips_added = False
+                    win_state = ''
                 if back_button.check_button_click(event):
                     return self.chips, True
 
@@ -183,25 +189,23 @@ class CasinoScreenManager:
 
                     #checks busting
                     if self.player_hand.get_hand_value() > 21:
-                        self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), f'You Busted',(255, 255, 255))
+                        win_state = 'You busted'
                         if self.bet_amount > self.chips:
                             self.bet_amount = self.chips
                         play_again_button.press = True
-                        hit_button.press = False
-                        stand_button.press = False
+                        blackjack_in_game = False
                         back_button.press = True
                         back_button.draw_button(self.surface)
                         play_again_button.draw_button(self.surface)
                         self.print_player_hand(self.player_hand.cards, self.screen_width / 2, self.screen_height / 2, 5)
                     #checks blackjacks
                     elif player_hand_value == 21:
-                        self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), f'Blackjack!', (255, 255, 255))
+                        win_state = 'Blackjack!'
                         if not self.chips_added:
                             self.chips += self.bet_amount * 2
                             self.chips_added = True
                         play_again_button.press = True
-                        hit_button.press = False
-                        stand_button.press = False
+                        blackjack_in_game = False
                         play_again_button.draw_button(self.surface)
                         self.print_player_hand(self.player_hand.cards, self.screen_width / 2, self.screen_height / 2, 5)
                         self.print_dealer_start_hand(self.dealer_hand.cards, self.screen_width / 2, self.screen_height / 10, 5)
@@ -232,21 +236,21 @@ class CasinoScreenManager:
 
                     #if the player wins then add double the bet amount
                     if player_hand_value > dealer_hand_value or dealer_hand_value > 21:
-                        self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'You Win!', (255, 255, 255))
+                        win_state = 'You Win!'
                         if not self.chips_added:
                             self.chips += self.bet_amount * 2
                             self.chips_added = True
 
                     #if tie then say push and refund the player
                     elif player_hand_value == dealer_hand_value:
-                        self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'Push!', (255, 255, 255))
+                        win_state = 'Push'
                         if not self.chips_added:
                             self.chips += self.bet_amount
                             self.chips_added = True
 
                     #if lose then you get nothing
                     else:
-                        self.fonts[100].render_to(self.surface, (self.screen_width / 4, self.screen_height / 2.3), 'You Lose!', (255, 255, 255))
+                        win_state = 'You lose'
                         if self.bet_amount > self.chips:
                             self.bet_amount = self.chips
             pygame.display.flip()
@@ -412,11 +416,23 @@ class CasinoScreenManager:
                 i += card_width + spacer
 
     def poker_check_win(self):
+        winners = []
         winning_hand_value = max(self.poker_hand_rankings[self.player_hand_value], self.poker_hand_rankings[self.cpu_1.hand_value], self.poker_hand_rankings[self.cpu_2.hand_value], self.poker_hand_rankings[self.cpu_3.hand_value])
         for cpu in self.cpus:
             if self.poker_hand_rankings[cpu.hand_value] == winning_hand_value and cpu.playing:
                 print(f'{cpu.name} wins')
-        if self.poker_hand_rankings[self.player_hand_value] == winning_hand_value: print('player wins')
+                winners.append(cpu.name)
+        if self.poker_hand_rankings[self.player_hand_value] == winning_hand_value:
+            print('player wins')
+            winners.append('player')
+        return winners
+
+    def print_winners(self, winners):
+        for index, winner in enumerate(winners):
+            self.fonts[100].render_to(self.surface, (self.screen_width / 3 + index * self.screen_width / 10, self.screen_height / 2.7), f'{winner}',(255, 255, 255))
+
+
+
 
     def play_poker(self):
         #initializes the center cards
@@ -427,8 +443,8 @@ class CasinoScreenManager:
         self.player_hand_value = self.check_poker_hands(self.player_hand.cards, self.community_cards.cards)
         #initializes the 3 cpus - cpu_1 is betting the small blind and cpu_3 is betting the big blind always
         self.cpu_1 = PokerCPU(self.deck, 5, 'CPU1')
-        self.cpu_2 = PokerCPU(self.deck, 0, 'CPU2')
-        self.cpu_3 = PokerCPU(self.deck, 10, 'CPU3')
+        self.cpu_2 = PokerCPU(self.deck, 10, 'CPU2')
+        self.cpu_3 = PokerCPU(self.deck, 0, 'CPU3')
         #a list of the cpus (so you can iterate through each
         self.cpus = [self.cpu_1, self.cpu_2, self.cpu_3]
         #a list of the cpus hands (useful for printing them)
@@ -441,8 +457,8 @@ class CasinoScreenManager:
         self.betting_round = 0
         #initializes the buttons
         fold_button = Button(self.screen_width * 0.61, self.screen_height / 2 + self.screen_height / 5, self.screen_width / 8, self.screen_height / 10, (255, 0, 0), 'Fold', 'CASINO', 40, (0, 0, 0))
-        check_button = Button(self.screen_width * 0.27, self.screen_height / 2 + self.screen_height / 5, self.screen_width / 8, self.screen_height / 10, (255, 0, 0), f'Call ({self.bet_amount})', 'CASINO', 40, (0, 0, 0))
-        raise_button = Button(self.screen_width * 0.27, self.screen_height / 2 + self.screen_height / 3, self.screen_width / 8, self.screen_height / 10, (255, 0, 0), f'Raise 10', 'CASINO', 40, (0, 0, 0))
+        call_button = Button(self.screen_width * 0.27, self.screen_height / 2 + self.screen_height / 5, self.screen_width / 8, self.screen_height / 10, (255, 0, 0), f'Call ({self.bet_amount})', 'CASINO', 40, (0, 0, 0))
+        raise_button = Button(self.screen_width * 0.27, self.screen_height / 2 + self.screen_height / 3, self.screen_width / 8, self.screen_height / 10, (255, 0, 0), f'Raise ({self.bet_amount})', 'CASINO', 40, (0, 0, 0))
         play_again_button = Button(self.screen_width * 0.7, self.screen_height / 6, self.screen_width / 5, self.screen_height / 5, (255, 0, 0), 'Play Again', 'CASINO', 40, (0, 0, 0))
         play_again_button.press = False
         poker_running = True
@@ -456,16 +472,17 @@ class CasinoScreenManager:
             pot = sum(bets)
             current_highest_bet = max(bets)
             bet_to_call = current_highest_bet - self.bet_amount
-            check_button.text = f'Call ({bet_to_call})'
+            call_button.text = f'Call ({bet_to_call})'
+            raise_button.text = f'Raise ({bet_to_call + 10})'
             for cpu in self.cpus:
                 if cpu.playing and not cpu.played:
                     cpu.bet, cpu.playing, cpu.played = self.cpu_play(cpu, current_highest_bet)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    poker_running = False
+                    return self.chips, None
                 if fold_button.check_button_click(event):
                     self.betting_round = 4
-                if check_button.check_button_click(event):
+                if call_button.check_button_click(event):
                     self.bet_amount += bet_to_call
                     self.betting_round += 1
                     for cpu in self.cpus:
@@ -479,7 +496,7 @@ class CasinoScreenManager:
                 if play_again_button.check_button_click(event):
                     self.poker_reset_game()
                     win_checked = False
-                    check_button.press = True
+                    call_button.press = True
                     raise_button.press = True
                     fold_button.press = True
                     play_again_button.press = False
@@ -493,7 +510,7 @@ class CasinoScreenManager:
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.45, self.screen_height * 0.32),f'Bet: {self.cpu_2.bet}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.76, self.screen_height * 0.59),f'Bet: {self.cpu_3.bet}', (255, 255, 255))
             fold_button.draw_button(self.surface)
-            check_button.draw_button(self.surface)
+            call_button.draw_button(self.surface)
             raise_button.draw_button(self.surface)
             if self.betting_round == 0:
                 self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 0)
@@ -510,12 +527,13 @@ class CasinoScreenManager:
             elif self.betting_round == 4:
                 self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 5)
                 play_again_button.press = True
-                check_button.press = False
+                call_button.press = False
                 raise_button.press = False
                 fold_button.press = False
                 if not win_checked:
-                    self.poker_check_win()
+                    winners = self.poker_check_win()
                     win_checked = True
+                self.print_winners(winners)
                 play_again_button.draw_button(self.surface)
                 self.print_cpu_hands(1, cpu_hands)
             else: self.betting_round = 0
