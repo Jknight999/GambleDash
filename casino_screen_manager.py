@@ -370,29 +370,29 @@ class CasinoScreenManager:
         btc = chb - cpu.bet
         random_num = random.random()
         if self.poker_hand_rankings[cpu.hand_value] < self.poker_hand_rankings[self.poker_player.hand_value]:
-            #will fold 80% if the time its down
-            if 0.1 < random_num < 0.8:
-                return cpu.bet, False
+            #will fold 50% if the time its down
+            if 0.1 < random_num < 0.6:
+                return cpu.bet, False, 'folded'
             #will raise 10% of the time its down (bluff)
             elif random_num <= 0.1:
                 cpu.bet += btc + 10
-                return cpu.bet, True
+                return cpu.bet, True, 'raised'
             # otherwise it will call
             else:
                 cpu.bet += btc
-                return cpu.bet, True
+                return cpu.bet, True, 'called'
         else:
             #will raise 30% of the time when its winning
             if random_num <= 0.3:
                 cpu.bet += btc + 10
-                return cpu.bet, True
+                return cpu.bet, True, 'raised'
             #will check 65% of the time
             elif 0.3 < random_num < 0.95:
                 cpu.bet += btc
-                return cpu.bet, True
+                return cpu.bet, True, 'checked'
             #will fold the rest of the time (to make it a little bit more fair)
             else:
-                return cpu.bet, False
+                return cpu.bet, False, 'folded (up)'
 
     #the cards argument is all the cards from every cpu hand
     def print_cpu_hands(self, showdown, cards):
@@ -432,8 +432,6 @@ class CasinoScreenManager:
             self.fonts[100].render_to(self.surface, (self.screen_width / 3 + index * self.screen_width / 10, self.screen_height / 2.7), f'{winner}',(255, 255, 255))
 
 
-
-
     def play_poker(self):
         #initializes the center cards
         self.community_cards = CommunityCards(self.deck)
@@ -441,19 +439,23 @@ class CasinoScreenManager:
         self.poker_player = PokerPlayer(self.deck, 0, 'Player')
         #immediately checks the value of the player hand
         self.poker_player.hand_value = self.check_poker_hands(self.poker_player.hand, self.community_cards.cards)
+
         #initializes the 3 cpus - cpu_1 is betting the small blind and cpu_3 is betting the big blind always
         self.cpu_1 = PokerCPU(self.deck, 5, 'CPU1')
         self.cpu_2 = PokerCPU(self.deck, 10, 'CPU2')
         self.cpu_3 = PokerCPU(self.deck, 0, 'CPU3')
+
         #a list of the cpus (so you can iterate through each
         self.cpus = [self.cpu_1, self.cpu_2, self.cpu_3]
-        #a list of the cpus hands (useful for printing them)
+
         #checks the value of each of the cpus hands
         for cpu in self.cpus:
             cpu.hand_value = self.check_poker_hands(cpu.hand, self.community_cards.cards)
+
         #sets your initial bet to 0 and the betting round to the 1st (pre-flop)
         self.poker_player.bet = 0
         self.betting_round = 0
+
         #initializes the buttons
         fold_button = Button(self.screen_width * 0.61, self.screen_height / 2 + self.screen_height / 5, self.screen_width / 8, self.screen_height / 10, (255, 0, 0), 'Fold', 'CASINO', 40, (0, 0, 0))
         call_button = Button(self.screen_width * 0.27, self.screen_height / 2 + self.screen_height / 5, self.screen_width / 8, self.screen_height / 10, (255, 0, 0), f'Call ({self.poker_player.bet})', 'CASINO', 40, (0, 0, 0))
@@ -472,24 +474,13 @@ class CasinoScreenManager:
         self.poker_player.played = False
 
         current_player_number = 0
+        cpu_thinking = False
+        cpu_think_end = None
+
+        bet_to_call = None
+        winners = None
 
         while poker_running:
-            bets = [self.poker_player.bet, self.cpu_1.bet, self.cpu_2.bet, self.cpu_3.bet]
-            pot = sum(bets)
-            active_bets = [player.bet for player in self.poker_players if player.playing]
-            current_highest_bet = max(bets)
-            bet_to_call = current_highest_bet - self.poker_player.bet
-            call_button.text = f'Call ({bet_to_call})'
-            raise_button.text = f'Raise ({bet_to_call + 10})'
-            current_player = self.poker_players[current_player_number]
-            if isinstance(current_player, PokerCPU):
-                if current_player.bet < current_highest_bet and current_player.playing:
-                    current_player.bet, current_player.playing = self.cpu_play(current_player, current_highest_bet)
-                current_player_number += 1
-            if len(set(active_bets)) == 1 and self.poker_player.played:
-                self.poker_player.played = False
-                self.betting_round += 1
-                print(self.betting_round)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return self.chips, None
@@ -517,18 +508,76 @@ class CasinoScreenManager:
                 if back_button.check_button_click(event):
                     return self.chips, True
 
-
             self.surface.fill((16, 82, 9))
+
+            current_time = pygame.time.get_ticks()
+
+            bets = [self.poker_player.bet, self.cpu_1.bet, self.cpu_2.bet, self.cpu_3.bet]
+            pot = sum(bets)
+            active_bets = [player.bet for player in self.poker_players if player.playing]
+
+            current_highest_bet = max(bets)
+            bet_to_call = current_highest_bet - self.poker_player.bet
+
+            call_button.text = f'Call ({bet_to_call})'
+            raise_button.text = f'Raise ({bet_to_call + 10})'
+
+            current_player = self.poker_players[current_player_number]
+
+            if isinstance(current_player, PokerCPU):
+                player_turn = False
+                if current_player.playing:
+                    if not self.poker_player.played:
+                        if not cpu_thinking:
+                            cpu_think_end = current_time + random.randint(1000, 1500)
+                            cpu_thinking = True
+                        if cpu_thinking and current_time > cpu_think_end:
+                            current_player.bet, current_player.playing, current_player.action = self.cpu_play(current_player, current_highest_bet)
+                            print('played')
+                            cpu_thinking = False
+                            current_player_number += 1
+                    else:
+                        if current_player.bet < current_highest_bet:
+                            if not cpu_thinking:
+                                cpu_think_end = current_time + random.randint(1000, 1500)
+                                cpu_thinking = True
+                        else: current_player_number += 1
+                        if cpu_thinking and current_time > cpu_think_end:
+                            current_player.bet, current_player.playing, current_player.action = self.cpu_play(current_player, current_highest_bet)
+                            print('played')
+                            cpu_thinking = False
+                            current_player_number += 1
+                else: current_player_number += 1
+            else: player_turn = True
+
+            if player_turn:
+                call_button.press = True
+                fold_button.press = True
+                raise_button.press = True
+                fold_button.draw_button(self.surface)
+                call_button.draw_button(self.surface)
+                raise_button.draw_button(self.surface)
+            else:
+
+                call_button.press = False
+                fold_button.press = False
+                raise_button.press = False
+
+            if len(set(active_bets)) == 1 and self.poker_player.played:
+                self.poker_player.played = False
+                self.betting_round += 1
+                print(self.betting_round)
+
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.47, self.screen_height * 0.83), f'Your Bet: {self.poker_player.bet}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.47, self.screen_height * 0.86), f'Your Chips: {self.chips}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.47, self.screen_height * 0.89), f'Your Hand: {self.poker_player.hand_value}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width / 15, self.screen_height / 3), f'Pot: {pot}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.2, self.screen_height * 0.59),f'Bet: {self.cpu_1.bet}', (255, 255, 255))
+            self.fonts[18].render_to(self.surface, (self.screen_width * 0.2, self.screen_height * 0.62),f'Action: {self.cpu_1.action}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.45, self.screen_height * 0.32),f'Bet: {self.cpu_2.bet}', (255, 255, 255))
+            self.fonts[18].render_to(self.surface, (self.screen_width * 0.45, self.screen_height * 0.35),f'Action: {self.cpu_2.action}', (255, 255, 255))
             self.fonts[18].render_to(self.surface, (self.screen_width * 0.76, self.screen_height * 0.59),f'Bet: {self.cpu_3.bet}', (255, 255, 255))
-            fold_button.draw_button(self.surface)
-            call_button.draw_button(self.surface)
-            raise_button.draw_button(self.surface)
+            self.fonts[18].render_to(self.surface, (self.screen_width * 0.76, self.screen_height * 0.62),f'Action: {self.cpu_3.action}', (255, 255, 255))
             if self.betting_round == 0:
                 self.print_community_cards(self.community_cards.cards, self.screen_width / 2, self.screen_height / 2.5, 5, 0)
                 self.print_cpu_hands(0, 0)
