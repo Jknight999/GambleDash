@@ -100,6 +100,7 @@ class PokerCPU:
         }
         self.hand_value = 'High Card'
         self.name = name
+        self.action = 'None'
 
 class PokerPlayer:
     def __init__(self, deck, starting_bet, name):
@@ -113,3 +114,4 @@ class PokerPlayer:
         }
         self.hand_value = 'High Card'
         self.name = name
+        self.action = 'None'
