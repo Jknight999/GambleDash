@@ -81,7 +81,7 @@ def draw_casino_screen():
     #handles screen background and text
     screen.fill((94, 6, 6))
     fonts.CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
-    pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
+    pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20), border_radius=20)
     place_chips_on_screen()
 
     screen.blit(casino_shark, (6.5 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 10))
@@ -154,6 +154,19 @@ def handle_loans():
     screen.blit(signature_surface, (0, 0))
     confirm_sign_button.draw_button(screen)
 
+def draw_shop_skins():
+    scan_x = SCREENWIDTH * 0.37
+    scan_y = SCREENHEIGHT * 0.18
+    for i in range(11):
+        skin = pygame.image.load(f"Assets/playerskin0{i+1}.png").convert_alpha()
+        skin = pygame.transform.scale(skin, (SCREENWIDTH / 16, SCREENHEIGHT / 8))
+        screen.blit(skin, (scan_x, scan_y))
+        scan_x += SCREENWIDTH * (1 / 16 + 0.02)
+        if (i + 1) % 4 == 0:
+            scan_y += SCREENHEIGHT * (0.3925 / 3 + 0.08)
+            scan_x = SCREENWIDTH * 0.37
+    screen.blit(shop_border, ((scan_x - SCREENWIDTH * 0.0085) , (scan_y - SCREENHEIGHT * 0.027)))
+
 def draw_shop_screen():
     screen.fill((8, 123, 255))
     place_chips_on_screen()
@@ -161,9 +174,10 @@ def draw_shop_screen():
     if loan_out:
         pay_loan_button.draw_button(screen)
     else:
-        pygame.draw.rect(screen, (0, 85, 210), (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.15, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.6))
+        pygame.draw.rect(screen, (0, 85, 210), (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.15, SCREENWIDTH * 0.6, SCREENHEIGHT * 0.6), border_radius=20)
         chip_mult_button.draw_button(screen)
         skin_change_button.draw_button(screen)
+        draw_shop_skins()
         player_skin = pygame.image.load(f"Assets/playerskin0{game_screen.skin_num}.png").convert_alpha()
         player_skin = pygame.transform.scale(player_skin, (SCREENHEIGHT / 5, SCREENHEIGHT / 5))
         screen.blit(player_skin, (skin_change_button.x + skin_change_button.w + 20, 3 * SCREENHEIGHT / 6))
@@ -194,6 +208,9 @@ try:
 except AttributeError:
     SCREENWIDTH = 1920
 SCREENHEIGHT = SCREENWIDTH * 0.5
+print(SCREENWIDTH)
+print(SCREENHEIGHT)
+
 #where the top of the floor is (for collision physics principles)
 GROUND_Y = math.floor(0.9 * SCREENHEIGHT)
 
@@ -219,7 +236,7 @@ continue_button = Button(SCREENWIDTH * 0.4, SCREENHEIGHT * 0.25, SCREENWIDTH * 0
 confirm_sign_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4, SCREENHEIGHT / 5, (80, 200, 120), 'Confirm', 'GD', 40, (0, 0, 0))
 chip_mult_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
 chip_mult_button.press = False
-skin_change_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4, SCREENHEIGHT / 5, (0,0,255), 'Change Skin (1,000)', 'GD', 32, (255,255,255))
+skin_change_button = Button(SCREENWIDTH * 0.105, SCREENHEIGHT * 0.54, SCREENWIDTH * 0.25, SCREENHEIGHT * 0.2, (0,0,255), 'Change Skin (1,000)', 'GD', 32, (255,255,255))
 skin_change_button.press = False
 pay_loan_button = Button(10, SCREENHEIGHT / 2, SCREENWIDTH - 20, SCREENHEIGHT / 2, (255,0,0), 'Pay Back Loan (1,100)', 'GD', 100, (255,255,255))
 pay_loan_button.press = False
@@ -254,6 +271,8 @@ casino_icon = pygame.image.load("Assets/casinoicon.png").convert_alpha()
 casino_icon = pygame.transform.scale(casino_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
 shop_icon = pygame.image.load("Assets/shopicon.png").convert_alpha()
 shop_icon = pygame.transform.scale(shop_icon, (SCREENWIDTH * 0.1, SCREENHEIGHT * 0.2))
+shop_border = pygame.image.load("Assets/shopborder.png").convert_alpha()
+shop_border = pygame.transform.scale(shop_border, (SCREENWIDTH / 10, SCREENHEIGHT / 5))
 block = pygame.image.load("Assets/gambledashblock.png").convert_alpha()
 block = pygame.transform.scale(block, (SCREENWIDTH / 20, SCREENHEIGHT / 10))
 spike = pygame.image.load("Assets/spike.png").convert_alpha()
@@ -421,7 +440,6 @@ while running:
         game_screen.tick(player)
         if not game_screen.player_alive:
             chips += game_screen.run_chips * game_screen.chip_multiplier
-            transition_screens(draw_death_screen)
             in_game = False
             in_death_screen = True
 
