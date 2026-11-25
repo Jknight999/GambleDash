@@ -16,7 +16,28 @@ pygame.init()
 pygame.mixer.init()
 pygame.freetype.init()
 
-def draw_menu_bg():
+def place_chips_on_screen():
+    # takes the players chips and renders it to the screen
+    chip_text = str(chips)
+    text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
+    text_rect.right = SCREENWIDTH * 0.95 - 40
+    text_rect.bottom = 85
+
+    # makes a rectangle and places it based off of the text rect
+    border_rect = pygame.Rect(100, 100, 100, 100)
+    border_rect.width = text_rect.width + 60
+    border_rect.right = SCREENWIDTH * 0.95
+    border_rect.height = 30 + text_rect.height
+    border_rect.bottom = text_rect.bottom + 15
+
+    # draws it and adds a border
+    pygame.draw.rect(screen, (0, 0, 0), border_rect, border_radius=20)
+    pygame.draw.rect(screen, (255, 255, 255), border_rect, width=2, border_radius=20)
+
+    fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
+    screen.blit(chips_icon, (SCREENWIDTH * 0.95 - 30, 30))
+
+def draw_screen_bg():
     screen.blit(bg, (0, 0))
     pygame.draw.rect(screen, floor_color, (0, GROUND_Y, SCREENWIDTH, SCREENHEIGHT - GROUND_Y))
 
@@ -44,27 +65,9 @@ def draw_menu_bg():
         scan_x = 0
 
 def draw_menu_screen():
-    draw_menu_bg()
+    draw_screen_bg()
 
-    #takes the players chips and renders it to the screen
-    chip_text = str(chips)
-    text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
-    text_rect.right = SCREENWIDTH * 0.95 - 40
-    text_rect.bottom = 85
-
-    #makes a rectangle and places it based off of the text rect
-    border_rect = pygame.Rect(100, 100, 100, 100)
-    border_rect.width = text_rect.width + 60
-    border_rect.right = SCREENWIDTH * 0.95
-    border_rect.height = 30 + text_rect.height
-    border_rect.bottom = text_rect.bottom + 15
-
-    #draws it and adds a border
-    pygame.draw.rect(screen, (0, 0, 0), border_rect, border_radius=20)
-    pygame.draw.rect(screen, (255, 255, 255), border_rect, width=2, border_radius=20)
-
-    fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
-    screen.blit(chips_icon, (SCREENWIDTH * 0.95 - 30, 30))
+    place_chips_on_screen()
 
     #draws play and casino buttons
     play_button.draw_button(screen)
@@ -79,7 +82,9 @@ def draw_casino_screen():
     screen.fill((94, 6, 6))
     fonts.CASINO_FONTS[50].render_to(screen, (SCREENWIDTH / 15, SCREENHEIGHT / 7), 'Casino', (255, 255, 255))
     pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREENWIDTH, SCREENHEIGHT), width=math.floor(SCREENWIDTH / 20))
-    
+    place_chips_on_screen()
+
+    screen.blit(casino_shark, (6.5 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 10))
     #draws back, blackjack, and poker buttons
     back_button.draw_button(screen)
     blackjack_button.draw_button(screen)
@@ -99,19 +104,18 @@ def draw_game_screen():
         text_rect.right = SCREENWIDTH - 30
         fonts.GD_FONTS[50].render_to(screen, text_rect, text, (255, 255, 255))
 
-def draw_death_screen(chipnum):
+def draw_death_screen():
     if not game_screen.player_alive:
+        draw_screen_bg()
         #resets run chips and renders chips to the screen
         game_screen.run_chips = 0
-        chip_text = str(chipnum)
-        text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
-        text_rect.right = SCREENWIDTH - 70
-        fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))
-        screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
+
+        place_chips_on_screen()
         
         #draws back, continue, and casino buttons
         back_button.draw_button(screen)
         continue_button.draw_button(screen)
+        screen.blit(play_icon, (SCREENWIDTH * 0.4475, SCREENHEIGHT * 0.285))
         casino_button.draw_button(screen)
         screen.blit(casino_icon, (SCREENWIDTH * 0.6875, SCREENHEIGHT * 0.3125))
         shop_button.draw_button(screen)
@@ -152,13 +156,7 @@ def handle_loans():
 
 def draw_shop_screen():
     screen.fill((0,128,0))
-
-    #takes the players chips and renders it to the screen
-    chip_text = str(chips)
-    text_rect = fonts.GD_FONTS[50].get_rect(chip_text)
-    text_rect.right = SCREENWIDTH - 70
-    fonts.GD_FONTS[50].render_to(screen, text_rect, chip_text, (255, 255, 255))  
-    screen.blit(chips_icon, (SCREENWIDTH - 60, 30))
+    place_chips_on_screen()
 
     if loan_out:
         pay_loan_button.draw_button(screen)
@@ -169,9 +167,10 @@ def draw_shop_screen():
         player_skin = pygame.transform.scale(player_skin, (SCREENHEIGHT / 5, SCREENHEIGHT / 5))
         screen.blit(player_skin, (skin_change_button.x + skin_change_button.w + 20, 3 * SCREENHEIGHT / 6))
         fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 3, chip_mult_button.y + chip_mult_button.h - 30), f'Currently  {game_screen.chip_multiplier}', (255, 255, 255))
+    screen.blit(shop_shark, (6.5 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 10))
     back_button.draw_button(screen)
 
-def transition_screens(next_screen_draw_function):
+def transition_screens(next_screen):
     transition_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT))
     transition_surface.fill((0, 0, 0))
 
@@ -182,7 +181,7 @@ def transition_screens(next_screen_draw_function):
         pygame.time.delay(15)
 
     for alpha in range(255, -1, -15):
-        next_screen_draw_function()
+        next_screen()
         transition_surface.set_alpha(alpha)
         screen.blit(transition_surface)
         pygame.display.flip()
@@ -215,7 +214,7 @@ shop_button = Button(SCREENWIDTH * 0.2, SCREENHEIGHT * 0.3, SCREENWIDTH * 0.15, 
 back_button = Button(SCREENHEIGHT / 20, SCREENWIDTH / 40, SCREENHEIGHT / 10, SCREENWIDTH / 20, (14, 237, 70), 'X', "GD", 24, (245, 200, 76))
 blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Blackjack', 'CASINO', 40, (0, 0, 0))
 poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Poker', 'CASINO', 40, (0, 0, 0))
-continue_button = Button(SCREENWIDTH * 0.375, SCREENHEIGHT * 0.3, SCREENWIDTH / 4, SCREENHEIGHT / 5, (14, 237, 70), 'Continue for 50 Chips?', 'GD', 32, (0, 0, 0))
+continue_button = Button(SCREENWIDTH * 0.4, SCREENHEIGHT * 0.25, SCREENWIDTH * 0.2, SCREENHEIGHT * 0.4, (14, 237, 70), 'Continue', 'GD', 50, (0, 0, 0))
 confirm_sign_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4, SCREENHEIGHT / 5, (80, 200, 120), 'Confirm', 'GD', 40, (0, 0, 0))
 chip_mult_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
 chip_mult_button.press = False
@@ -225,7 +224,7 @@ pay_loan_button = Button(10, SCREENHEIGHT / 2, SCREENWIDTH - 20, SCREENHEIGHT / 
 pay_loan_button.press = False
 
 floor_color = [0,42,124]
-chips = 10
+chips = 1000
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None
@@ -244,6 +243,10 @@ bank = pygame.image.load("Assets/bank.png").convert_alpha()
 bank = pygame.transform.scale(bank, (3 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 5))
 loan_shark = pygame.image.load("Assets/loanshark.png").convert_alpha()
 loan_shark = pygame.transform.scale(loan_shark, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
+shop_shark = pygame.image.load("Assets/shopshark.png").convert_alpha()
+shop_shark = pygame.transform.scale(shop_shark, (SCREENWIDTH * 0.4, SCREENHEIGHT * 0.8))
+casino_shark = pygame.image.load("Assets/casinoshark.png").convert_alpha()
+casino_shark = pygame.transform.scale(casino_shark, (SCREENWIDTH * 0.4, SCREENHEIGHT * 0.8))
 play_icon = pygame.image.load("Assets/playicon.png").convert_alpha()
 play_icon = pygame.transform.scale(play_icon, (SCREENWIDTH * 0.15, SCREENHEIGHT * 0.3))
 casino_icon = pygame.image.load("Assets/casinoicon.png").convert_alpha()
@@ -417,7 +420,7 @@ while running:
         game_screen.tick(player)
         if not game_screen.player_alive:
             chips += game_screen.run_chips * game_screen.chip_multiplier
-            draw_game_screen()
+            transition_screens(draw_death_screen)
             in_game = False
             in_death_screen = True
 
@@ -426,7 +429,7 @@ while running:
     elif in_menu:
         draw_menu_screen()
     elif in_death_screen:
-        draw_death_screen(chips)
+        draw_death_screen()
     elif in_loan_screen:
         # plays music when entering the loan screen
         if not pygame.mixer.music.get_busy():
