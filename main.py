@@ -183,7 +183,7 @@ def draw_shop_screen():
         player_skin = pygame.image.load(f"Assets/playerskin0{game_screen.skin_num}.png").convert_alpha()
         player_skin = pygame.transform.scale(player_skin, (SCREENWIDTH / 8, SCREENHEIGHT / 4))
         screen.blit(player_skin, (SCREENWIDTH * 0.1675, SCREENHEIGHT * 0.22))
-        fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 4, chip_mult_button.y + chip_mult_button.h - 30), f'Currently: x{game_screen.chip_multiplier} Chips', (255, 255, 255))
+        fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 3.5, chip_mult_button.y + chip_mult_button.h - 30), f'Currently: x{game_screen.chip_multiplier} Chips', (255, 255, 255))
     screen.blit(shop_shark, (6.5 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 10))
     back_button.draw_button(screen)
 
