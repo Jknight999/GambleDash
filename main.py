@@ -184,7 +184,7 @@ def draw_shop_screen():
         player_skin = pygame.transform.scale(player_skin, (SCREENWIDTH / 8, SCREENHEIGHT / 4))
         screen.blit(player_skin, (SCREENWIDTH * 0.1675, SCREENHEIGHT * 0.22))
         fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 3.5, chip_mult_button.y + chip_mult_button.h - 30), f'Currently: x{game_screen.chip_multiplier} Chips', (255, 255, 255))
-    screen.blit(shop_shark, (6.5 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 10))
+        screen.blit(shop_shark, (6.5 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 10))
     back_button.draw_button(screen)
 
 def transition_screens(next_screen):
@@ -244,7 +244,7 @@ pay_loan_button = Button(10, SCREENHEIGHT / 2, SCREENWIDTH - 20, SCREENHEIGHT / 
 pay_loan_button.press = False
 
 floor_color = [0,42,124]
-chips = 100000000
+chips = 40
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None
