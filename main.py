@@ -4,6 +4,7 @@ import pygame.freetype
 import math
 import fonts
 import random
+import json
 
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
@@ -244,7 +245,6 @@ pay_loan_button = Button(10, SCREENHEIGHT / 2, SCREENWIDTH - 20, SCREENHEIGHT / 
 pay_loan_button.press = False
 
 floor_color = [0,42,124]
-chips = 40
 signature_surface = pygame.Surface((SCREENWIDTH, SCREENHEIGHT), pygame.SRCALPHA)
 drawing = False
 last_signature_pos = None
@@ -252,6 +252,18 @@ voice_line_num = 1
 current_voice_line = voice_lines[voice_line_num]
 player_state = "cube"
 game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor_color, GROUND_Y, bg, player_state)
+
+# Loads the save file, if there is one
+try:
+    with open("player_data.txt") as save_file:
+        save_data = json.load(save_file)
+        chips = save_data[0]
+        game_screen.chip_multiplier = save_data[1]
+        game_screen.skin_num = save_data[2]
+except FileNotFoundError:
+    # chip_multiplier and skin_num are set in game screen init so not here
+    chips = 1000
+
 casino_screen = CasinoScreenManager(screen, chips, SCREENWIDTH, SCREENHEIGHT)
 
 # Loads and scales all the images that never change
@@ -297,6 +309,9 @@ while running:
     for event in pygame.event.get():
         #quit events
         if event.type == pygame.QUIT:
+            save_data = [chips, game_screen.chip_multiplier, game_screen.skin_num]
+            with open("player_data.txt", "w") as save_file:
+                json.dump(save_data, save_file)
             running = False
             
         if in_loan_screen:
