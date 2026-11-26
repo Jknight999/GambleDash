@@ -165,7 +165,9 @@ def draw_shop_skins():
         if (i + 1) % 4 == 0:
             scan_y += SCREENHEIGHT * (0.3925 / 3 + 0.08)
             scan_x = SCREENWIDTH * 0.37
-    screen.blit(shop_border, ((scan_x - SCREENWIDTH * 0.0085) , (scan_y - SCREENHEIGHT * 0.027)))
+    scan_x = SCREENWIDTH * 0.37
+    scan_y = SCREENHEIGHT * 0.18
+    screen.blit(shop_border, (scan_x + ((game_screen.skin_num - 1) % 4) * SCREENWIDTH * (1 / 16 + 0.02) - SCREENWIDTH * 0.0085, scan_y + ((game_screen.skin_num - 1) // 4) * (SCREENHEIGHT * (0.3925 / 3 + 0.08)) - SCREENHEIGHT * 0.0275))
 
 def draw_shop_screen():
     screen.fill((8, 123, 255))
@@ -179,8 +181,8 @@ def draw_shop_screen():
         skin_change_button.draw_button(screen)
         draw_shop_skins()
         player_skin = pygame.image.load(f"Assets/playerskin0{game_screen.skin_num}.png").convert_alpha()
-        player_skin = pygame.transform.scale(player_skin, (SCREENHEIGHT / 5, SCREENHEIGHT / 5))
-        screen.blit(player_skin, (skin_change_button.x + skin_change_button.w + 20, 3 * SCREENHEIGHT / 6))
+        player_skin = pygame.transform.scale(player_skin, (SCREENWIDTH / 8, SCREENHEIGHT / 4))
+        screen.blit(player_skin, (SCREENWIDTH * 0.1675, SCREENHEIGHT * 0.22))
         fonts.GD_FONTS[24].render_to(screen, (chip_mult_button.x + chip_mult_button.w / 4, chip_mult_button.y + chip_mult_button.h - 30), f'Currently: x{game_screen.chip_multiplier} Chips', (255, 255, 255))
     screen.blit(shop_shark, (6.5 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 10))
     back_button.draw_button(screen)
@@ -234,7 +236,7 @@ blackjack_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 2, SCREENWIDTH / 3, SC
 poker_button = Button(SCREENWIDTH / 3, SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (255, 0, 0), 'Poker', 'CASINO', 40, (0, 0, 0))
 continue_button = Button(SCREENWIDTH * 0.4, SCREENHEIGHT * 0.25, SCREENWIDTH * 0.2, SCREENHEIGHT * 0.4, (14, 237, 70), 'Continue', 'GD', 50, (0, 0, 0))
 confirm_sign_button = Button(SCREENWIDTH / 15, SCREENHEIGHT / 2, SCREENWIDTH / 4, SCREENHEIGHT / 5, (80, 200, 120), 'Confirm', 'GD', 40, (0, 0, 0))
-chip_mult_button = Button(SCREENWIDTH / 15, 3 * SCREENHEIGHT / 4, SCREENWIDTH / 3, SCREENHEIGHT / 5, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
+chip_mult_button = Button(SCREENWIDTH * 0.25, SCREENHEIGHT * 0.8, SCREENWIDTH * 0.4, SCREENHEIGHT * 0.15, (0,0,255), '+1 Chip Mult (10,000)', 'GD', 40, (255,255,255))
 chip_mult_button.press = False
 skin_change_button = Button(SCREENWIDTH * 0.105, SCREENHEIGHT * 0.54, SCREENWIDTH * 0.25, SCREENHEIGHT * 0.2, (0,0,255), 'Change Skin (1,000)', 'GD', 32, (255,255,255))
 skin_change_button.press = False
