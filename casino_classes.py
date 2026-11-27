@@ -102,6 +102,9 @@ class PokerCPU:
         self.name = name
         self.action = 'None'
 
+    def __repr__(self):
+        return self.name
+
 class PokerPlayer:
     def __init__(self, deck, starting_bet, name):
         self.hand = [deck.deal(), deck.deal()]
@@ -115,3 +118,6 @@ class PokerPlayer:
         self.hand_value = 'High Card'
         self.name = name
         self.action = 'None'
+
+    def __repr__(self):
+        return self.name
