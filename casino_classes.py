@@ -117,7 +117,7 @@ class PokerPlayer:
         }
         self.hand_value = 'High Card'
         self.name = name
-        self.action = 'None'
+        self.action = ' '
 
     def __repr__(self):
         return self.name
