@@ -5,6 +5,7 @@ import math
 import fonts
 import random
 import json
+from time import sleep
 
 from game_classes import Player, Button
 from game_screen_manager import GameScreenManager
@@ -257,9 +258,24 @@ game_screen = GameScreenManager(screen, player, SCREENWIDTH, SCREENHEIGHT, floor
 try:
     with open("player_data.txt") as save_file:
         save_data = json.load(save_file)
-        chips = save_data[0]
-        game_screen.chip_multiplier = save_data[1]
-        game_screen.skin_num = save_data[2]
+        # This if statement is probably the dumbest feature in the game
+        # Basically makes it annoying to tamper with the save data
+        if save_data[3] == (save_data[0] * 31 + save_data[1] * 7919 + save_data[2] * 104729) % 1000003:
+            chips = save_data[0]
+            game_screen.chip_multiplier = save_data[1]
+            game_screen.skin_num = save_data[2]
+        else:
+            chips = 0
+            screen.fill(0)
+            sad_shark = pygame.image.load("Assets/casinoshark.png").convert_alpha()
+            sad_shark = pygame.transform.scale(sad_shark, (4 * SCREENWIDTH / 10, 4 * SCREENHEIGHT / 5))
+            screen.blit(sad_shark, (6.5 * SCREENWIDTH / 10, 3 * SCREENHEIGHT / 10))
+            fonts.GD_FONTS[50].render_to(screen, (SCREENWIDTH/8, SCREENHEIGHT/2), "I am disappointed in your cheating.", (255, 255, 255))
+            pygame.event.pump()
+            pygame.display.flip()
+            sleep(2)
+            quit()
+
 except FileNotFoundError:
     # chip_multiplier and skin_num are set in game screen init so not here
     chips = 1000
@@ -309,9 +325,6 @@ while running:
     for event in pygame.event.get():
         #quit events
         if event.type == pygame.QUIT:
-            save_data = [chips, game_screen.chip_multiplier, game_screen.skin_num]
-            with open("player_data.txt", "w") as save_file:
-                json.dump(save_data, save_file)
             running = False
             
         if in_loan_screen:
@@ -481,3 +494,9 @@ while running:
         draw_shop_screen()
 
     pygame.display.flip()
+
+# Saves the game when it ends
+save_hash = (chips * 31 + game_screen.chip_multiplier * 7919 + game_screen.skin_num * 104729) % 1000003
+save_data = [chips, game_screen.chip_multiplier, game_screen.skin_num, save_hash]
+with open("player_data.txt", "w") as save_file:
+    json.dump(save_data, save_file)
